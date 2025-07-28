@@ -11,6 +11,9 @@
 |Update()|프레임마다 호출(1초에 약 60번)|프로그램 내에서 핵심적으로 자주 사용되는 메인 로직을 짤 때 사용되며, 가장 많이 사용되는 영역|계산에 대한 보정 값, 키 입력 기반 움직임 등의 정규화/단위 벡터를 이용한 작업 처리
 |FixedUpdate()|프레임마다 호출되는 것이 아닌, Fixed TimeStep이라는 설정 값에 의해 호출(default: 0.02초)|일정한 발생 주기가 보장되어야 하는 로직을 구현할 때 사용|물리 연산(Rigidbody)이 적용된 오브젝트에 대한 조정|
 |LateUpdate()|모든 Update 함수(Update, FixedUpdate)가 호출된 이후 마지막으로 호출|후처리 작업에 사용|렌더링 이후 동작하는 카메라 처리와 같은 후처리 작업|
+
+[이벤트 함수의 실행 순서](https://docs.unity3d.com/kr/current/Manual/ExecutionOrder.html)
+
 <br>
 
 ## 오브젝트 캐싱(Object Cashing)
