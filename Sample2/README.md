@@ -58,6 +58,31 @@ public class Sample3 : MonoBehaviour
 > 3. 벡터에 대한 계산 보조 기능이 많이 제공됩니다.(magnitude, normalize, Dot, Cross, ...)
 > 4. 벡터는 스택(stack) 영역의 메모리에서 저장됩니다.
 
+#### 벡터 생성
+기본 벡터 생성
+```cs
+Vector3 vector = new Vector3();
+```
+<br>
+
+x,y,z 축 값을 지정해 생성하는 벡터
+```cs
+Vector3 vector = new Vector3(float x, float y, float z);
+```
+<br>
+
+방향 벡터(유니티에서 제공하는 기본 벡터)
+|방향 벡터|값|
+|------|---|
+|Vector3.up|(0,1,0)|
+|Vector3.down|(0,-1,0)|
+|Vector3.left|(-1,0,0)|
+|Vector3.right|(1,1,0)|
+|Vector3.forward|(0,0,1)|
+|Vector3.back|(0,0,-1)|
+|Vector3.one|(1,1,1)|
+<br>
+
 #### 값(Value) vs 참조(Reference)
 > 값: 변수에 데이터가 직접 저장되는 경우
 > > ex) int a = 5;
