@@ -117,10 +117,20 @@ Vector3 vector = new Vector3(float x, float y, float z);
 #### Lerp와 Slerp
 > Lerp: 직선 이동
 > > 체력 게이지 등이 일정하게 변화하는 경우
+```cs
+transform.position = Vector3.Lerp(start_position, target.position, t);
+```
+start_position -> target.position까지 t에 따라 선형 보간(일정 간격 천천히 직선 이동)합니다.
+<br><br>
 
 > Slerp: 곡선 이동
 > > 회전이나 각도의 개념이 필요한 경우<br>
 > > 3D 회전(쿼터니언) / 벡터 간의 곡선 경로 확인 / 방향 회전이 부드럽게 대상 방향을 바라봐야 할 경우
+```cs
+transform.position = Vector3.Slerp(start_position, target.position, t);
+```
+start_position -> target.position까지 t에 따라 구면 선형 보간(일정 간격 천천히 곡선 이동)합니다.
+<br><br>
 
 #### Lerp와 Slerp가 사용되는 경우
 1. 단순한 위치 이동? -> Lerp
