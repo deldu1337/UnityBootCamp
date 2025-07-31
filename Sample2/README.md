@@ -1,6 +1,7 @@
 # 유니티 스크립트 예제
 ***
 ## 유니티의 생명주기
+***
 > 유니티에서는 프로그램의 실행부터 종료까지의 작업 영역을 함수로 제공합니다.
 
 |제목|내용|설명|역할|
@@ -17,6 +18,7 @@
 <br>
 
 ## 오브젝트 캐싱(Object Cashing)
+***
 ### 캐시(Cashe): 자주 사용되는 데이터나 값을 미리 복사해두는 임시 저장소
 #### 캐시 사용 의도
 > 1. 시간 지역성: 가장 최근에 사용된 값이 다시 사용될 가능성이 높다.
@@ -45,6 +47,7 @@ public class Sample3 : MonoBehaviour
 <br>
 
 ## 유니티의 벡터
+***
 ### 벡터(Vector): 벡터는 크기와 방향을 가진 물리량으로 유니티에서 위치(Position), 이동(Movement), 방향(Direction), 힘(Force)등을 표현할 때 사용합니다.
 #### 벡터의 요소
 > 1. X: X축의 값
@@ -136,3 +139,337 @@ start_position -> target.position까지 t에 따라 구면 선형 보간(일정 
 1. 단순한 위치 이동? -> Lerp
 2. 회전 및 방향 전환? -> Slerp(Vector3.Slerp, Quaternion.Slerp)
 3. 자연스러운 카메라의 움직임? -> Slerp
+
+## 유니티의 특성(Attribute)
+***
+### 유니티의 Attribute는 코드 메타 데이터를 제공하거나 유니티 에디터와 런타임 동작을 제어할 때 사용됩니다.
+|Attribute|설명|
+|------|---|
+|SerializeField|직렬화|
+|HideInInspector|인스펙터에서 숨김|
+|Range(min,max)|슬라이더로 표현|
+|Tooltip("")|마우스 오버 시 설명 표시|
+|Header("")|섹션 헤더 표시|
+|Space(float)|공백 추가하기|
+|TextArea(min, max)|멀티라인 텍스트 입력으로 표시|
+|Multiline(lines)|직렬화|
+|ContextMenu("")|인스펙터에서 숨김|
+|ContextMenuItem("","")|슬라이더로 표현|
+|RequireComponent(typeof(T))|마우스 오버 시 설명 표시|
+|AddComponentMenu("/")|섹션 헤더 표시|
+|Default Execution Order(int order)|공백 추가하기|
+
+#### 사용 목적
+사용자가 에디터를 더 직관적으로, 편의적으로 사용하기 위해서<br>
+
+### 에디터 속성
+#### AddComponentMenu("그룹이름/기능이름")
+Editor의 Component에 메뉴를 추가하는 기능
+```cs
+public class MenuAttributes : MonoBehaviour
+{
+    [ContextMenuItem("메시지 초기화","MessageReset")]
+    public string message = "";
+    public void MessageReset()
+    {
+        message = "";
+    }
+
+    [ContextMenu("경고 메시지 호출")]
+    public void MenuAttributesMethod()
+    {
+        Debug.LogWarning("경고 메시지!");
+    }
+}
+```
+> [ContextMenuItem("기능으로 표현할 이름", "함수의 이름")]<br>
+> message를 대상으로 MessageReset 기능을 에디터로서 사용할 수 있습니다.
+```cs
+[ContextMenuItem("메시지 초기화","MessageReset")] public string message = "";
+```
+> 위처럼 ContextMenuItem은 필드 값이기 때문에 뒤에 값이 붙여있는 것과 동일합니다.
+
+#### [ExecuteInEditMode]
+Play를 누르지 않아도 Editor 내에서 Update 등에 설계한 기능들을 실행해 볼 수 있습니다.
+```cs
+[ExecuteInEditMode]
+public class EditMenuSample : MonoBehaviour
+{
+    void Update()
+    {
+        // 에디터에서만 실행해보는 코드
+        if(!Application.isPlaying)
+        {
+            // 현재 오브젝트 y축을 0으로 고정하는 코드
+            Vector3 pos = transform.position;
+            pos.y = 0;
+            transform.position = pos;
+            Debug.Log("Editor Test...(이 스크립트를 낀 오브젝트는 y축이 0으로 고정됩니다.)");
+        }
+    }
+}
+```
+
+### 인스펙터 속성
+#### [Serializable]
+직렬화(Serialization): 데이터를 저장 가능한 형식으로 변환하는 작업
+```cs
+[Serializable]
+public class Items
+{
+    public string name;
+    public string description;
+}
+```
+> 이 변환을 통해 Scene, Prefab, Asset 등에 저장하고 복원하는 작업을 수행할 수 있습니다.
+
+**직렬화 조건**
+1. public 혹은 [SerializeField]
+2. static이 아닌 경우
+3. 직렬화 가능한 데이터 타입인 경우
+
+**직렬화가 가능한 데이터**
+1. 기본 데이터(int, float, bool, string, ...)
+2. 유니티에서 제공해주는 구조체(Vector3, Quaternion, Color)
+3. 유니티 객체 참조(GameObject, Transform, Material)
+4. [Serializable] 속성이 붙은 클래스
+5. 배열 / 리스트
+
+**직렬화 불가능한 데이터**
+1. Dictionary<K,V>
+2. Interface (인터페이스)
+3. static 키워드가 붙은 필드
+4. abstract(추상 클래스) 키워드가 붙은 필드
+
+#### [HideInInspector]
+인스펙터에 공개하기 싫은 값에 대한 설정
+```cs
+[HideInInspector]
+public int value = 5;
+```
+
+#### [Space()]
+Space(수치): 해당 수치만큼 높이 간격 설정
+```cs
+[Space(30)]
+```
+
+#### [TextArea()]
+TextArea(기본 표시 줄, 최대 줄): 긴 문자열을 여러 줄로 적을 수 있는 설정
+```cs
+[TextArea(5,10)]
+```
+#### 유니티에서의 Struct와 Class
+**Struct**
+GC 필요 없음(작은 데이터의 묶음을 자주 할당/복사하는 개념에서 활용 ex. Vector3)
+<br>
+**Class**
+객체를 위한 설계도(속성과 기능) / 유니티에서는 class 사용 권장(안정성이 높음)
+
+#### 인스펙터 속성 예시 코드
+```cs
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
+
+public enum Job
+{
+    전사,
+    도적,
+    궁수,
+    마법사
+}
+
+[Serializable]
+public class Player
+{
+    public string name;
+    public Job job;
+    public int HP;
+    public int MP;
+    public int ATK;
+    public int INT;
+    public int DEX;
+    [HideInInspector]
+    private int gold;
+}
+
+[Serializable]
+public class Item
+{
+    public string name;
+    public int level;
+    public int HP;
+    public int MP;
+    public int ATK;
+    public int INT;
+    public int DEX;
+    public int sell;
+}
+
+public class PlayerStat : MonoBehaviour
+{
+    public Player player = new Player();
+
+    [Space(10)]
+    [Header("Infomation")]
+    public int level;
+    public int exp;
+
+    [Space(20)]
+    [TextArea(5, 10)]
+    public string intro;
+
+    [Space(20)]
+    public List<Item> item;
+
+    [Space(10)]
+    [Header("Setting")]
+    [Range(0, 100)] public int sound;
+    [Range(0, 100)] public float mouse;
+    [Range(0, 100)] public int FieidOfVision;
+}
+```
+
+## 유니티의 입력 시스템
+***
+### 입력 관리자(Input Manager)
+Edit -> Project Settings -> Input을 통해 확인할 수 있습니다.
+#### 입력 문법
+Axes 키에 대한 입력(인풋 매니저에 설정되어있는 키에 대한 입력을 받을 수 있습니다.)<br>
+음수는 negative, 양수는 positive
+|이름|설명|
+|------|---|
+|Input.GetAxis("키 이름")|-1 ~ 1까지의 실수를 반환합니다.|
+|Input.GetAxisRaw("키 이름")|-1, 1, 0을 반환합니다.|
+<br>
+Button에 대한 입력(KeyCode를 사용합니다.)
+
+|이름|설명|
+|------|---|
+|Input.GetButton("버튼 이름")|마우스 버튼이 눌렸는지를 확인합니다.|
+|Input.GetMouseButtonDown()|마우스 버튼이 처음 눌렀을 때를 확인합니다.|
+|Input.GetMouseButtonUp()|마우스 버튼이 떼어졌을 때를 확인합니다.|
+|Input.mousePosition|마우스의 화면 내의 위치를 얻습니다.|
+<br>
+마우스 입력( 0 : 왼쪽 1: 오른쪽 2: 중앙(휠) )
+
+|이름|설명|
+|------|---|
+|Input.GetMouseButton()|마우스 버튼이 눌렸는지를 확인합니다.|
+|Input.GetMouseButtonDown()|마우스 버튼이 처음 눌렀을 때를 확인합니다.|
+|Input.GetMouseButtonUp()|마우스 버튼이 떼어졌을 때를 확인합니다.|
+|Input.mousePosition|마우스의 화면 내의 위치를 얻습니다.|
+
+### Unity Input System
+유니티 2019 버전 이후부터 New Input System을 새로 만들어 해당 시스템을 사용합니다. 현재의 legacy 코드는 
+기존과의 호환성, 간단한 기능 구현에 사용됩니다.
+이전 버전에서는 패키지 매니저에 따라 Input System을 별도로 설치해야 하며, 현재의 버전에서는 자동으로 설치가 
+되어있습니다.
+1. 멀티 플랫폼 지원(다양한 디바이스에서 동일한 코드로 입력 보장)
+2. 동적 입력 바인딩(사용자가 게임 내에서 키 매핑 수정 가능)
+3. 이벤트 기반의 입력(기존의 레거시는 폴링 방식, 현재의 인풋 시스템은 이벤트 기반)
+4. 입력 액션 시스템(액션을 통해 다양한 입력에 대한 처리를 한 곳에서 관리 가능)
+
+#### 기존 시스템과의 성능 차이점
+|Legacy|New|
+|------|---|
+|매 프레임 마다 입력 확인(폴링)|입력 발생 시에만 처리(이벤트)|
+|입력 없는 장치도 체크될 우려 있음|정해진 특정 이벤트 때만 실행|
+|메모리 사용 적음|메모리 사용량 많음|
+|장치별로 개별적 처리가 필요함|입력 액션에서의 통일성, 다양한 디바이스 제공|
+|유지보수 어려움|유연하고 확장성 높음|
+
+#### 키를 입력하면 텍스트에 특정 메세지가 나오도록 하는 예시 코드
+```cs
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
+public class LegacyExample : MonoBehaviour
+{
+    public Text text;
+
+    KeyCode key;
+
+    // Text는 Canvas 안에 있는 값이기 때문에 GetComponent의 자식(Children)으로 가져옴
+    private void Start()
+    {
+        text = GetComponentInChildren<Text>();
+        // GetComponentInChildren<T>();
+        // 현 오브젝트의 자식으로부터 컴포넌트를 얻어오는 기능
+    }
+
+    void Update()
+    {
+        // 배열과 같은 묶음으로 관리되는 데이터를 순차적으로 조사하는 코드
+        // KeyCode 형태의 데이터 전체를 조사합니다.
+        foreach(KeyCode Key in System.Enum.GetValues(typeof(KeyCode)))
+        {
+            if (Input.GetKeyDown(Key))
+            {
+                switch (Key)
+                {
+                    case KeyCode.Escape:
+                        text.text = "";
+                        break;
+                    case KeyCode.Space:
+                        text.text = "pata";
+                        break;
+                    case KeyCode.Return:
+                        text.text = "pong";
+                        break;
+                }
+            }
+        }
+    }
+}
+```
+> GetComponentInChildren<T>();
+> > 현 오브젝트의 자식으로부터 컴포넌트를 얻어오는 기능<br>
+> > 위 코드에서는 Canvas(부모) 안에 Text(자식)을 불러오기 위해 사용
+
+#### Player Input
+유니티 Input System에서 사용하는 컴포넌트입니다.<br>
+InputActions를 등록해 자동으로 매핑합니다.<br>
+이벤트 기반으로 할지, 메시지 기반으로 할지, 수동으로 호출할지 설정이 가능합니다.<br>
+여러 Player Input도 지원합니다.(멀티 플레이)
+
+#### Player Input을 이용한 키 입력 시 움직이는 예시 코드
+```cs
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+// RequireComponent(typeof(T))는 이 스크립트를 컴포넌트로
+// 사용할 경우 해당 오브젝트는 반드시 T를 가지고 있어야 합니다.
+// 없는 경우라면 자동으로 등록해주고, 이 코드가 존재하는 한
+// 에디터에서 게임 오브젝트는 해당 컴포넌트를 제거할 수 없습니다.
+[RequireComponent(typeof(PlayerInput))]
+public class InputSystemExample : MonoBehaviour
+{
+    // 현재 Action Map : Sample
+    //      Action : Move
+    //      Type : Value
+    //      Compos : Vector2
+    //      Binding : 2D Vector(WASD)
+    private Vector2 moveInputValue;
+    private float speed = 3.0f;
+
+    // Send Messages로 사용되는 경우
+    // 특정 키가 들어오면, 특정 함수로 호출합니다.
+    // 함수 명은 On + Actions name, 현재 만든 Actions의 이름 Move라면
+    // 함수명은 OnMove가 됩니다.
+    void OnMove(InputValue value)
+    {
+        moveInputValue = value.Get<Vector2>();
+    }
+
+    void Update()
+    {
+        Vector3 move = new Vector3(moveInputValue.x, 0, moveInputValue.y); // 좌우 x축, 상하 z축
+
+        transform.Translate(move * speed * Time.deltaTime);
+    }
+}
+```
