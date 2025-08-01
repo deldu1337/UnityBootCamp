@@ -73,8 +73,8 @@ public class InspectorAttributes : MonoBehaviour
     // 3. static 키워드가 붙은 필드
     // 4. abstract(추상 클래스) 키워드가 붙은 필드
 
-    [SerializeField]
-    private int value2 = 7;
+    //[SerializeField]
+    //private int value2 = 7;
 
     // Space(높이) : 적은 높이만큼 간격이 생깁니다.
 

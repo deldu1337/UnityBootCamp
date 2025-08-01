@@ -52,19 +52,19 @@ public class Practice : MonoBehaviour
                     str++;
                     texts[0].text = $"쓸데없는 칼 ( +{str} )";
                 }
-                else if (cnt <=3 && cnt > 6)
+                else if (cnt >=3 && cnt < 6)
                 {
                     // 아이템 강화
                     str++;
                     texts[0].text = $"쓸모있는 칼 ( +{str} )";
                 }
-                else if (cnt <= 6 && cnt > 8)
+                else if (cnt >= 6 && cnt < 8)
                 {
                     // 아이템 강화
                     str++;
                     texts[0].text = $"용사의 칼 ( +{str} )";
                 }
-                else
+                else if (cnt >= 8)
                 {
                     // 아이템 강화
                     str++;
