@@ -252,22 +252,6 @@ public class IEnumeratorSample : MonoBehaviour
         }
     }
 
-    // yield는 C#에서 한 번에 하나 씩 값을 넘기고, 메소드가 일시 정지 되며
-    // 후속 값들을 지속적으로 반환하게 합니다.(반복적인 작업, 순차적인 데이터 처리에 사용됩니다.)
-
-    // yield는 yield return, yield break로 사용됩니다.
-
-    // yield return은 메소드가 값을 반환하면서 그 지점에서 메소드 실행을 일시 중지 시킵니다.
-    // 호출자가 다음 값을 요구할 때마다 대기합니다.
-
-    // yield break는 메소드에서의 반복을 종료하는 코드입니다.(실행 종료)
-
-    // yield return을 사용하는 메소드는 IEnumerable 또는 IEnumerator 인터페이스를 구현하게 됩니다.
-    // 컬렉션을 자동으로 순회하는 foreach와 자주 사용됩니다.
-
-    // 장점 : 값을 필요로 할 때까지 계산을 미루는 방식(메모리 효율이 좋음, 큰 데이터를 처리할 때 이점이 큽니다.)
-    // --> 모든 데이터를 저장하는게 아닌 필요한 부분만 처리할 수 있게 되기 때문
-
     static IEnumerable GetMessage()
     {
         Debug.Log("메소드 시작");
@@ -282,7 +266,6 @@ public class IEnumeratorSample : MonoBehaviour
         Debug.Log("탈출 했다가 돌아옴 3");
         yield return 3;
     }
-
 }
 ```
 
@@ -307,5 +290,3 @@ IEnumerator Sample() { … }
 ```
 단 상태가 변하는 코루틴을 재사용 시 상태가 꼬일 수 있어서 새 인스턴스를 만드는 것이 좋습니다.<br>
 재사용 시의 상태 초기화 코드도 필요할 수 있습니다.<br>
-
-
