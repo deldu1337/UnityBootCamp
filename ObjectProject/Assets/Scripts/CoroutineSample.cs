@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CoroutineSample : MonoBehaviour
 {
-    // 적용할 타
+    // 적용할 타겟
     public GameObject target;
 
     // 변화 시간
