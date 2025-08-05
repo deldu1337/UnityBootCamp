@@ -48,10 +48,9 @@ public class Enemy : MonoBehaviour
     {
         while (player_position != null)
         {
-            float distance = Vector3.Distance(transform.position, player_position.position);
-
             transform.position = Vector3.MoveTowards(transform.position, player_position.position, speed * Time.deltaTime);
-            transform.rotation = Quaternion.LookRotation(transform.position);
+            Vector3 a = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            transform.rotation = Quaternion.LookRotation(a);
 
             yield return null;
         }
@@ -70,7 +69,6 @@ public class Enemy : MonoBehaviour
 
         // 이펙트 연출(파티클)
         
-
         ReturnPool();
     }
 
