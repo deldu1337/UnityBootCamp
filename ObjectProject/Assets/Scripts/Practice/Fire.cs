@@ -11,7 +11,7 @@ public class Fire : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetMouseButtonDown(0))
         {
             var bullet = pool.GetBullet();
             bullet.transform.position = pos.position;

@@ -31,7 +31,7 @@ public class EffectPool : MonoBehaviour
         }
     }
 
-    public GameObject GetEffect()
+    public GameObject GetEffect(Transform trans)
     {
         // 비활성화되어있는 총알을 찾아서 활성화합니다.
         foreach (var effect in pool)
@@ -39,12 +39,15 @@ public class EffectPool : MonoBehaviour
             // 계층 창에서 활성화가 안되어있다면 (사용하고 있지 않는다면)
             if (!effect.activeInHierarchy)
             {
+                effect.transform.position = trans.position;
+                effect.transform.rotation = Quaternion.identity;
                 effect.SetActive(true);
+                Debug.Log($"[이펙트] 활성화됨: {effect.name} 위치: {effect.transform.position}");
                 return effect;
             }
         }
         // 총알이 부족한 경우에는 새롭게 만들어서 리스트에 등록합니다.
-        var new_effect = Instantiate(effect_prefab);
+        var new_effect = Instantiate(effect_prefab, trans.position, Quaternion.identity);
         new_effect.transform.parent = transform;
         new_effect.GetComponent<Effect>().SetPool(this);
         pool.Add(new_effect);

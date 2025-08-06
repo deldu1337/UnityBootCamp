@@ -25,6 +25,11 @@ public class Bullet : MonoBehaviour
         this.pool = pool;
     }
 
+    public void SetEffectPool(EffectPool pool)
+    {
+        effect_pool = pool;
+    }
+
     // 활성화 단계
     private void OnEnable()
     {
@@ -64,11 +69,8 @@ public class Bullet : MonoBehaviour
             hp.Damage(damage); // 체력 감소
         }
 
-        if (effect_prefab != null)
-        {
-            Instantiate(effect_prefab, transform.position, Quaternion.identity);
-
-        }
+        //Instantiate(effect_prefab, transform.position, Quaternion.identity);
+        effect_pool.GetEffect(transform);
 
         ReturnEffectPool();
         ReturnPool();

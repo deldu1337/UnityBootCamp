@@ -16,6 +16,7 @@ using UnityEngine;
 public class BulletPool : MonoBehaviour
 {
     public GameObject bullet_prefab;
+    public EffectPool effectPool;
     public int size = 30;
 
     // 풀로 자주 사용되는 자료구조
@@ -38,6 +39,10 @@ public class BulletPool : MonoBehaviour
 
             bullet.GetComponent<Bullet>().SetPool(this);
 
+            var bulletScript = bullet.GetComponent<Bullet>(); //
+            bulletScript.SetPool(this); //
+            bulletScript.SetEffectPool(effectPool); //
+
             pool.Add(bullet);
             // 리스트명.Add(값) : 리스트에 해당 값을 추가하는 문법
         }
@@ -59,6 +64,11 @@ public class BulletPool : MonoBehaviour
         var new_bullet = Instantiate(bullet_prefab);
         new_bullet.transform.parent = transform;
         new_bullet.GetComponent<Bullet>().SetPool(this);
+
+        var bulletScript = new_bullet.GetComponent<Bullet>(); //
+        bulletScript.SetPool(this); //
+        bulletScript.SetEffectPool(effectPool); //
+
         pool.Add(new_bullet);
         return new_bullet;
     }

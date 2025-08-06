@@ -23,7 +23,7 @@ public class Effect : MonoBehaviour
     {
         // if문 작성 시 명령문이 1줄일 경우 {} 생략 가능합니다.
         if (life_coroutine != null)
-            StopCoroutine(life_coroutine);
+            StopCoroutine(life_coroutine); 
     }
 
     IEnumerator EffecttReturn()
