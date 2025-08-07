@@ -6,7 +6,7 @@ public class HP : MonoBehaviour
     protected float curHealth; //* 현재 체력
     public float maxHealth; //* 최대 체력
 
-    private int Score;
+    private static int Score = 0;
     [SerializeField] private Text text;
     public void SetHp(float amount) //*Hp설정
     {
@@ -42,7 +42,6 @@ public class HP : MonoBehaviour
         // 자동 초기화
         curHealth = maxHealth;
         CheckHp();
-        Score = 0;
         text = GameObject.FindWithTag("Score").GetComponent<Text>();
         text.text = $"Score: {Score}";
     }
