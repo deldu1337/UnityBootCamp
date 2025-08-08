@@ -79,10 +79,10 @@ public class DropDownPractice : MonoBehaviour
     //{
     //    text1.text = $"流诀: {dropdown[].options[idx].text}";
     //}
-    void onDropDownValueChanged()
-    {
-        text1.text = $"流诀: {job.options[idx].text}";
-    }
+    //void onDropDownValueChanged()
+    //{
+    //    text1.text = $"流诀: {job.options[idx].text}";
+    //}
     void onDropDownValueChanged1(int idx)
     {
         text1.text = $"流诀: {job.options[idx].text}";
