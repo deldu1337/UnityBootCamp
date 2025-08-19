@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4de61b9c1637e8043a9e04cabd612b3a, type: 3}
+  m_Name: "\uC815\uB2F5"
+  m_EditorClassIdentifier: 
+  quiz:
+  - "\uC778\uB3C4\uC758 \uC218\uB3C4\uB294?"
+  - "\uC18C\uB098\uD0C0\uB294 \uB204\uAC00 \uD0C8\uAE4C?"
+  - "\uACF5\uC774 \uC6C3\uC73C\uBA74?"
+  - "\uAD11\uBD80\uAC00 \uAC00\uC7A5 \uB9CE\uC740 \uB098\uB77C\uB294?"
+  - "\uC0C8\uC6B0\uAC00 \uCD9C\uC5F0\uD558\uB294 \uB4DC\uB77C\uB9C8\uB294?"
+  - "\uC2A4\uB2D8\uB4E4\uC774 \uC808\uC5D0 \uC5C6\uC73C\uBA74?"
+  - "\uD574\uC640 \uB2EC\uC911 \uD574\uB9CC \uC804\uBB38\uC801\uC73C\uB85C \uCDE8\uC7AC\uD558\uB294
+    \uC0AC\uB78C\uC740? "
+  - "\uC815\uC0BC\uAC01\uD615\uC758 \uB3D9\uC0DD \uC774\uB984\uC740?"
+  - "\uD560\uC544\uBC84\uC9C0\uAC00 \uAC00\uC7A5 \uC88B\uC544\uD558\uB294 \uB3C8\uC740?"
+  - "\uACF0\uB3CC\uC774 \uD478\uAC00 \uCC28\uC5D0 \uCE58\uC774\uBA74?"
+  answer:
+  - "\uB274\uB378\uB9AC"
+  - "\uC18C"
+  - "\uD48B\uBCFC"
+  - "\uCF00\uB0D0"
+  - "\uB300\uD558\uB4DC\uB77C\uB9C8"
+  - "\uBD80\uC7AC\uC911"
+  - "\uD574\uB9AC\uD3EC\uD130"
+  - "\uC815\uC0BC\uAC01"
+  - "\uD560\uBA38\uB2C8"
+  - "\uCE74\uD478\uCE58\uB178"
