@@ -9,10 +9,14 @@ public class Enemy : MonoBehaviour
     {
         Down, Chase // 아래로 내려가는 패턴, 플레이어를 추적하는 패턴
     }
+
     // 이동 속도
     public float speed = 5.0f;
     public EnemyType type = EnemyType.Down; // 기본적으로는 아래로 내려가는 기믹만 설계
     Vector3 dir; // 방향 설정
+
+    public GameObject explosionFactory; // 폭발 공장
+    public GameObject nuclearFactory; // 폭발 공장
 
     // 적에 대한 패턴
     private void Start()
@@ -63,6 +67,23 @@ public class Enemy : MonoBehaviour
     // Is Trigger 체크가 진행된 오브젝트와의 트리거 충돌 Trigger (충돌 여부만 체크함)
     private void OnCollisionEnter(Collision collision)
     {
+        // 클래스명.Instance.메소드명()으로 기능만 사용하는 것이 가능해진다.
+        ScoreManager.Instance.SetScore(5);
+        StageManager.count += 1;
+        if (StageManager.count != 0 && StageManager.count % 5 == 0)
+            SkillManager.checkSkill = true;
+
+        if (collision.collider.CompareTag("nuclear"))
+        {
+            Instantiate(nuclearFactory, transform.position, Quaternion.identity);
+        }
+        else
+            Instantiate(explosionFactory, transform.position, Quaternion.identity);
+
+        //GameObject explosion = Instantiate(explosionFactory, transform.position, Quaternion.identity);
+
+        if(collision.gameObject.CompareTag("Player"))
+            StageManager.count = -1;
         Destroy(collision.gameObject); // 상대방 파괴
         Destroy(gameObject); // 자신 파괴
     }

@@ -76,4 +76,4 @@ crashlytics-build.properties
 
 
 # Asset ignore
-/[Aa]ssets/Fonts
+/[Aa]ssets/CustomAssets

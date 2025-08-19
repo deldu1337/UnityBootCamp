@@ -4,7 +4,10 @@ public class PlayerFire : MonoBehaviour
 {
     [Header("Fire Setting")]
     [Tooltip("총알 생산 공장")] public GameObject bulletFactory;
+    [Tooltip("핵 생산 공장")] public GameObject nuclearFactory;
     [Tooltip("총구")] public GameObject firePosition;
+
+    public BulletPool pool;
 
     private void Update()
     {
@@ -20,7 +23,15 @@ public class PlayerFire : MonoBehaviour
             // 총알은 총알 생산 공장에서 등록한 총알을 생성한다.
             // 총알의 위치는 총구 지점으로 설정한다.
             // 별도의 회전은 넣지 않는다.
-            var bullet = Instantiate(bulletFactory, firePosition.transform.position, Quaternion.identity);
+            //var bullet = Instantiate(bulletFactory, firePosition.transform.position, Quaternion.identity);
+            var bullet = pool.GetBullet();
+            bullet.transform.position = firePosition.transform.position;
+        }
+
+        if (Input.GetMouseButtonDown(1) && SkillManager.checkSkill)
+        {
+            var nuclear = Instantiate(nuclearFactory, firePosition.transform.position, Quaternion.identity);
+            SkillManager.checkSkill = false;
         }
     }
 }
