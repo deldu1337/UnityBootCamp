@@ -8,6 +8,7 @@ public class HP : MonoBehaviour
 
     private static int Score = 0;
     [SerializeField] private Text text;
+    public Text gameOver;
     public void SetHp(float amount) //*Hp설정
     {
         maxHealth = amount;
@@ -31,10 +32,16 @@ public class HP : MonoBehaviour
         if (curHealth <= 0)
         {
             //* 체력이 0 이하라 죽음
+            if (gameObject.CompareTag("Player"))
+            {
+                gameOver.text = "<color=red>Game Over</color>";
+                gameOver.gameObject.SetActive(true);
+            }
+            else
+                text.text = $"Score: {Score}";
             Destroy(gameObject);
             Debug.Log("[HP] 체력 0 이하. 사망 처리 예정.");
             Score += 10;
-            text.text = $"Score: {Score}";
         }
     }
     private void Start()
@@ -44,5 +51,6 @@ public class HP : MonoBehaviour
         CheckHp();
         text = GameObject.FindWithTag("Score").GetComponent<Text>();
         text.text = $"Score: {Score}";
+        gameOver.gameObject.SetActive(false);
     }
 }
