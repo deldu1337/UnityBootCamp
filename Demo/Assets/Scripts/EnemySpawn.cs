@@ -5,7 +5,7 @@ public class EnemySpawn : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public TileMapGenerator mapGenerator;
-    public float spawnFactor = 10f;
+    public float spawnFactor = 35f;
 
     void Start()
     {
