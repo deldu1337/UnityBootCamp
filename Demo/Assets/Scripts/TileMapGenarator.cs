@@ -15,8 +15,8 @@ public class TileMapGenerator : MonoBehaviour
 
     private int[,] map;
     private List<RectInt> rooms;
+    private RectInt playerRoom; // 플레이어 전용 방 저장
 
-    // 맵 생성 완료 이벤트
     public delegate void MapGeneratedHandler();
     public event MapGeneratedHandler OnMapGenerated;
 
@@ -40,11 +40,29 @@ public class TileMapGenerator : MonoBehaviour
         RectInt root = new RectInt(1, 1, width - 2, height - 2);
         SplitRoom(root, maxDepth, rooms);
 
-        // 방 바닥 생성
+        // 플레이어 전용 방 생성 (10x10)
+        playerRoom = new RectInt(2, 2, 10, 10);
+
+        // 플레이어 방 벽 초기화
+        for (int x = playerRoom.xMin; x < playerRoom.xMax; x++)
+            for (int y = playerRoom.yMin; y < playerRoom.yMax; y++)
+                map[x, y] = 1;
+
+        // 플레이어 방 내부 바닥 생성 (가장자리 제외)
+        for (int x = playerRoom.xMin + 1; x < playerRoom.xMax - 1; x++)
+            for (int y = playerRoom.yMin + 1; y < playerRoom.yMax - 1; y++)
+                map[x, y] = 0;
+
+        // 방 바닥 생성 (플레이어 방 제외)
         foreach (var room in rooms)
-            for (int x = room.xMin; x < room.xMax; x++)
-                for (int y = room.yMin; y < room.yMax; y++)
-                    map[x, y] = 0;
+        {
+            if (!room.Overlaps(playerRoom))
+            {
+                for (int x = room.xMin; x < room.xMax; x++)
+                    for (int y = room.yMin; y < room.yMax; y++)
+                        map[x, y] = 0;
+            }
+        }
 
         // 방 중심 좌표 계산
         List<Vector2Int> centers = rooms.Select(r =>
@@ -54,8 +72,11 @@ public class TileMapGenerator : MonoBehaviour
         // MST 연결 (Prim 알고리즘)
         List<Vector2Int> connected = new List<Vector2Int>();
         List<Vector2Int> remaining = new List<Vector2Int>(centers);
-        connected.Add(remaining[0]);
-        remaining.RemoveAt(0);
+        if (remaining.Count > 0)
+        {
+            connected.Add(remaining[0]);
+            remaining.RemoveAt(0);
+        }
 
         while (remaining.Count > 0)
         {
@@ -82,6 +103,32 @@ public class TileMapGenerator : MonoBehaviour
             remaining.Remove(b);
         }
 
+        // 플레이어 방과 가장 가까운 방 연결 (통로 1개, 항상 위쪽)
+        Vector2Int playerCenter = new Vector2Int(
+            Mathf.RoundToInt(playerRoom.center.x),
+            Mathf.RoundToInt(playerRoom.center.y)
+        );
+
+        if (centers.Count > 0)
+        {
+            Vector2Int nearestRoomCenter = centers
+                .OrderBy(c => Vector2Int.Distance(c, playerCenter))
+                .First();
+
+            // 통로 시작점: 플레이어 방 위쪽 중앙
+            Vector2Int corridorStart = new Vector2Int(
+                (playerRoom.xMin + playerRoom.xMax) / 2,
+                playerRoom.yMax
+            );
+
+            // 플레이어 방 벽 뚫기
+            map[corridorStart.x, corridorStart.y - 1] = 0; // 방 내부 위쪽 끝
+            map[corridorStart.x, corridorStart.y] = 0;     // 벽 바로 위
+
+            // MST 방과 연결
+            CreateCorridor(corridorStart, nearestRoomCenter);
+        }
+
         // 맵 생성 완료 이벤트 호출
         OnMapGenerated?.Invoke();
     }
@@ -94,7 +141,10 @@ public class TileMapGenerator : MonoBehaviour
             int roomHeight = Random.Range(minRoomSize, Mathf.Min(space.height, maxRoomSize));
             int roomX = Random.Range(space.xMin + 1, space.xMax - roomWidth - 1);
             int roomY = Random.Range(space.yMin + 1, space.yMax - roomHeight - 1);
-            rooms.Add(new RectInt(roomX, roomY, roomWidth, roomHeight));
+            RectInt newRoom = new RectInt(roomX, roomY, roomWidth, roomHeight);
+
+            if (!newRoom.Overlaps(playerRoom))
+                rooms.Add(newRoom);
             return;
         }
 
@@ -133,7 +183,8 @@ public class TileMapGenerator : MonoBehaviour
             for (int w = 0; w < corridorWidth; w++)
             {
                 int yy = y + w;
-                if (yy < height) map[x, yy] = 0;
+                if (yy < height && !playerRoom.Contains(new Vector2Int(x, yy)))
+                    map[x, yy] = 0;
             }
     }
 
@@ -143,7 +194,8 @@ public class TileMapGenerator : MonoBehaviour
             for (int w = 0; w < corridorWidth; w++)
             {
                 int xx = x + w;
-                if (xx < width) map[xx, y] = 0;
+                if (xx < width && !playerRoom.Contains(new Vector2Int(xx, y)))
+                    map[xx, y] = 0;
             }
     }
 
@@ -165,7 +217,12 @@ public class TileMapGenerator : MonoBehaviour
 
     public List<RectInt> GetRooms()
     {
-        return rooms;
+        return rooms.Where(r => r != playerRoom).ToList();
+    }
+
+    public RectInt GetPlayerRoom()
+    {
+        return playerRoom;
     }
 
     public void ReloadMap()

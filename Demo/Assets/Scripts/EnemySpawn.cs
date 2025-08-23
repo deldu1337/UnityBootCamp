@@ -5,7 +5,7 @@ public class EnemySpawn : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public TileMapGenerator mapGenerator;
-    public float spawnFactor = 35f;
+    public float spawnFactor = 25f;
 
     void Start()
     {
@@ -15,8 +15,8 @@ public class EnemySpawn : MonoBehaviour
             return;
         }
 
-        // 맵 생성 완료 이벤트 구독
         mapGenerator.OnMapGenerated += GenerateEnemies;
+        GenerateEnemies();
     }
 
     public void GenerateEnemies()
@@ -43,7 +43,10 @@ public class EnemySpawn : MonoBehaviour
                 int x = Mathf.RoundToInt(xF);
                 int z = Mathf.RoundToInt(zF);
 
-                if (mapGenerator.IsFloor(x, z))
+                Vector2Int pos = new Vector2Int(x, z);
+
+                // 바닥 확인 + 플레이어 방 내부 제외
+                if (mapGenerator.IsFloor(x, z) && !mapGenerator.GetPlayerRoom().Contains(pos))
                 {
                     Vector3 spawnPos = new Vector3(x, 0, z);
                     Instantiate(enemyPrefab, spawnPos, Quaternion.identity, transform);
@@ -53,7 +56,6 @@ public class EnemySpawn : MonoBehaviour
         }
     }
 
-    // 버튼에서 호출할 함수
     public void RespawnEnemies()
     {
         GenerateEnemies();

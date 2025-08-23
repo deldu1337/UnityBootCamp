@@ -205,13 +205,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00031856328, y: -0.8078439, z: 0.58939624, w: 0.00051726156}
-  m_LocalPosition: {x: 45.042824, y: 120.67642, z: 99.14737}
+  m_LocalRotation: {x: 0.42660013, y: 0.33944437, z: -0.17670354, w: 0.8194912}
+  m_LocalPosition: {x: 1.5, y: 10, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 55, y: 45, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,9 +641,9 @@ RectTransform:
   - {fileID: 397959988}
   m_Father: {fileID: 547180819}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -236.5, y: -241.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 80, y: 15}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &961917329
@@ -690,9 +690,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1080398098}
-        m_TargetAssemblyTypeName: TileMapGenerator, Assembly-CSharp
-        m_MethodName: ReloadMap
+      - m_Target: {fileID: 1827502801}
+        m_TargetAssemblyTypeName: EnemySpawn, Assembly-CSharp
+        m_MethodName: RespawnEnemies
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -702,9 +702,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1827502801}
-        m_TargetAssemblyTypeName: EnemySpawn, Assembly-CSharp
-        m_MethodName: RespawnEnemies
+      - m_Target: {fileID: 1080398098}
+        m_TargetAssemblyTypeName: TileMapGenerator, Assembly-CSharp
+        m_MethodName: ReloadMap
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -883,6 +883,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1531966323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1531966325}
+  - component: {fileID: 1531966324}
+  m_Layer: 0
+  m_Name: PlayerPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1531966324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1531966323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c8b7b8fde13544b9dc64edf661e61c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 2655836338778539426, guid: 1e76526fbd421a743b10bfae260c6019, type: 3}
+  mapGenerator: {fileID: 1080398098}
+--- !u!4 &1531966325
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1531966323}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1827502800
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,3 +987,4 @@ SceneRoots:
   - {fileID: 547180819}
   - {fileID: 1233484224}
   - {fileID: 1827502802}
+  - {fileID: 1531966325}
