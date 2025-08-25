@@ -1,3 +1,4 @@
+using Unity.Hierarchy;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -19,7 +20,6 @@ public class PlayerMove : MonoBehaviour
             Debug.LogError("Animation 컴포넌트가 Player 프리팹 또는 자식에 없습니다!");
     }
 
-
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -31,8 +31,7 @@ public class PlayerMove : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 targetPosition = hit.point;
                 targetPosition.y = transform.position.y; // 높이 고정
@@ -43,7 +42,6 @@ public class PlayerMove : MonoBehaviour
                     AnimationState runState = animationComponent["Run (ID 5 variation 0)"];
                     runState.speed = moveSpeed / 6.5f; // 속도 조절
                     animationComponent.Play("Run (ID 5 variation 0)"); // Run 애니메이션 재생
-
                 }
             }
         }
@@ -54,9 +52,21 @@ public class PlayerMove : MonoBehaviour
         if (isMoving)
         {
             Vector3 direction = (targetPosition - rb.position).normalized;
-            Vector3 nextPos = rb.position + direction * moveSpeed * Time.fixedDeltaTime;
+            Vector3 moveDelta = direction * moveSpeed * Time.fixedDeltaTime;
+            Vector3 nextPos = rb.position + moveDelta;
 
-            rb.MovePosition(nextPos);
+            // --- 벽 충돌 체크 추가 ---
+            if (!Physics.Raycast(rb.position, direction, moveDelta.magnitude + 0.1f))
+            {
+                rb.MovePosition(nextPos);
+            }
+            else
+            {
+                // 벽에 막히면 멈추기
+                isMoving = false;
+                if (animationComponent != null)
+                    animationComponent.Play("Stand (ID 0 variation 0)");
+            }
 
             // 회전
             if (direction != Vector3.zero)
@@ -69,7 +79,7 @@ public class PlayerMove : MonoBehaviour
             {
                 isMoving = false;
                 if (animationComponent != null)
-                    animationComponent.Play("Stand (ID 0 variation 0)"); // 멈출 때 Stand 재생
+                    animationComponent.Play("Stand (ID 0 variation 0)");
             }
         }
     }

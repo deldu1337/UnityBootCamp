@@ -103,7 +103,7 @@ public class TileMapGenerator : MonoBehaviour
             remaining.Remove(b);
         }
 
-        // 플레이어 방과 가장 가까운 방 연결 (통로 1개, 항상 위쪽)
+        // 플레이어 방과 가장 가까운 방 연결 (항상 위쪽 방향 우선)
         Vector2Int playerCenter = new Vector2Int(
             Mathf.RoundToInt(playerRoom.center.x),
             Mathf.RoundToInt(playerRoom.center.y)
@@ -121,12 +121,22 @@ public class TileMapGenerator : MonoBehaviour
                 playerRoom.yMax
             );
 
-            // 플레이어 방 벽 뚫기
-            map[corridorStart.x, corridorStart.y - 1] = 0; // 방 내부 위쪽 끝
-            map[corridorStart.x, corridorStart.y] = 0;     // 벽 바로 위
+            // 플레이어 방 벽 뚫기 (최소 corridorWidth 적용)
+            int offset = Mathf.Max(corridorWidth / 2, 1); // 최소 1
+            for (int w = -offset; w <= offset; w++)
+            {
+                int x = corridorStart.x + w;
+                int y = corridorStart.y;
+                if (x >= playerRoom.xMin && x < playerRoom.xMax && y < height)
+                {
+                    map[x, y] = 0;
+                    map[x, y - 1] = 0; // 입구 폭 확보
+                }
+            }
 
-            // MST 방과 연결
-            CreateCorridor(corridorStart, nearestRoomCenter);
+
+            // 개선된 통로 생성
+            CreatePlayerCorridor(corridorStart, nearestRoomCenter);
         }
 
         // 맵 생성 완료 이벤트 호출
@@ -143,8 +153,15 @@ public class TileMapGenerator : MonoBehaviour
             int roomY = Random.Range(space.yMin + 1, space.yMax - roomHeight - 1);
             RectInt newRoom = new RectInt(roomX, roomY, roomWidth, roomHeight);
 
-            if (!newRoom.Overlaps(playerRoom))
+            float minDistanceFromPlayer = 8f;
+            Vector2Int newCenter = new Vector2Int(Mathf.RoundToInt(newRoom.center.x), Mathf.RoundToInt(newRoom.center.y));
+            Vector2Int playerCenter = new Vector2Int(Mathf.RoundToInt(playerRoom.center.x), Mathf.RoundToInt(playerRoom.center.y));
+
+            if (!newRoom.Overlaps(playerRoom) &&
+                Vector2Int.Distance(newCenter, playerCenter) > minDistanceFromPlayer)
+            {
                 rooms.Add(newRoom);
+            }
             return;
         }
 
@@ -177,27 +194,84 @@ public class TileMapGenerator : MonoBehaviour
         }
     }
 
+    void CreatePlayerCorridor(Vector2Int start, Vector2Int end)
+    {
+        // corridorWidth가 최소 2 이상인지 보장
+        int offset = Mathf.Max(corridorWidth / 2, 1);
+
+        // 중간점 생성 (조금 랜덤)
+        Vector2Int mid = new Vector2Int(
+            (start.x + end.x) / 2 + Random.Range(-2, 3),
+            (start.y + end.y) / 2 + Random.Range(-2, 3)
+        );
+
+        // 시작 → 중간
+        for (int w = -offset; w <= offset; w++)
+            DigCorridor(new Vector2Int(start.x + w, start.y), new Vector2Int(mid.x + w, mid.y));
+
+        // 중간 → 끝
+        for (int w = -offset; w <= offset; w++)
+            DigCorridor(new Vector2Int(mid.x + w, mid.y), new Vector2Int(end.x + w, end.y));
+    }
+
+
+
+    void DigCorridor(Vector2Int start, Vector2Int end)
+    {
+        Vector2Int current = start;
+
+        // x축 이동
+        int xDir = (end.x > current.x) ? 1 : -1;
+        while (current.x != end.x)
+        {
+            current.x += xDir;
+            for (int w = -1; w <= 1; w++) // 폭 3칸
+            {
+                int yy = current.y + w;
+                if (!playerRoom.Contains(new Vector2Int(current.x, yy)))
+                    map[current.x, yy] = 0;
+            }
+        }
+
+        // y축 이동
+        int yDir = (end.y > current.y) ? 1 : -1;
+        while (current.y != end.y)
+        {
+            current.y += yDir;
+            for (int w = -1; w <= 1; w++) // 폭 3칸
+            {
+                int xx = current.x + w;
+                if (!playerRoom.Contains(new Vector2Int(xx, current.y)))
+                    map[xx, current.y] = 0;
+            }
+        }
+    }
+
+
     void DrawHorizontalCorridor(int xStart, int xEnd, int y)
     {
+        int offset = corridorWidth / 2;
         for (int x = Mathf.Min(xStart, xEnd); x <= Mathf.Max(xStart, xEnd); x++)
-            for (int w = 0; w < corridorWidth; w++)
+            for (int w = -offset; w <= offset; w++)
             {
                 int yy = y + w;
-                if (yy < height && !playerRoom.Contains(new Vector2Int(x, yy)))
+                if (yy >= 0 && yy < height && !playerRoom.Contains(new Vector2Int(x, yy)))
                     map[x, yy] = 0;
             }
     }
 
     void DrawVerticalCorridor(int yStart, int yEnd, int x)
     {
+        int offset = corridorWidth / 2;
         for (int y = Mathf.Min(yStart, yEnd); y <= Mathf.Max(yStart, yEnd); y++)
-            for (int w = 0; w < corridorWidth; w++)
+            for (int w = -offset; w <= offset; w++)
             {
                 int xx = x + w;
-                if (xx < width && !playerRoom.Contains(new Vector2Int(xx, y)))
+                if (xx >= 0 && xx < width && !playerRoom.Contains(new Vector2Int(xx, y)))
                     map[xx, y] = 0;
             }
     }
+
 
     void RenderMap()
     {

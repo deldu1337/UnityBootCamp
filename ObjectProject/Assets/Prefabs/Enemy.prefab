@@ -450,6 +450,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
+  damage: 20
 --- !u!114 &7424150572975459309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -463,6 +464,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  text: {fileID: 0}
+  gameOver: {fileID: 0}
   barImage: {fileID: 7377666868400532500}
 --- !u!1 &6642922493328671576
 GameObject:

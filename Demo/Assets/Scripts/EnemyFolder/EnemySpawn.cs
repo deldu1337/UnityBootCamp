@@ -48,7 +48,7 @@ public class EnemySpawn : MonoBehaviour
                 // 바닥 확인 + 플레이어 방 내부 제외
                 if (mapGenerator.IsFloor(x, z) && !mapGenerator.GetPlayerRoom().Contains(pos))
                 {
-                    Vector3 spawnPos = new Vector3(x, 0, z);
+                    Vector3 spawnPos = new Vector3(x, 1f, z);
                     Instantiate(enemyPrefab, spawnPos, Quaternion.identity, transform);
                     spawned++;
                 }

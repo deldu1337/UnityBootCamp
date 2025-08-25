@@ -24,7 +24,7 @@ public class PlayerSpawn : MonoBehaviour
             Destroy(child.gameObject);
 
         RectInt playerRoom = mapGenerator.GetPlayerRoom();
-        Vector3 vector3 = new Vector3(playerRoom.center.x, 0, playerRoom.center.y);
+        Vector3 vector3 = new Vector3(playerRoom.center.x, 0.5f, playerRoom.center.y);
 
         Vector2Int playerCenter = new Vector2Int(
             Mathf.RoundToInt(playerRoom.center.x),
