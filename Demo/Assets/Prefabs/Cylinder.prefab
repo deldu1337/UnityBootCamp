@@ -225,7 +225,7 @@ CapsuleCollider:
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &135555433334819122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,12 +317,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4711203494023344327}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb5bf5bb0aa133f49a8ee7afeccb0639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthComponent: {fileID: 135555433334819122}
+  enemy: {fileID: 4944751363554349929, guid: 9da7aca8b7e0600459ce0dba39c619df, type: 3}
   barImage: {fileID: 6042604607599247485}
 --- !u!1 &6448820124399935362
 GameObject:

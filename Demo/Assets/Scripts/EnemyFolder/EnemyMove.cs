@@ -11,16 +11,16 @@ public class EnemyMove : MonoBehaviour
     private TileMapGenerator mapGenerator; // 에디터에서 할당
 
     private Rigidbody rb;
-    private Animator animator;
+    //private Animator animator;
     private Transform target; // 추적 대상
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+        //animator = GetComponent<Animator>();
 
-        if (animator == null)
-            Debug.LogError("Animator 컴포넌트가 Enemy에 없습니다!");
+        //if (animator == null)
+        //    Debug.LogError("Animator 컴포넌트가 Enemy에 없습니다!");
 
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
@@ -72,7 +72,7 @@ public class EnemyMove : MonoBehaviour
 
         if (target == null)
         {
-            animator.SetFloat("Speed", 0f);
+            //animator.SetFloat("Speed", 0f);
             return;
         }
 
@@ -92,11 +92,11 @@ public class EnemyMove : MonoBehaviour
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
 
             // 이동 속도에 따라 애니메이션 전환
-            animator.SetFloat("Speed", moveSpeed);
+            //animator.SetFloat("Speed", moveSpeed);
         }
         else
         {
-            animator.SetFloat("Speed", 0f);
+            //animator.SetFloat("Speed", 0f);
         }
     }
 
