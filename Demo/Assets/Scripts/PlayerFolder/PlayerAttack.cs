@@ -3,9 +3,9 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
     [Header("공격 설정")]
-    public float attackSpeed = 2.3f;
+    public float attackSpeed = 2.5f;
     public float attackPower = 20f;
-    public float attackRange = 2f;        // 근접 공격 범위
+    public float attackRange = 1f;        // 근접 공격 범위
     public float raycastYOffset = 1f; // 기존 A보다 캡슐 콜라이더가 1 높으므로 1만큼 올림
     public LayerMask enemyLayer;           // Enemy 레이어만 공격
 
@@ -17,6 +17,20 @@ public class PlayerAttack : MonoBehaviour
     private EnemyStats targetEnemy;        // 현재 공격 대상
     private HealthBarUI targetHealthBar;
     private Animation animationComponent; // Animator 대신
+
+    public EnemyStats GetCurrentTarget() => targetEnemy;
+
+    public void SetTarget(EnemyStats enemy)
+    {
+        targetEnemy = enemy;
+        targetHealthBar = enemy?.GetComponentInChildren<HealthBarUI>();
+        if (enemy != null)
+        {
+            isAutoAttacking = true;
+            lastAttackTime = 0f;
+        }
+    }
+
 
     void Awake()
     {
@@ -32,44 +46,71 @@ public class PlayerAttack : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, enemyLayer))
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
             {
-                targetEnemy = hit.collider.GetComponent<EnemyStats>();
-                targetHealthBar = hit.collider.GetComponentInChildren<HealthBarUI>();
-                if (targetEnemy != null)
+                EnemyStats clickedEnemy = hit.collider.GetComponent<EnemyStats>();
+                if (clickedEnemy != null && ((1 << hit.collider.gameObject.layer) & enemyLayer) != 0)
                 {
-                    isAutoAttacking = true;
-                    lastAttackTime = 0f; // 첫 타 바로 가능하게
+                    SetTarget(clickedEnemy); // 자동 공격 시작
+                }
+                else
+                {
+                    // 빈 공간 클릭 → 타겟 해제
+                    isAutoAttacking = false;
+                    targetEnemy = null;
+                    targetHealthBar = null;
+
+                    if (animationComponent != null)
+                        animationComponent.CrossFade("Stand (ID 0 variation 0)", 0.1f);
                 }
             }
         }
 
-        if (isAutoAttacking)
+
+        // 자동 공격
+        if (isAutoAttacking && targetEnemy != null && targetEnemy.currentHP > 0)
         {
-            // 타겟이 사망하면 자동 공격 종료 + 공격 모션 멈춤
-            if (targetEnemy == null || targetEnemy.currentHP <= 0)
+            // 공격 쿨타임 확인
+            if (Time.time >= lastAttackTime)
             {
-                isAutoAttacking = false;
-                targetEnemy = null;
-                targetHealthBar = null;
+                // 공격 범위 체크
+                Collider enemyCollider = targetEnemy.GetComponent<Collider>();
+                Vector3 playerOrigin = transform.position + Vector3.up * raycastYOffset;
+                Vector3 closest = enemyCollider.ClosestPoint(playerOrigin);
+                float distance = Vector3.Distance(playerOrigin, closest);
 
-                // 공격 중이면 스탠드 모션으로 전환
-                if (animationComponent != null && animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
+                if (distance <= attackRange)
                 {
-                    animationComponent.CrossFade("Stand (ID 0 variation 0)", 0.1f);
+                    PerformAttack();
+                    lastAttackTime = Time.time + attackCooldown; // 쿨타임 적용
                 }
-
-                return;
             }
 
-            // 플레이어와 적 사이 거리 체크
-            Vector3 playerAttackOrigin = transform.position + Vector3.up * raycastYOffset;
-            float distance = Vector3.Distance(playerAttackOrigin, targetEnemy.transform.position);
-            if (distance <= attackRange && Time.time >= lastAttackTime)
-            {
-                PerformAttack();
-                lastAttackTime = Time.time + attackCooldown;
-            }
+            // 타겟 방향 회전
+            RotateTowardsTarget(targetEnemy.transform.position);
+        }
+        else if (targetEnemy == null || targetEnemy.currentHP <= 0)
+        {
+            // 타겟이 없거나 죽으면 자동 공격 종료
+            isAutoAttacking = false;
+            targetEnemy = null;
+            targetHealthBar = null;
+
+            if (animationComponent != null && animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
+                animationComponent.CrossFade("Stand (ID 0 variation 0)", 0.1f);
+        }
+    }
+
+
+    // 타겟 위치로 부드럽게 회전
+    private void RotateTowardsTarget(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - transform.position;
+        direction.y = 0; // y축만 회전
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
     }
 

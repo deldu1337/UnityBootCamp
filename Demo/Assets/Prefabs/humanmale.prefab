@@ -1449,8 +1449,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   rotationSpeed: 10
-  targetPosition: {x: 0, y: 0, z: 0}
-  attackScript: {fileID: 0}
 --- !u!114 &1016322298301940480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1475,15 +1473,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49429a7a8e49d324ea341ca843415b41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackSpeed: 2.5
   attackPower: 20
   attackRange: 1
   raycastYOffset: 1
-  attackSpeed: 2.2
-  attackDelay: 0.3
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
   attackCooldown: 0.5
+  moveSpeed: 5
 --- !u!114 &4246065900588243630
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -49,8 +49,15 @@ public class EnemySpawn : MonoBehaviour
                 if (mapGenerator.IsFloor(x, z) && !mapGenerator.GetPlayerRoom().Contains(pos))
                 {
                     Vector3 spawnPos = new Vector3(x, 1f, z);
-                    Instantiate(enemyPrefab, spawnPos, Quaternion.identity, transform);
+                    GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity, transform);
+
+                    // 스폰된 적의 원래 위치 저장
+                    EnemyMove move = enemy.GetComponent<EnemyMove>();
+                    if (move != null)
+                        move.SetSpawnPosition(spawnPos);
+
                     spawned++;
+
                 }
             }
         }

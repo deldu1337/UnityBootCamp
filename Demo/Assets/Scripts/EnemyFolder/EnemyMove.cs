@@ -8,20 +8,15 @@ public class EnemyMove : MonoBehaviour
     public float rotationSpeed = 10f;
     public float detectRadius = 10f; // 플레이어 감지 범위
     public Transform TargetPlayer { get; private set; }
-    private TileMapGenerator mapGenerator; // 에디터에서 할당
+    private TileMapGenerator mapGenerator;
 
     private Rigidbody rb;
-    //private Animator animator;
     private Transform target; // 추적 대상
+    private Vector3 spawnPosition; // 원래 스폰된 위치
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        //animator = GetComponent<Animator>();
-
-        //if (animator == null)
-        //    Debug.LogError("Animator 컴포넌트가 Enemy에 없습니다!");
-
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
         // TileMapGenerator 자동 할당
@@ -31,6 +26,14 @@ public class EnemyMove : MonoBehaviour
             if (mapGenerator == null)
                 Debug.LogError("씬에 TileMapGenerator가 없습니다!");
         }
+
+        // 초기 스폰 위치 저장
+        spawnPosition = transform.position;
+    }
+
+    public void SetSpawnPosition(Vector3 position)
+    {
+        spawnPosition = position;
     }
 
     void FixedUpdate()
@@ -62,45 +65,30 @@ public class EnemyMove : MonoBehaviour
                 }
             }
 
-            target = closest; // 플레이어 방 밖에 있는 플레이어만 추적
+            target = closest;
         }
         else
         {
-            target = null; // 범위 밖이면 추적 안함
+            target = null; // 플레이어가 없으면 스폰 위치로
         }
 
+        Vector3 destination = target != null ? target.position : spawnPosition;
 
-        if (target == null)
-        {
-            //animator.SetFloat("Speed", 0f);
-            return;
-        }
-
-        Vector3 direction = target.position - rb.position;
-        direction.y = 0; // 높이 무시
+        Vector3 direction = destination - rb.position;
+        direction.y = 0;
         float distance = direction.magnitude;
 
         if (distance > 2f)
         {
             Vector3 moveDir = direction.normalized;
 
-            // 이동
             rb.MovePosition(rb.position + moveDir * moveSpeed * Time.fixedDeltaTime);
 
-            // 회전
             Quaternion targetRotation = Quaternion.LookRotation(moveDir);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
-
-            // 이동 속도에 따라 애니메이션 전환
-            //animator.SetFloat("Speed", moveSpeed);
-        }
-        else
-        {
-            //animator.SetFloat("Speed", 0f);
         }
     }
 
-    // 디버그용 감지 범위 표시
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
