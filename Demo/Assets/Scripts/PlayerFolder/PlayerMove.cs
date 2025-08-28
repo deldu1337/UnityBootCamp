@@ -34,7 +34,7 @@ public class PlayerMove : MonoBehaviour
 
     void HandleMovementInput()
     {
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
