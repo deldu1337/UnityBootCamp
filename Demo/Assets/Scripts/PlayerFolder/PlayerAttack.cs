@@ -61,7 +61,7 @@ public class PlayerAttack : MonoBehaviour
                     targetHealthBar = null;
 
                     if (animationComponent != null)
-                        animationComponent.CrossFade("Stand (ID 0 variation 0)", 0.1f);
+                        animationComponent.Play("Stand (ID 0 variation 0)");
                 }
             }
         }
@@ -97,7 +97,7 @@ public class PlayerAttack : MonoBehaviour
             targetHealthBar = null;
 
             if (animationComponent != null && animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
-                animationComponent.CrossFade("Stand (ID 0 variation 0)", 0.1f);
+                animationComponent.Play("Stand (ID 0 variation 0)");
         }
     }
 
@@ -122,18 +122,15 @@ public class PlayerAttack : MonoBehaviour
             Debug.LogWarning("TargetEnemy is null!");
             return;
         }
-        if (animationComponent != null)
+        string animName = "Attack1H (ID 17 variation 0)";
+        if (animationComponent.GetClip(animName) != null)
         {
-            string animName = "Attack1H (ID 17 variation 0)";
-            if (animationComponent.GetClip(animName) != null)
-            {
-                animationComponent[animName].speed = attackSpeed;
-                animationComponent.CrossFade(animName, 0.1f); // 부드럽게 전환
-            }
-            else
-            {
-                Debug.LogError($"애니메이션 {animName}을 찾을 수 없습니다!");
-            }
+            animationComponent[animName].speed = attackSpeed;
+            animationComponent.Play(animName); // 부드럽게 전환
+        }
+        else
+        {
+            Debug.LogError($"애니메이션 {animName}을 찾을 수 없습니다!");
         }
 
 

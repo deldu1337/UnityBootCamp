@@ -5,7 +5,7 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 distance;
     void Start()
     {
-        Vector3 vector3 = new Vector3(1f, 13f, 1f);
+        Vector3 vector3 = new Vector3(-2f, 17f, -2f);
         //distance = Camera.main.transform.position - transform.position;
         distance = vector3 - transform.position;
     }

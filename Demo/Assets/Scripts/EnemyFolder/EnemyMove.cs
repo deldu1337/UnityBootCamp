@@ -78,7 +78,7 @@ public class EnemyMove : MonoBehaviour
         direction.y = 0;
         float distance = direction.magnitude;
 
-        if (distance > 2f)
+        if (distance > 1f)
         {
             Vector3 moveDir = direction.normalized;
 

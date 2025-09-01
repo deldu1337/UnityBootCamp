@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Rigidbody 컴포넌트가 반드시 필요함을 명시
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerMove : MonoBehaviour
+public class PlayerMove1 : MonoBehaviour
 {
     // 플레이어 이동 속도
     public float moveSpeed = 5f;
@@ -26,7 +26,7 @@ public class PlayerMove : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         // 회전 강제 고정 (물리적으로 회전하지 않도록)
         rb.constraints = RigidbodyConstraints.FreezeRotation;
-        
+
         wallLayer = LayerMask.GetMask("Wall");
 
         // Animation 컴포넌트 가져오기
@@ -60,7 +60,7 @@ public class PlayerMove : MonoBehaviour
     void HandleMovementInput()
     {
         // 마우스 우클릭 시 이동
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(1))
         {
             // 카메라에서 마우스 위치로 Ray 발사
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -73,31 +73,8 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        // 마우스 우클릭 시 이동
-        if (Input.GetMouseButtonDown(1))
-        {
-            // 카메라에서 마우스 위치로 Ray 발사
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-
-                // Ray가 닿은 지점을 목표 위치로 설정
-                targetPosition = hit.point;
-                targetPosition.y = transform.position.y; // y좌표는 플레이어 높이로 고정
-                isMoving = true;
-            }
-        }
-
-        // 이동 애니메이션 재생
-        if (isMoving && animationComponent != null)
-        {
-            // 공격 중이면 Run 재생 금지
-            if (!animationComponent.IsPlaying("Attack1H (ID 17 variation 0)") &&
-                !animationComponent.IsPlaying("Run (ID 5 variation 0)"))
-            {
-                animationComponent.Play("Run (ID 5 variation 0)");
-            }
-        }
+        if (isMoving && animationComponent != null && !animationComponent.IsPlaying("Run (ID 5 variation 0)"))
+            animationComponent.Play("Run (ID 5 variation 0)");
     }
 
     // 실제 플레이어 이동 처리
