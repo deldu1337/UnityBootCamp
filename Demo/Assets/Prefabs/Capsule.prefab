@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 280449151351255958}
   - component: {fileID: -3198792290207516418}
   - component: {fileID: 4499593287681799263}
+  - component: {fileID: 5407009743756149776}
   m_Layer: 7
   m_Name: Capsule
   m_TagString: Untagged
@@ -208,6 +209,25 @@ MonoBehaviour:
   moveSpeed: 5
   rotationSpeed: 10
   detectRadius: 10
+--- !u!114 &5407009743756149776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049026547032071048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9c8bb46351c5bd4f85a907edfc3c4de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dropTable:
+  - itemPrefab: {fileID: 584906182147590915, guid: f7128b2b33a81bc4f824c4f81712c9f6, type: 3}
+    dropChance: 26.9
+    minAmount: 1
+    maxAmount: 1
+  dropPoint: {fileID: 2159107551186399572}
+  dropRadius: 1
 --- !u!1 &3495639509453790342
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,10 +7,12 @@ public class EnemyStats : MonoBehaviour
     public float currentHP { get; private set; }
 
     public float attackPower = 10f;
+    private ItemDropManager dropManager;
 
     void Awake()
     {
         currentHP = maxHP;
+        dropManager = GetComponent<ItemDropManager>();
     }
 
     /// <summary> 적이 데미지를 받음 </summary>
@@ -23,6 +25,7 @@ public class EnemyStats : MonoBehaviour
         if (currentHP <= 0)
         {
             Die();
+            dropManager.DropItems();
         }
     }
 

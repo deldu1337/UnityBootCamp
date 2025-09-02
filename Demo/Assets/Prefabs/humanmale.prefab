@@ -1467,7 +1467,7 @@ PrefabInstance:
       addedObject: {fileID: -8427115250060388944}
     - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4624680811014029274}
+      addedObject: {fileID: 2405269217426671909}
   m_SourcePrefab: {fileID: 5058450713772209833, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
 --- !u!4 &2761100263615861165 stripped
 Transform:
@@ -1606,20 +1606,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66e937d742daddc489fbcffb4074ad61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4624680811014029274
+--- !u!114 &2405269217426671909
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6914515128741021224}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15e5ae865424f4144946a07b3ac83e02, type: 3}
+  m_Script: {fileID: 11500000, guid: 076a8e607d7e6d1449c2134c7b1ee62a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
-  rotationSpeed: 10
+  inventoryPanel: {fileID: 3846489616724301420, guid: f69386e11b547964ead4c5a9af0100e0, type: 3}
 --- !u!1001 &3400078409985484333
 PrefabInstance:
   m_ObjectHideFlags: 0
