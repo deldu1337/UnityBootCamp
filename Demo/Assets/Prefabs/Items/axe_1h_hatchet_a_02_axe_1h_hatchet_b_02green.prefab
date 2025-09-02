@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemInfo: "\uB0A0\uCE74\uB85C\uC6B4 \uAC80"
-  showDistance: 5
+  showDistance: 7
 --- !u!136 &1696571426411959195
 CapsuleCollider:
   m_ObjectHideFlags: 0

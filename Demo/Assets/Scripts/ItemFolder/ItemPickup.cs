@@ -5,7 +5,7 @@ public class ItemPickup : MonoBehaviour
     [TextArea] public string itemInfo; // 아이템 설명
 
     [Header("툴팁 설정")]
-    public float showDistance = 5f; // 플레이어와 이 거리 안에서만 툴팁 표시
+    public float showDistance = 7f; // 플레이어와 이 거리 안에서만 툴팁 표시
 
     private bool isMouseOver = false;
     private Transform player;
