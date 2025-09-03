@@ -15,9 +15,15 @@ public class Board : MonoBehaviour
     public int DestY { get; set; }
     public int DestX { get; set; }
 
+    private Transform _maze;
     private Material emptyMat;
     private Material wallMat;
     private Material goalMat;
+
+    private void Start()
+    {
+        
+    }
 
     public void Initialze()
     {
@@ -113,13 +119,20 @@ public class Board : MonoBehaviour
 
     public void Spawn()
     {
+        if (_maze != null)
+            Despawn();
+
+        _maze = new GameObject().transform;
+        _maze.parent = transform;
+        _maze.name = "Maze";
+
         for (int y = 0; y < Size; y++)
         {
             for (int x = 0; x < Size; x++)
             {
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.transform.position = new Vector3(x, 0, -y);
-                go.transform.parent = transform;
+                go.transform.parent = _maze;
 
                 if (Tile[y, x] == TileType.Empty || Tile[y, x] == TileType.Goal)
                     go.transform.localScale = new Vector3(1f, 0.1f, 1f);
@@ -144,5 +157,11 @@ public class Board : MonoBehaviour
         }
 
         return wallMat;
+    }
+
+    private void Despawn()
+    {
+        Destroy(_maze.gameObject);
+        _maze = null;
     }
 }

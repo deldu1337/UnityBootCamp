@@ -38,6 +38,83 @@ public class Player : MonoBehaviour
 
         transform.position = new Vector3(posX, 0, -posY);
 
+        _points.Clear();
+        _lastIndex = 0;
+
+        // 우수법
+        //RightHand();
+
+        BFS();
+
+        _isBoardCreated = true;
+    }
+    
+    void BFS()
+    {
+        int[] deltaY = new int[] {-1,0,1,0 };
+        int[] deltaX = new int[] {0,-1,0,1 };
+
+        bool[,] found = new bool[_board.Size, _board.Size];
+        Pos[,] parent = new Pos[_board.Size, _board.Size];
+
+        Queue<Pos> queue = new Queue<Pos>();
+        queue.Enqueue(new Pos(PosY, PosX));
+        found[PosY,PosX] = true;
+        parent[PosY,PosX] = new Pos(PosY, PosX);
+
+        while (queue.Count > 0)
+        {
+            Pos pos  = queue.Dequeue();
+            int nowY = pos.Y;
+            int nowX = pos.X;
+
+            for(int i = 0; i < 4; i++)
+            {
+                int nextY = nowY + deltaY[i];
+                int nextX = nowX + deltaX[i];
+
+                // 범위를 초과하지 않게 막기
+                if (nextY < 0 || nextY >= _board.Size || nextX < 0 || nextX >= _board.Size)
+                    continue;
+                // 체크하려는 점이 갈 수 있는 점인지
+                if (_board.Tile[nextY, nextX] == TileType.Wall)
+                    continue;
+                // 이미 찾은 점인지 확인
+                if (!found[nextY, nextX])
+                    continue;
+
+                queue.Enqueue(new Pos(nextY, nextX));
+                found[nextY, nextX] = true;
+                parent[nextY, nextX] = new Pos(nowY, nowX);
+            }
+        }
+
+        int y = _board.DestY;
+        int x = _board.DestX;
+
+        while (parent[y,x].Y != y || parent[y,x].X != x)
+        {
+            // [0] -> 목적지
+            // [1] -> 목적지 부모
+            // ...
+            // [마지막 인덱스] -> 최초 지점 이전
+            _points.Add(new Pos(y, x));
+            Pos pos = parent[y,x];
+            y = pos.Y;
+            x = pos.X;
+        }
+        // 최초 지점 추가
+        _points.Add(new Pos(y, x));
+        // [0] -> 최초 지점
+        // [1] -> 최초 지점 다음
+        // ...
+        // [마지막 인덱스] -> 목적지
+        _points.Reverse();
+    }
+
+    // 우수법 - (미로를 탈출하기 위한) 오른손 법칙
+    void RightHand()
+    {
         // 내가 바라보는 방향 기준 앞방향 타일을 확인 하기 위한 좌표
         int[] _frontY = new int[] { -1, 0, 1, 0 };
         int[] _frontX = new int[] { 0, -1, 0, 1 };
@@ -49,12 +126,12 @@ public class Player : MonoBehaviour
         _points.Add(new Pos(PosY, PosX));
 
         // 목적지 계산전 까지 계속실행
-        while (PosY != board.DestY || PosX != board.DestX)
+        while (PosY != _board.DestY || PosX != _board.DestX)
         {
             // 1. 현재 바라보는 방향을 기준으로 오른쪽으로 갈 수 있는지 확인
 
             // 현재 내가 바라 보고 있는 방향기준, 오른쪽 의 타일을 확인해야하니까
-            if (board.Tile[PosY + _rightY[_dir], PosX + _rightX[_dir]] != TileType.Wall)
+            if (_board.Tile[PosY + _rightY[_dir], PosX + _rightX[_dir]] != TileType.Wall)
             {
                 #region 
                 // 오른쪽 방향으로 90도 회전
@@ -101,7 +178,7 @@ public class Player : MonoBehaviour
                 _points.Add(new Pos(PosY, PosX));
             }
             // 2. 현재 바라보는 방향을 기준으로 전진할 수 있는지 확인
-            else if (board.Tile[PosY + _frontY[_dir], PosX + _frontX[_dir]] != TileType.Wall)
+            else if (_board.Tile[PosY + _frontY[_dir], PosX + _frontX[_dir]] != TileType.Wall)
             {
                 // 앞으로 한보 전진
                 PosY = PosY + _frontY[_dir];
@@ -116,12 +193,7 @@ public class Player : MonoBehaviour
                 _dir = (_dir + 1 + 4) % 4;
             }
         }
-
-        _isBoardCreated = true;
     }
-
-    // 우수법 - (미로를 탈출하기 위한) 오른손 법칙
-
 
 
     private const float MOVE_TICK = 0.1f;
@@ -142,33 +214,6 @@ public class Player : MonoBehaviour
 
         _sumTick = 0;
 
-        //int dir = Random.Range(0, 4);
-
-        //int NextY = PosY;
-        //int NextX = PosX;
-
-        //switch (dir)
-        //{
-        //    case 0:
-        //        NextY = PosY - 1;
-        //        break;
-        //    case 1:
-        //        NextY = PosY + 1;
-        //        break;
-        //    case 2:
-        //        NextX = PosX - 1;
-        //        break;
-        //    case 3:
-        //        NextX = PosX + 1;
-        //        break;
-        //}
-
-        //if (NextY < 0 || NextY >= _board.Size) return;
-        //if (NextX < 0 || NextX >= _board.Size) return;
-        //if (_board.Tile[NextY, NextX] == TileType.Wall) return; 
-
-        //PosY = NextY;
-        //PosX = NextX;
         PosY = _points[_lastIndex].Y;
         PosX = _points[_lastIndex].X;
         _lastIndex++;

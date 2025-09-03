@@ -35,7 +35,7 @@ public class ItemDropManager : MonoBehaviour
                                       + Random.insideUnitSphere * dropRadius;
                     dropPos.y = transform.position.y; // TODO: 필요시 레이캐스트로 지면 보정
 
-                    Instantiate(drop.itemPrefab, dropPos, Quaternion.identity);
+                    Instantiate(drop.itemPrefab, dropPos, Quaternion.identity, transform.parent);
                 }
             }
         }
