@@ -132,7 +132,6 @@ public class PlayerMove : MonoBehaviour
         {
             isMoving = false;
             if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
-                //animationComponent.CrossFade("Stand (ID 0 variation 0)", 0.1f);
                 animationComponent.Play("Stand (ID 0 variation 0)");
         }
     }

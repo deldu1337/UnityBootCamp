@@ -4,26 +4,27 @@ using System.Linq;
 
 public class TileMapGenerator : MonoBehaviour
 {
-    public int width = 100;
-    public int height = 100;
-    public GameObject wallPrefab;
-    public GameObject floorPrefab;
-    public int minRoomSize = 10;
-    public int maxRoomSize = 24;
-    public int maxDepth = 20;
-    public int corridorWidth = 5;
+    public int width = 100; // 맵 가로 크기
+    public int height = 100; // 맵 세로 크기
+    public GameObject wallPrefab;  // 벽 프리팹
+    public GameObject floorPrefab; // 바닥 프리팹
+    public int minRoomSize = 10;   // 방 최소 크기
+    public int maxRoomSize = 24;   // 방 최대 크기
+    public int maxDepth = 20;      // BSP 분할 최대 깊이
+    public int corridorWidth = 5;  // 통로 폭
 
-    private int[,] map;
-    private List<RectInt> rooms;
-    private RectInt playerRoom; // 플레이어 전용 방 저장
+    private int[,] map; // 2D 맵 데이터: 0=바닥, 1=벽
+    private List<RectInt> rooms; // 일반 방 리스트
+    private RectInt playerRoom;  // 플레이어 전용 방
 
+    // 맵 생성 완료 이벤트
     public delegate void MapGeneratedHandler();
     public event MapGeneratedHandler OnMapGenerated;
 
     void Start()
     {
-        GenerateMap();
-        RenderMap();
+        GenerateMap(); // 맵 데이터 생성
+        RenderMap();   // 맵 오브젝트 생성
     }
 
     public void GenerateMap()
@@ -31,12 +32,12 @@ public class TileMapGenerator : MonoBehaviour
         map = new int[width, height];
         rooms = new List<RectInt>();
 
-        // 전체 벽 초기화
+        // 전체 벽으로 초기화
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
                 map[x, y] = 1;
 
-        // BSP 분할
+        // BSP로 방 분할
         RectInt root = new RectInt(1, 1, width - 2, height - 2);
         SplitRoom(root, maxDepth, rooms);
 
@@ -53,7 +54,7 @@ public class TileMapGenerator : MonoBehaviour
             for (int y = playerRoom.yMin + 1; y < playerRoom.yMax - 1; y++)
                 map[x, y] = 0;
 
-        // 방 바닥 생성 (플레이어 방 제외)
+        // 일반 방 바닥 생성 (플레이어 방 제외)
         foreach (var room in rooms)
         {
             if (!room.Overlaps(playerRoom))
@@ -69,7 +70,7 @@ public class TileMapGenerator : MonoBehaviour
             new Vector2Int(Mathf.RoundToInt(r.center.x), Mathf.RoundToInt(r.center.y))
         ).ToList();
 
-        // MST 연결 (Prim 알고리즘)
+        // MST 연결 (Prim 알고리즘) - 방들을 최소 연결 통로로 연결
         List<Vector2Int> connected = new List<Vector2Int>();
         List<Vector2Int> remaining = new List<Vector2Int>(centers);
         if (remaining.Count > 0)
@@ -84,6 +85,7 @@ public class TileMapGenerator : MonoBehaviour
             Vector2Int a = Vector2Int.zero;
             Vector2Int b = Vector2Int.zero;
 
+            // 연결된 방과 남은 방 사이의 최소 거리 방 선택
             foreach (var c in connected)
             {
                 foreach (var r in remaining)
@@ -98,7 +100,7 @@ public class TileMapGenerator : MonoBehaviour
                 }
             }
 
-            CreateCorridor(a, b);
+            CreateCorridor(a, b); // 통로 생성
             connected.Add(b);
             remaining.Remove(b);
         }
@@ -122,7 +124,7 @@ public class TileMapGenerator : MonoBehaviour
             );
 
             // 플레이어 방 벽 뚫기 (최소 corridorWidth 적용)
-            int offset = Mathf.Max(corridorWidth / 2, 1); // 최소 1
+            int offset = Mathf.Max(corridorWidth / 2, 1);
             for (int w = -offset; w <= offset; w++)
             {
                 int x = corridorStart.x + w;
@@ -134,8 +136,7 @@ public class TileMapGenerator : MonoBehaviour
                 }
             }
 
-
-            // 개선된 통로 생성
+            // 플레이어 방 → 가장 가까운 방 통로 생성
             CreatePlayerCorridor(corridorStart, nearestRoomCenter);
         }
 
@@ -143,8 +144,10 @@ public class TileMapGenerator : MonoBehaviour
         OnMapGenerated?.Invoke();
     }
 
+    // BSP 분할 함수
     void SplitRoom(RectInt space, int depth, List<RectInt> rooms)
     {
+        // 최대 깊이 도달 또는 공간이 너무 작으면 방 생성
         if (depth == 0 || space.width < minRoomSize * 2 || space.height < minRoomSize * 2)
         {
             int roomWidth = Random.Range(minRoomSize, Mathf.Min(space.width, maxRoomSize));
@@ -153,7 +156,7 @@ public class TileMapGenerator : MonoBehaviour
             int roomY = Random.Range(space.yMin + 1, space.yMax - roomHeight - 1);
             RectInt newRoom = new RectInt(roomX, roomY, roomWidth, roomHeight);
 
-            float minDistanceFromPlayer = 8f;
+            float minDistanceFromPlayer = 8f; // 플레이어 방 최소 거리
             Vector2Int newCenter = new Vector2Int(Mathf.RoundToInt(newRoom.center.x), Mathf.RoundToInt(newRoom.center.y));
             Vector2Int playerCenter = new Vector2Int(Mathf.RoundToInt(playerRoom.center.x), Mathf.RoundToInt(playerRoom.center.y));
 
@@ -165,6 +168,7 @@ public class TileMapGenerator : MonoBehaviour
             return;
         }
 
+        // 공간 분할 (수평 또는 수직 랜덤)
         bool splitHorizontally = Random.value > 0.5f;
         if (splitHorizontally)
         {
@@ -180,6 +184,7 @@ public class TileMapGenerator : MonoBehaviour
         }
     }
 
+    // 두 방 사이 통로 생성
     void CreateCorridor(Vector2Int a, Vector2Int b)
     {
         if (Random.value > 0.5f)
@@ -194,9 +199,9 @@ public class TileMapGenerator : MonoBehaviour
         }
     }
 
+    // 플레이어 방 → 방 통로 생성
     void CreatePlayerCorridor(Vector2Int start, Vector2Int end)
     {
-        // corridorWidth가 최소 2 이상인지 보장
         int offset = Mathf.Max(corridorWidth / 2, 1);
 
         // 중간점 생성 (조금 랜덤)
@@ -205,17 +210,16 @@ public class TileMapGenerator : MonoBehaviour
             (start.y + end.y) / 2 + Random.Range(-2, 3)
         );
 
-        // 시작 → 중간
+        // 시작 → 중간 통로
         for (int w = -offset; w <= offset; w++)
             DigCorridor(new Vector2Int(start.x + w, start.y), new Vector2Int(mid.x + w, mid.y));
 
-        // 중간 → 끝
+        // 중간 → 끝 통로
         for (int w = -offset; w <= offset; w++)
             DigCorridor(new Vector2Int(mid.x + w, mid.y), new Vector2Int(end.x + w, end.y));
     }
 
-
-
+    // 직선 통로 파기
     void DigCorridor(Vector2Int start, Vector2Int end)
     {
         Vector2Int current = start;
@@ -247,7 +251,7 @@ public class TileMapGenerator : MonoBehaviour
         }
     }
 
-
+    // 수평 통로 생성
     void DrawHorizontalCorridor(int xStart, int xEnd, int y)
     {
         int offset = corridorWidth / 2;
@@ -260,6 +264,7 @@ public class TileMapGenerator : MonoBehaviour
             }
     }
 
+    // 수직 통로 생성
     void DrawVerticalCorridor(int yStart, int yEnd, int x)
     {
         int offset = corridorWidth / 2;
@@ -272,7 +277,7 @@ public class TileMapGenerator : MonoBehaviour
             }
     }
 
-
+    // 맵 렌더링: 벽/바닥 프리팹 생성
     void RenderMap()
     {
         for (int x = 0; x < width; x++)
@@ -283,24 +288,29 @@ public class TileMapGenerator : MonoBehaviour
             }
     }
 
+    // 지정 좌표가 바닥인지 확인
     public bool IsFloor(int x, int y)
     {
         if (x < 0 || x >= width || y < 0 || y >= height) return false;
         return map[x, y] == 0;
     }
 
+    // 일반 방 리스트 반환
     public List<RectInt> GetRooms()
     {
         return rooms.Where(r => r != playerRoom).ToList();
     }
 
+    // 플레이어 방 반환
     public RectInt GetPlayerRoom()
     {
         return playerRoom;
     }
 
+    // 맵 재생성
     public void ReloadMap()
     {
+        // 기존 맵 오브젝트 제거
         for (int i = transform.childCount - 1; i >= 0; i--)
             Destroy(transform.GetChild(i).gameObject);
 
