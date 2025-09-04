@@ -1,14 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using static GLTFast.Schema.AnimationChannelBase;
-using Path = System.IO.Path;
 
 public class ItemPickup : MonoBehaviour
 {
     [TextArea] public string itemInfo; // 아이템 설명
     [TextArea] public string id; // 아이템 id
+    public Sprite icon; // 인벤토리에 사용할 아이콘
 
     [Header("툴팁 설정")]
     public float showDistance = 7f; // 플레이어와 이 거리 안에서만 툴팁 표시
@@ -16,16 +15,12 @@ public class ItemPickup : MonoBehaviour
     private bool isMouseOver = false;
     private Transform player;
     private DataManager dataManager;
-    private string inventoryFilePath;
+    private PlayerInventory playerInventory;
 
     private void Start()
     {
-        // 아이템 name 불러오기
         dataManager = DataManager.GetInstance();
         dataManager.LoadDatas();
-
-        // C:\Users\user\AppData\LocalLow\DefaultCompany\Demo
-        inventoryFilePath = Path.Combine(Application.persistentDataPath, "playerInventory.json");
 
         // 플레이어 레이어 기반으로 씬에서 찾기
         int playerLayer = LayerMask.NameToLayer("Player");
@@ -38,6 +33,11 @@ public class ItemPickup : MonoBehaviour
                 break;
             }
         }
+
+        // PlayerInventory 자동 참조
+        playerInventory = FindObjectOfType<PlayerInventory>();
+        if (playerInventory == null)
+            Debug.LogError("PlayerInventory를 찾을 수 없습니다! Player 오브젝트에 PlayerInventory 스크립트를 붙여주세요.");
     }
 
     private void Update()
@@ -51,9 +51,11 @@ public class ItemPickup : MonoBehaviour
             {
                 ItemTooltip.Instance.Show(dataManager.dicItemDatas[int.Parse(id)].name);
 
-                // 우클릭 시 아이템 제거
+                // 우클릭 시 아이템 추가 후 제거
                 if (Input.GetMouseButtonDown(0))
                 {
+                    playerInventory.AddItemToInventory(int.Parse(id), icon);
+                    //Debug.Log($"{playerInventory.inv}")
                     Destroy(gameObject);
                     ItemTooltip.Instance.Hide();
                 }
