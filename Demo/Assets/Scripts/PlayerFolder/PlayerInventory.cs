@@ -10,7 +10,7 @@ public class InventoryItem
     public string uniqueId; // 아이템 고유 ID (UUID)
     public int id;          // DataManager에서 관리하는 아이템 ID
     public ItemData data;   // 아이템 데이터 (이름, 공격력 등)
-    public Sprite icon;     // 인벤토리 UI에서 사용할 아이콘
+    public string iconPath; // 아이콘 리소스 경로
 }
 
 [Serializable]
@@ -40,8 +40,8 @@ public class PlayerInventory : MonoBehaviour
 {
     [SerializeField] private GameObject inventoryPanel; // 인벤토리 UI Panel
     private Button[] inventoryButtons;                  // 인벤토리 슬롯 버튼 배열
+    public GameObject InventoryPanel => inventoryPanel;
     private Transform buttonContainer;                  // 버튼들이 들어있는 부모 Transform
-
     private bool isOpen;                                // 인벤토리 열림 상태
     private DataManager dataManager;                    // 아이템 데이터를 관리하는 싱글톤
     private string inventoryFilePath;                   // 인벤토리 저장 경로
@@ -95,61 +95,54 @@ public class PlayerInventory : MonoBehaviour
     // 인벤토리 UI 갱신
     public void RefreshInventoryUI()
     {
-        // 1) 모든 버튼 비활성화
+        // 모든 버튼 비활성화
         foreach (var btn in inventoryButtons)
             btn.gameObject.SetActive(false);
 
-        // 2) 인벤토리 아이템 순회
-        int index = 0;
-        foreach (var kvp in inventoryDict)
+        // 인벤토리 List 기반 UI
+        for (int i = 0; i < inventory.items.Count && i < inventoryButtons.Length; i++)
         {
-            if (index >= inventoryButtons.Length)
-                break; // 슬롯 초과 방지
-
-            var item = kvp.Value;
-
-            // 버튼 활성화
-            var button = inventoryButtons[index];
+            var item = inventory.items[i];
+            var button = inventoryButtons[i];
             button.gameObject.SetActive(true);
 
-            // 버튼 이미지 변경
+            // 아이콘 적용
             var image = button.GetComponent<Image>();
-            if (image != null && item.icon != null)
-                image.sprite = item.icon; // 저장된 아이콘 사용
-
-            // 드래그 가능하게 Component 추가
-            DraggableItem draggable = button.GetComponent<DraggableItem>();
-            if (draggable == null)
+            if (image != null && !string.IsNullOrEmpty(item.iconPath))
             {
-                draggable = button.gameObject.AddComponent<DraggableItem>();
-                draggable.playerInventory = this; // PlayerInventory 참조 전달
+                Sprite icon = Resources.Load<Sprite>(item.iconPath);
+                if (icon != null)
+                    image.sprite = icon;
             }
 
-            index++;
+            // 드래그 컴포넌트 연결
+            DraggableItem draggable = button.GetComponent<DraggableItem>();
+            if (draggable == null)
+                draggable = button.gameObject.AddComponent<DraggableItem>();
+
+            draggable.playerInventory = this;
         }
     }
 
     public void SwapInventoryData(int indexA, int indexB)
     {
-        // inventoryDict → List로 변환
-        List<InventoryItem> itemList = new List<InventoryItem>(inventoryDict.Values);
-
-        if (indexA < 0 || indexA >= itemList.Count || indexB < 0 || indexB >= itemList.Count)
+        if (indexA == indexB || indexA < 0 || indexB < 0 ||
+            indexA >= inventory.items.Count || indexB >= inventory.items.Count)
             return;
 
-        // 순서 교환
-        InventoryItem temp = itemList[indexA];
-        itemList[indexA] = itemList[indexB];
-        itemList[indexB] = temp;
+        var temp = inventory.items[indexA];
+        inventory.items[indexA] = inventory.items[indexB];
+        inventory.items[indexB] = temp;
 
-        // Dictionary 갱신
+        // Dictionary 동기화
         inventoryDict.Clear();
-        foreach (var item in itemList)
+        foreach (var item in inventory.items)
             inventoryDict[item.uniqueId] = item;
 
-        // 저장
         SaveInventory();
+        RefreshInventoryUI();
     }
+
 
     // 인벤토리 파일에서 데이터 불러오기
     public void LoadInventory()
@@ -184,13 +177,14 @@ public class PlayerInventory : MonoBehaviour
         }
 
         string uniqueId = Guid.NewGuid().ToString(); // UUID 생성
+        string iconPath = "Icons/" + icon.name; // 예: Resources/Icons 폴더 기준
 
         var newItem = new InventoryItem
         {
             uniqueId = uniqueId,
             id = id,
             data = dataManager.dicItemDatas[id],
-            icon = icon
+            iconPath = iconPath
         };
 
         // Dictionary에 추가

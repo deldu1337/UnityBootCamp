@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -10,68 +9,55 @@ public class DraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Transform originalParent;
-    private int originalSiblingIndex;
+    private int originalIndex;
+    private GameObject placeholder;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-
-        // CanvasGroup 없으면 자동 추가
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-
-        // 상위 Canvas 찾기
+        canvasGroup = gameObject.AddComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
-        if (canvas == null)
-            Debug.LogError("DraggableItem: Canvas를 찾을 수 없습니다!");
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        originalParent = rectTransform.parent;
-        originalSiblingIndex = rectTransform.GetSiblingIndex();
+        originalParent = transform.parent;
+        originalIndex = transform.GetSiblingIndex();
 
+        // placeholder는 필요 없음 (버튼은 고정)
         canvasGroup.blocksRaycasts = false;
 
-        // 드래그 중엔 Canvas 루트로 이동 → 최상위로 표시
-        rectTransform.SetParent(canvas.transform, true);
+        // 아이콘만 드래그 (버튼이 아니라)
+        transform.SetParent(canvas.transform, true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        rectTransform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        canvasGroup.blocksRaycasts = true;
-
-        // 마우스 위치에서 Raycast로 슬롯 확인
-        GameObject hitObj = eventData.pointerCurrentRaycast.gameObject;
-        if (hitObj != null)
+        // 가장 가까운 슬롯 찾기
+        int closestIndex = 0;
+        float closestDistance = float.MaxValue;
+        for (int i = 0; i < originalParent.childCount; i++)
         {
-            DraggableItem targetItem = hitObj.GetComponent<DraggableItem>();
-            if (targetItem != null && targetItem != this)
+            float dist = Vector2.SqrMagnitude(eventData.position - (Vector2)originalParent.GetChild(i).position);
+            if (dist < closestDistance)
             {
-                // 서로 부모와 위치 교환
-                Transform targetParent = targetItem.transform.parent;
-                int targetSibling = targetItem.transform.GetSiblingIndex();
-
-                targetItem.transform.SetParent(originalParent, false);
-                targetItem.transform.SetSiblingIndex(originalSiblingIndex);
-
-                rectTransform.SetParent(targetParent, false);
-                rectTransform.SetSiblingIndex(targetSibling);
-
-                // **인벤토리 데이터 순서 갱신**
-                playerInventory.SwapInventoryData(originalSiblingIndex, targetSibling);
-                return;
+                closestDistance = dist;
+                closestIndex = i;
             }
         }
 
-        // 다른 버튼이 없으면 원래 위치로 복귀
-        rectTransform.SetParent(originalParent, false);
-        rectTransform.SetSiblingIndex(originalSiblingIndex);
+        // 아이콘 원래 자리로 복귀
+        transform.SetParent(originalParent);
+        transform.SetSiblingIndex(originalIndex);
+
+        canvasGroup.blocksRaycasts = true;
+
+        // 데이터만 교체
+        playerInventory.SwapInventoryData(originalIndex, closestIndex);
     }
 }
