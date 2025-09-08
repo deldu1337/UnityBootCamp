@@ -41,6 +41,9 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private GameObject inventoryPanel; // 인벤토리 UI Panel
     private Button[] inventoryButtons;                  // 인벤토리 슬롯 버튼 배열
     public GameObject InventoryPanel => inventoryPanel;
+
+    private Button ExitButton;
+
     private Transform buttonContainer;                  // 버튼들이 들어있는 부모 Transform
     private bool isOpen;                                // 인벤토리 열림 상태
     private DataManager dataManager;                    // 아이템 데이터를 관리하는 싱글톤
@@ -56,11 +59,18 @@ public class PlayerInventory : MonoBehaviour
 
         if (inventoryPanel != null)
         {
+            // ExitButton 찾기
+            ExitButton = inventoryPanel.transform.GetComponentInChildren<Button>();
+
+            // 버튼 클릭 이벤트 등록
+            ExitButton.onClick.AddListener(() =>
+            {
+                CloseInventory();
+            });
+
             inventoryPanel.SetActive(false); // 처음엔 비활성화
 
-            // Scroll View → Viewport → Content 순서로 버튼 컨테이너 가져오기
-            buttonContainer = inventoryPanel.transform.GetChild(0).GetChild(0);
-
+            buttonContainer = inventoryPanel.transform.Find("InventoryUI/TextPanel");
             // 버튼 배열 가져오기
             inventoryButtons = buttonContainer.GetComponentsInChildren<Button>(true);
         }
@@ -91,6 +101,21 @@ public class PlayerInventory : MonoBehaviour
             }
         }
     }
+
+    public void CloseInventory()
+    {
+        if (inventoryPanel != null)
+        {
+            inventoryPanel.SetActive(false);
+            isOpen = false;
+            Debug.Log("인벤토리 닫힘");
+        }
+        else
+        {
+            Debug.LogWarning("InventoryPanel이 할당되지 않았습니다.");
+        }
+    }
+
 
     // 인벤토리 UI 갱신
     public void RefreshInventoryUI()
