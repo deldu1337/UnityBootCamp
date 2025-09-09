@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [Serializable]
-public class InventoryItem
+public class InventoryItems
 {
     public string uniqueId; // 아이템 고유 ID (UUID)
     public int id;          // DataManager에서 관리하는 아이템 ID
@@ -78,7 +78,7 @@ public class PlayerInventory : MonoBehaviour
         isOpen = false;
 
         // DataManager에서 아이템 데이터 불러오기
-        dataManager = DataManager.GetInstance();
+        //dataManager = DataManager.GetInstance();
         dataManager.LoadDatas();
 
         // 저장된 인벤토리 불러오기
