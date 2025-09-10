@@ -10,7 +10,7 @@ public class EnemyAttack : MonoBehaviour
 
     private float lastAttackTime = 0f;    // 마지막 공격 시간 기록
     private EnemyMove enemyMove;          // 이동 및 추적 관련 컴포넌트
-    private PlayerStats targetPlayer;     // 공격 대상 플레이어 정보
+    private PlayerCombatStats targetPlayer;     // 공격 대상 플레이어 정보
 
     void Awake()
     {
@@ -25,7 +25,7 @@ public class EnemyAttack : MonoBehaviour
         // EnemyMove가 추적 중인 플레이어가 있는지 확인
         if (enemyMove.TargetPlayer != null)
         {
-            targetPlayer = enemyMove.TargetPlayer.GetComponent<PlayerStats>();
+            targetPlayer = enemyMove.TargetPlayer.GetComponent<PlayerCombatStats>();
 
             // 플레이어가 존재하고 HP가 0 이상이면 공격 가능
             if (targetPlayer != null && targetPlayer.currentHP > 0)

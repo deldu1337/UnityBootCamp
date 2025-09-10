@@ -1446,9 +1446,6 @@ PrefabInstance:
       addedObject: {fileID: 1016322298301940480}
     - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1979436497907078827}
-    - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 4246065900588243630}
     - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
       insertIndex: -1
@@ -1462,6 +1459,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
       insertIndex: -1
       addedObject: {fileID: -3498325204928642015}
+    - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7298492771729238487}
   m_SourcePrefab: {fileID: 5058450713772209833, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
 --- !u!4 &2761100263615861165 stripped
 Transform:
@@ -1540,8 +1540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de1760d8de15a0249b2184c51935e580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
-  rotationSpeed: 10
+  baseRotationSpeed: 10
 --- !u!114 &1016322298301940480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1554,26 +1553,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 924dbd15bad2e4b40971d21c0719eab4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1979436497907078827
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6914515128741021224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49429a7a8e49d324ea341ca843415b41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackSpeed: 2.5
-  attackPower: 20
-  attackRange: 1
-  raycastYOffset: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  attackCooldown: 0.5
 --- !u!114 &4246065900588243630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1587,7 +1566,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 100
-  attackPower: 20
+  maxMP: 50
+  atk: 20
+  def: 5
+  dex: 10
+  attackSpeed: 3
+  critChance: 0.1
+  critDamage: 1.5
 --- !u!114 &-8427115250060388944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1638,6 +1623,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiCamera: {fileID: 0}
   targetCharacter: {fileID: 2761100263615861165}
+--- !u!114 &-7298492771729238487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6914515128741021224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c6abbd65b776fa498d65f54597766f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  raycastYOffset: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  lastAttackTime: 0
+  targetEnemy: {fileID: 0}
+  targetHealthBar: {fileID: 0}
+  animationComponent: {fileID: 0}
 --- !u!1001 &8823989808443070904
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -40,29 +40,6 @@ public class DraggableItemView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         rectTransform.position = eventData.position;
     }
 
-    //public void OnEndDrag(PointerEventData eventData)
-    //{
-    //    // 가장 가까운 슬롯 찾기
-    //    int closestIndex = 0;
-    //    float closestDistance = float.MaxValue;
-    //    for (int i = 0; i < originalParent.childCount; i++)
-    //    {
-    //        float dist = Vector2.SqrMagnitude(eventData.position - (Vector2)originalParent.GetChild(i).position);
-    //        if (dist < closestDistance)
-    //        {
-    //            closestDistance = dist;
-    //            closestIndex = i;
-    //        }
-    //    }
-
-    //    // 원래 위치로 복귀
-    //    transform.SetParent(originalParent);
-    //    transform.SetSiblingIndex(originalIndex);
-    //    canvasGroup.blocksRaycasts = true;
-
-    //    // Presenter에 데이터 스왑 요청
-    //    onItemDropped?.Invoke(originalIndex, closestIndex);
-    //}
     public void OnEndDrag(PointerEventData eventData)
     {
         // 슬롯 영역 밖으로 드래그했는지 체크
