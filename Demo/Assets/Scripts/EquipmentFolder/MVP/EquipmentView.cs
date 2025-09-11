@@ -17,7 +17,7 @@ public class EquipmentView : MonoBehaviour
     [SerializeField] private Button weaponSlot; // 예시: 무기 슬롯 하나
     [SerializeField] private Button shieldSlot; // 예시: 무기 슬롯 하나
 
-    public void Initialize(Action onExit)
+    public void Initialize(Action onExit, Action<string, InventoryItem> onEquipDropped)
     {
         if (equipmentUI == null)
             equipmentUI = GameObject.Find("EquipmentUI");
@@ -47,6 +47,17 @@ public class EquipmentView : MonoBehaviour
         equipmentUI?.SetActive(show);
         if (exitButton != null)
             exitButton.transform.SetAsLastSibling();
+    }
+
+    private void SetupSlot(Button button, string slotType, Action<string, InventoryItem> onEquipDropped)
+    {
+        if (button == null) return;
+        var slotView = button.GetComponent<EquipmentSlotView>();
+        if (slotView == null)
+            slotView = button.gameObject.AddComponent<EquipmentSlotView>();
+
+        slotView.slotType = slotType;
+        slotView.onItemDropped = onEquipDropped;
     }
 
     public void UpdateEquipmentUI(IReadOnlyList<EquipmentSlot> slots, Action<string> onSlotClicked)

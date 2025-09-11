@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems; // 추가 필요
+
 
 // Rigidbody 컴포넌트가 반드시 필요함을 명시
 [RequireComponent(typeof(Rigidbody))]
@@ -56,6 +58,10 @@ public class PlayerMove : MonoBehaviour
     // 마우스 입력을 받아 목표 위치 설정
     void HandleMovementInput()
     {
+        // UI 위에서 우클릭 시 이동 입력 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
         // 마우스 우클릭으로 이동
         if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(1))
         {

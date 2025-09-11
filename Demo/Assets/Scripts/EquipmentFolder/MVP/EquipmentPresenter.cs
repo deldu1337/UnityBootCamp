@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class EquipmentPresenter : MonoBehaviour
 {
@@ -51,7 +52,7 @@ public class EquipmentPresenter : MonoBehaviour
             }
         }
 
-        view.Initialize(CloseEquipment);
+        view.Initialize(CloseEquipment, HandleEquipFromInventory);
         InitializeEquippedItemsFromJson();
         RefreshEquipmentUI();
         isOpen = false;
@@ -78,6 +79,28 @@ public class EquipmentPresenter : MonoBehaviour
         }
     }
 
+    private void HandleEquipFromInventory(string slotType, InventoryItem item)
+    {
+        Debug.Log($"인벤토리 아이템 {item.data.name} → {slotType} 장착 시도");
+
+        // 모델에 반영
+        model.EquipItem(slotType, item);
+
+        // 프리팹 장착 처리
+        if (!string.IsNullOrEmpty(item.prefabPath))
+        {
+            GameObject prefab = Resources.Load<GameObject>(item.prefabPath);
+            if (prefab != null)
+                Handle(prefab, slotType);
+        }
+
+        // 스탯 갱신
+        if (playerCombatStats != null)
+            playerCombatStats.RecalculateStats(model.Slots);
+
+        RefreshEquipmentUI();
+    }
+
     private void ToggleEquipment()
     {
         if (view == null) return;
@@ -89,6 +112,69 @@ public class EquipmentPresenter : MonoBehaviour
         if (isOpen)
             RefreshEquipmentUI();
     }
+
+    private void Handle(GameObject prefab, string slot)
+    {
+        Transform body = null;
+        Vector3 offset = Vector3.zero;
+
+        // 슬롯 타입 기준으로 처리
+        switch (slot)
+        {
+            case "weapon":
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_HandR")
+                    {
+                        body = t;
+                        break;
+                    }
+                }
+                if (body == null)
+                {
+                    Debug.LogWarning("캐릭터 오른손(bone_HandR)을 찾을 수 없음");
+                    return;
+                }
+                break;
+
+            case "head":
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_Head")
+                    {
+                        body = t;
+                        break;
+                    }
+                }
+                if (body == null)
+                {
+                    Debug.LogWarning("캐릭터 머리(bone_Head)를 찾을 수 없음");
+                    return;
+                }
+                offset = new Vector3(-0.12f, 0.035f, 0);
+                break;
+
+            default:
+                Debug.LogWarning($"지원되지 않는 슬롯 타입: {slot}");
+                return;
+        }
+
+        // 기존 장비 제거
+        for (int i = body.childCount - 1; i >= 0; i--)
+        {
+            Transform child = body.GetChild(i);
+            // 이름이 숫자 또는 Clone 포함 여부 체크
+            if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
+                Destroy(child.gameObject);
+        }
+
+        // 새 장비 장착
+        GameObject instance = Instantiate(prefab, body);
+        instance.transform.SetAsLastSibling();
+        instance.transform.localPosition = offset;
+        instance.transform.localRotation = Quaternion.identity;
+    }
+
 
     /// <summary>
     /// JSON에 장착 데이터가 있는 슬롯만 캐릭터에 프리팹 장착
@@ -105,41 +191,7 @@ public class EquipmentPresenter : MonoBehaviour
                     Debug.LogWarning($"프리팹을 찾을 수 없음: {slot.equipped.prefabPath}");
                     continue;
                 }
-
-                // 오른손 찾기
-                Transform hand = null;
-                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
-                {
-                    if (t.name == "bone_HandR")
-                    {
-                        hand = t;
-                        break;
-                    }
-                }
-
-                if (hand == null)
-                {
-                    Debug.LogWarning("캐릭터 오른손(bone_HandR)을 찾을 수 없음");
-                    return;
-                }
-
-                if (hand != null)
-                {
-                    // 기존 무기 제거: 숫자 무기만 삭제하는 대신, 모든 기존 무기 제거
-                    for (int i = hand.childCount - 1; i >= 0; i--)
-                    {
-                        Transform child = hand.GetChild(i);
-                        // 이름이 숫자 또는 Clone 포함 여부 체크
-                        if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
-                            Destroy(child.gameObject);
-                    }
-
-                    // 새 무기 장착 (마지막 위치에)
-                    GameObject weaponInstance = Instantiate(prefab, hand);
-                    weaponInstance.transform.SetAsLastSibling(); // 가장 마지막 자식으로
-                    weaponInstance.transform.localPosition = Vector3.zero;
-                    weaponInstance.transform.localRotation = Quaternion.identity;
-                }
+                Handle(prefab, slot.slotType);
             }
         }
         // 장비 스탯 합산
@@ -150,64 +202,22 @@ public class EquipmentPresenter : MonoBehaviour
     public void HandleEquipItem(InventoryItem item, int slotIndex)
     {
         Debug.Log($"장비 착용 처리: {slotIndex}번 슬롯 → {item.data.name}");
+        Debug.Log(item.data.type);
 
         model.EquipItem(item.data.type, item);
 
         if (!string.IsNullOrEmpty(item.prefabPath) && targetCharacter != null)
         {
             GameObject prefab = Resources.Load<GameObject>(item.prefabPath);
-            if (prefab != null)
-            {
-                // 오른손 찾기
-                Transform hand = null;
-                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
-                {
-                    if (t.name == "bone_HandR")
-                    {
-                        hand = t;
-                        break;
-                    }
-                }
-
-                if (hand == null)
-                {
-                    Debug.LogWarning("캐릭터 오른손(bone_HandR)을 찾을 수 없음");
-                    return;
-                }
-                if (hand != null)
-                {
-                    // 기존 무기 제거: 숫자 무기만 삭제하는 대신, 모든 기존 무기 제거
-                    for (int i = hand.childCount - 1; i >= 0; i--)
-                    {
-                        Transform child = hand.GetChild(i);
-                        // 이름이 숫자 또는 Clone 포함 여부 체크
-                        if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
-                            Destroy(child.gameObject);
-                    }
-
-                    // 새 무기 장착 (마지막 위치에)
-                    GameObject weaponInstance = Instantiate(prefab, hand);
-                    weaponInstance.transform.SetAsLastSibling(); // 가장 마지막 자식으로
-                    weaponInstance.transform.localPosition = Vector3.zero;
-                    weaponInstance.transform.localRotation = Quaternion.identity;
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"프리팹을 찾을 수 없음: {item.prefabPath}");
-            }
+            Handle(prefab, item.data.type);
         }
         // 장착 후
         if (playerCombatStats != null)
             playerCombatStats.RecalculateStats(model.Slots);
 
-        // 해제 후
-        if (playerCombatStats != null)
-            playerCombatStats.RecalculateStats(model.Slots);
-
-
         RefreshEquipmentUI();
     }
+
 
     public void HandleUnequipItem(string slotType)
     {

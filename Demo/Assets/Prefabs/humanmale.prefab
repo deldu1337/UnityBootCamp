@@ -1557,14 +1557,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b330489cbfa8af45b456ea07e9f7b0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseMaxHP: 100
-  baseMaxMP: 50
-  baseAtk: 20
-  baseDef: 5
-  baseDex: 5
-  baseAttackSpeed: 2
-  baseCritChance: 0.1
-  baseCritDamage: 1.5
 --- !u!114 &-8427115250060388944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1615,6 +1607,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiCamera: {fileID: 0}
   targetCharacter: {fileID: 2761100263615861165}
+  playerCombatStats: {fileID: 0}
 --- !u!114 &-7298492771729238487
 MonoBehaviour:
   m_ObjectHideFlags: 0
