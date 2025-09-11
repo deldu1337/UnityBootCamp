@@ -96,8 +96,14 @@ public class PlayerMove : MonoBehaviour
         Vector3 moveDelta = direction * moveSpeed * Time.fixedDeltaTime;
         Vector3 nextPos = rb.position + moveDelta;
 
-        // Wall 레이어 충돌 체크
-        if (Physics.Raycast(rb.position, direction, moveDelta.magnitude + 0.1f, wallLayer))
+        if (Physics.SphereCast(rb.position, 0.1f, direction, out _, moveDelta.magnitude + 0.1f, wallLayer))
+        {
+            isMoving = false;
+            if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
+                animationComponent.Play("Stand (ID 0 variation 0)");
+            return;
+        }
+        if (moveDelta.magnitude < 0.001f)
         {
             isMoving = false;
             if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
@@ -115,7 +121,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         // 목표 지점 도달 시 Idle
-        if (Vector3.Distance(rb.position, targetPosition) < 0.1f)
+        if (Vector3.Distance(rb.position, targetPosition) < 0.2f)
         {
             isMoving = false;
             if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))

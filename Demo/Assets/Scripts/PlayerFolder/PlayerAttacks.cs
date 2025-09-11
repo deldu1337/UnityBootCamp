@@ -161,25 +161,6 @@ public class PlayerAttacks : MonoBehaviour
         }
     }
 
-    //public void PerformAttack()
-    //{
-    //    if (targetEnemy == null) return;
-
-    //    string animName = "Attack1H (ID 17 variation 0)";
-    //    if (animationComponent.GetClip(animName) != null)
-    //    {
-    //        animationComponent[animName].speed = stats.AttackSpeed;
-    //        animationComponent.Play(animName);
-    //    }
-
-    //    float damage = stats.CalculateDamage();
-
-    //    Debug.Log($"Before Attack: {targetEnemy.name} HP={targetEnemy.currentHP}");
-    //    targetEnemy.TakeDamage(damage);
-    //    Debug.Log($"After Attack: {targetEnemy.name} HP={targetEnemy.currentHP}");
-
-    //    targetHealthBar?.CheckHp();
-    //}
     public void PerformAttack()
     {
         if (targetEnemy == null) return;

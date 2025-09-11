@@ -4,14 +4,6 @@ using UnityEngine;
 public class PlayerCombatStats : MonoBehaviour
 {
     [Header("±‚∫ª Ω∫≈»")]
-    //[SerializeField] private float baseMaxHP = 100f;
-    //[SerializeField] private float baseMaxMP = 50f;
-    //[SerializeField] private float baseAtk = 20f;
-    //[SerializeField] private float baseDef = 5f;
-    //[SerializeField] private float baseDex = 5f;
-    //[SerializeField] private float baseAttackSpeed = 2f;
-    //[SerializeField] private float baseCritChance = 0.1f;
-    //[SerializeField] private float baseCritDamage = 1.5f;
     private float baseMaxHP = 100f;
     private float baseMaxMP = 50f;
     private float baseAtk = 5f;
