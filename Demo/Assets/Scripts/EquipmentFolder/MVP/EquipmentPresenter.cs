@@ -154,6 +154,57 @@ public class EquipmentPresenter : MonoBehaviour
                 offset = new Vector3(-0.12f, 0.035f, 0);
                 break;
 
+            case "shield":
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_HandL")
+                    {
+                        body = t;
+                        break;
+                    }
+                }
+                if (body == null)
+                {
+                    Debug.LogWarning("캐릭터 왼손(bone_HandL)를 찾을 수 없음");
+                    return;
+                }
+                offset = new Vector3(0, 0, -0.05f);
+                break;
+
+            case "lshoulder":
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_ShoulderL")
+                    {
+                        body = t;
+                        break;
+                    }
+                }
+                if (body == null)
+                {
+                    Debug.LogWarning("캐릭터 왼쪽 어깨(bone_ShoulderL)를 찾을 수 없음");
+                    return;
+                }
+                offset = new Vector3(0, 0, -0.2f);
+                break;
+
+            case "rshoulder":
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_ShoulderR")
+                    {
+                        body = t;
+                        break;
+                    }
+                }
+                if (body == null)
+                {
+                    Debug.LogWarning("캐릭터 오른쪽 어깨(bone_ShoulderR)를 찾을 수 없음");
+                    return;
+                }
+                offset = new Vector3(0, 0, 0.2f);
+                break;
+
             default:
                 Debug.LogWarning($"지원되지 않는 슬롯 타입: {slot}");
                 return;

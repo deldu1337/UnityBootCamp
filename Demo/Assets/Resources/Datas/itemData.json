@@ -51,6 +51,45 @@
       "cc": 0,
       "cd": 0,
       "type": "head"
+    },
+    {
+      "id": 5,
+      "name": "철방패",
+      "hp": 20,
+      "mp": 0,
+      "atk": 0,
+      "def": 20,
+      "dex": 0,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
+      "type": "shield"
+    },
+    {
+      "id": 6,
+      "name": "(왼)가죽어깨보호대",
+      "hp": 5,
+      "mp": 0,
+      "atk": 0,
+      "def": 10,
+      "dex": 1,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
+      "type": "lshoulder"
+    },
+    {
+      "id": 7,
+      "name": "(오)가죽어깨보호대",
+      "hp": 5,
+      "mp": 0,
+      "atk": 0,
+      "def": 10,
+      "dex": 1,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
+      "type": "rshoulder"
     }
   ]
 }
