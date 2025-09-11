@@ -53,7 +53,10 @@ public class ItemPickup : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 if (inventoryPresenter != null)
-                    inventoryPresenter.AddItem(int.Parse(id), icon);
+                {
+                    string prefabPath = $"Prefabs/{id}"; // Resources 폴더 기준 경로
+                    inventoryPresenter.AddItem(int.Parse(id), icon, prefabPath);
+                }
 
                 Destroy(gameObject);
                 ItemTooltip.Instance.Hide();

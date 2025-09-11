@@ -25,7 +25,7 @@ public class InventoryView : MonoBehaviour
         inventoryPanel?.SetActive(show);
     }
 
-    public void UpdateInventoryUI(IReadOnlyList<InventoryItem> items, Action<int, int> onItemDropped, Action<int> onItemRemoved)
+    public void UpdateInventoryUI(IReadOnlyList<InventoryItem> items, Action<int, int> onItemDropped, Action<int> onItemRemoved, Action<int> equipCallback)
     {
         foreach (var btn in inventoryButtons)
             btn.gameObject.SetActive(false);
@@ -51,7 +51,7 @@ public class InventoryView : MonoBehaviour
             if (draggable == null)
                 draggable = button.gameObject.AddComponent<DraggableItemView>();
 
-            draggable.Initialize(onItemDropped, i, onItemRemoved);
+            draggable.Initialize(onItemDropped, i, onItemRemoved, equipCallback);
         }
     }
 }

@@ -3,12 +3,14 @@
     {
       "id": 1,
       "name": "날카로운 칼",
-      "atk": 10
+      "atk": 10,
+      "type": "weapon"
     },
     {
       "id": 2,
       "name": "개 쎈 망치",
-      "atk": 20
+      "atk": 20,
+      "type": "weapon"
     }
   ]
 }

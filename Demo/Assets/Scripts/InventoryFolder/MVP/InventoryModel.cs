@@ -10,6 +10,8 @@ public class InventoryItem
     public int id;
     public ItemData data;
     public string iconPath;
+    public string prefabPath;      // JSON에서 불러오는 필드
+    public GameObject prefab => Resources.Load<GameObject>(prefabPath); // 런타임에 로드
 }
 
 [Serializable]

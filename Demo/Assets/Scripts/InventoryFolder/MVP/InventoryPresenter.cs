@@ -35,7 +35,7 @@ public class InventoryPresenter : MonoBehaviour
         view.Show(isOpen);
 
         if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved);
+            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 
     private void CloseInventory()
@@ -46,7 +46,7 @@ public class InventoryPresenter : MonoBehaviour
         view.Show(false);
     }
 
-    public void AddItem(int id, Sprite icon)
+    public void AddItem(int id, Sprite icon, string prefabPath)
     {
         var dataManager = DataManager.Instance;
         if (!dataManager.dicItemDatas.ContainsKey(id))
@@ -60,20 +60,32 @@ public class InventoryPresenter : MonoBehaviour
             uniqueId = Guid.NewGuid().ToString(),
             id = id,
             data = dataManager.dicItemDatas[id],
-            iconPath = "Icons/" + icon.name
+            iconPath = "Icons/" + icon.name,
+            prefabPath = prefabPath // Resources 경로 문자열
         };
 
         model.AddItem(item);
 
         if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved);
+            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 
     private void OnItemDropped(int fromIndex, int toIndex)
     {
         model.SwapItems(fromIndex, toIndex);
         if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved);
+            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
+    }
+
+    private void OnItemEquipped(int index)
+    {
+        if (index < 0 || index >= model.Items.Count) return;
+        var item = model.Items[index];
+        Debug.Log($"OnItemEquipped - {index}번 슬롯 아이템 {item.data.name} 장착 시도");
+
+        // EquipmentPresenter 연결 → 실제 장착 처리
+        var equipPresenter = FindObjectOfType<EquipmentPresenter>();
+        equipPresenter?.HandleEquipItem(item, index);
     }
 
     private void OnItemRemoved(int index)
@@ -84,7 +96,7 @@ public class InventoryPresenter : MonoBehaviour
         Debug.Log("OnItemRemoved");
 
         if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved);
+            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 
 }

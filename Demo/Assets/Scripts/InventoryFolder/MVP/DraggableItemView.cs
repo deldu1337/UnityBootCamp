@@ -2,10 +2,11 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DraggableItemView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Action<int, int> onItemDropped; // (fromIndex, toIndex) 전달
     public Action<int> onItemRemoved;      // 인벤토리 외부로 드래그 시 호출 (fromIndex)
+    public Action<int> onItemEquipped;     // 우클릭 시 장비창에 전달
 
     private Canvas canvas;
     private RectTransform rectTransform;
@@ -20,11 +21,23 @@ public class DraggableItemView : MonoBehaviour, IBeginDragHandler, IDragHandler,
         canvas = GetComponentInParent<Canvas>();
     }
 
-    public void Initialize(Action<int, int> dropCallback, int slotIndex, Action<int> removeCallback = null)
+    public void Initialize(Action<int, int> dropCallback, int slotIndex,
+        Action<int> removeCallback = null, Action<int> equipCallback = null)
     {
         onItemDropped = dropCallback;
         onItemRemoved = removeCallback;
+        onItemEquipped = equipCallback;
         originalIndex = slotIndex;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            // 우클릭 → 아이템 장착 시도
+            onItemEquipped?.Invoke(originalIndex);
+            Debug.Log($"우클릭: 슬롯 {originalIndex} 아이템 장착 시도");
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)

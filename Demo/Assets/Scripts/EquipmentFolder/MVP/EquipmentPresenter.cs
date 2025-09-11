@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EquipmentPresenter : MonoBehaviour
 {
@@ -44,11 +45,21 @@ public class EquipmentPresenter : MonoBehaviour
                 {
                     Debug.LogError("UICharacter 레이어를 가진 카메라를 찾을 수 없습니다! 카메라를 추가하세요.");
                 }
+
+
             }
         }
 
         view.Initialize(CloseEquipment);
+        RefreshEquipmentUI();
         isOpen = false;
+    }
+
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+            ToggleEquipment();
     }
 
     void LateUpdate()
@@ -64,13 +75,6 @@ public class EquipmentPresenter : MonoBehaviour
         }
     }
 
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-            ToggleEquipment();
-    }
-
     private void ToggleEquipment()
     {
         if (view == null) return;
@@ -78,6 +82,79 @@ public class EquipmentPresenter : MonoBehaviour
         isOpen = !isOpen;
         view.Show(isOpen);
         uiCamera.gameObject.SetActive(isOpen);
+
+        if (isOpen)
+            RefreshEquipmentUI();
+    }
+
+    public void HandleEquipItem(InventoryItem item, int slotIndex)
+    {
+        Debug.Log($"장비 착용 처리: {slotIndex}번 슬롯 → {item.data.name}");
+
+        model.EquipItem(item.data.type, item);
+
+        if (!string.IsNullOrEmpty(item.prefabPath) && targetCharacter != null)
+        {
+            GameObject prefab = Resources.Load<GameObject>(item.prefabPath);
+            if (prefab != null)
+            {
+                // 오른손 찾기
+                Transform hand = null;
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_HandR")
+                    {
+                        hand = t;
+                        break;
+                    }
+                }
+
+                if (hand == null)
+                {
+                    Debug.LogWarning("캐릭터 오른손(bone_HandR)을 찾을 수 없음");
+                    return;
+                }
+                if (hand != null)
+                {
+                    // 기존 무기 제거: 마지막 자식만 제거
+                    if (hand.childCount > 0)
+                    {
+                        Transform lastChild = hand.GetChild(hand.childCount - 1);
+                        // 이름이 숫자인 경우만 제거
+                        if (int.TryParse(lastChild.name, out _))
+                            Destroy(lastChild.gameObject);
+                    }
+
+                    // 새 무기 장착 (마지막 위치에)
+                    GameObject weaponInstance = Instantiate(prefab, hand);
+                    weaponInstance.transform.SetAsLastSibling(); // 가장 마지막 자식으로
+                    weaponInstance.transform.localPosition = Vector3.zero;
+                    weaponInstance.transform.localRotation = Quaternion.identity;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"프리팹을 찾을 수 없음: {item.prefabPath}");
+            }
+        }
+
+        RefreshEquipmentUI();
+    }
+
+
+
+    public void HandleUnequipItem(string slotType)
+    {
+        model.UnequipItem(slotType);
+        RefreshEquipmentUI();
+    }
+
+    private void RefreshEquipmentUI()
+    {
+        if (view != null && model != null)
+        {
+            view.UpdateEquipmentUI(model.Slots, HandleUnequipItem);
+        }
     }
 
     private void CloseEquipment()

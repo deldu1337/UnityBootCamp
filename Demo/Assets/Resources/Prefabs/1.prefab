@@ -8,9 +8,77 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8589920083719289246, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -6893982043694437210, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -5672356839330823421, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -4025022007707589911, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -3373477890246744715, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -2403072843648615514, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -1916117693081996758, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -790549232123420110, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -772592853127279647, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -13578840967168905, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 445722426862973074, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 680584879421194718, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2195868554498525686, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2278734646215191110, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
       propertyPath: m_Name
-      value: axe_1h_hatchet_a_02_axe_1h_hatchet_b_02green
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2278734646215191110, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2707625358187616960, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002659705151722043, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4067376219620861858, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6223797053644474556, guid: 0f740dae8e2e22b4587fbe677b716e9a, type: 3}
       propertyPath: m_LocalPosition.x
