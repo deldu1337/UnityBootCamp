@@ -1557,14 +1557,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b330489cbfa8af45b456ea07e9f7b0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 100
-  maxMP: 50
-  atk: 20
-  def: 5
-  dex: 10
-  attackSpeed: 3
-  critChance: 0.1
-  critDamage: 1.5
+  baseMaxHP: 100
+  baseMaxMP: 50
+  baseAtk: 20
+  baseDef: 5
+  baseDex: 5
+  baseAttackSpeed: 2
+  baseCritChance: 0.1
+  baseCritDamage: 1.5
 --- !u!114 &-8427115250060388944
 MonoBehaviour:
   m_ObjectHideFlags: 0

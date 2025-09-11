@@ -3,13 +3,27 @@
     {
       "id": 1,
       "name": "날카로운 칼",
+      "hp": 0,
+      "mp": 0,
       "atk": 10,
+      "def": 0,
+      "dex": 0,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
       "type": "weapon"
     },
     {
       "id": 2,
       "name": "개 쎈 망치",
+      "hp": 0,
+      "mp": 0,
       "atk": 20,
+      "def": 0,
+      "dex": 0,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
       "type": "weapon"
     }
   ]

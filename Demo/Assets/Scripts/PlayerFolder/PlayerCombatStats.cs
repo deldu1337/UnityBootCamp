@@ -1,90 +1,117 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCombatStats : MonoBehaviour
 {
     [Header("기본 스탯")]
-    [SerializeField] private float maxHP = 100f;
-    [SerializeField] private float maxMP = 50f;
-    [SerializeField] private float atk = 20f;        // 공격력
-    [SerializeField] private float def = 5f;         // 방어력
-    [SerializeField] private float dex = 25f;         // 민첩성 (이동 속도)
-    [SerializeField] private float attackSpeed = 5f; // 공격 속도
-    [SerializeField] private float critChance = 0.1f; // 치명타 확률 (0~1)
-    [SerializeField] private float critDamage = 1.5f; // 치명타 배율 (1.5 = 150%)
+    //[SerializeField] private float baseMaxHP = 100f;
+    //[SerializeField] private float baseMaxMP = 50f;
+    //[SerializeField] private float baseAtk = 20f;
+    //[SerializeField] private float baseDef = 5f;
+    //[SerializeField] private float baseDex = 5f;
+    //[SerializeField] private float baseAttackSpeed = 2f;
+    //[SerializeField] private float baseCritChance = 0.1f;
+    //[SerializeField] private float baseCritDamage = 1.5f;
+    private float baseMaxHP = 100f;
+    private float baseMaxMP = 50f;
+    private float baseAtk = 5f;
+    private float baseDef = 5f;
+    private float baseDex = 10f;
+    private float baseAttackSpeed = 2f;
+    private float baseCritChance = 0.1f;
+    private float baseCritDamage = 1.5f;
 
     [Header("현재 상태")]
     public float currentHP { get; private set; }
     public float currentMP { get; private set; }
 
+    // 최종 스탯
+    public float MaxHP { get; private set; }
+    public float MaxMP { get; private set; }
+    public float Atk { get; private set; }
+    public float Def { get; private set; }
+    public float Dex { get; private set; }
+    public float AttackSpeed { get; private set; }
+    public float CritChance { get; private set; }
+    public float CritDamage { get; private set; }
+
     void Awake()
     {
-        // 게임 시작 시 HP/MP 풀로 초기화
-        currentHP = maxHP;
-        currentMP = maxMP;
+        RecalculateStats(null); // 초기화
+        currentHP = MaxHP;
+        currentMP = MaxMP;
     }
 
-    // === 외부에서 읽기 위한 프로퍼티 ===
-    public float MaxHP => maxHP;
-    public float MaxMP => maxMP;
-    public float Atk => atk;
-    public float Def => def;
-    public float Dex => dex;
-    public float AttackSpeed => attackSpeed;
-    public float CritChance => critChance;
-    public float CritDamage => critDamage;
+    /// <summary>
+    /// 장비 기반으로 최종 스탯 재계산
+    /// </summary>
+    public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
+    {
+        // 기본 스탯 초기화
+        MaxHP = baseMaxHP;
+        MaxMP = baseMaxMP;
+        Atk = baseAtk;
+        Def = baseDef;
+        Dex = baseDex;
+        AttackSpeed = baseAttackSpeed;
+        CritChance = baseCritChance;
+        CritDamage = baseCritDamage;
+
+        if (equippedSlots == null) return;
+
+        // 장착 중인 장비 스탯 합산
+        foreach (var slot in equippedSlots)
+        {
+            if (slot.equipped == null || slot.equipped.data == null) continue;
+            var eq = slot.equipped.data;
+
+            MaxHP += eq.hp;
+            MaxMP += eq.mp;
+            Atk += eq.atk;
+            Def += eq.def;
+            Dex += eq.dex;
+            AttackSpeed += eq.As;
+            CritChance += eq.cc;
+            CritDamage += eq.cd;
+        }
+
+        // 현재 HP/MP가 Max보다 크면 보정
+        currentHP = Mathf.Min(currentHP, MaxHP);
+        currentMP = Mathf.Min(currentMP, MaxMP);
+    }
 
     // === HP/MP 관리 ===
     public void TakeDamage(float damage)
     {
-        // 방어력 적용
-        float finalDamage = Mathf.Max(damage - def, 1f);
+        float finalDamage = Mathf.Max(damage - Def, 1f);
         currentHP -= finalDamage;
         currentHP = Mathf.Max(currentHP, 0);
-
-        Debug.Log($"피해 {finalDamage} → HP {currentHP}/{maxHP}");
+        Debug.Log($"피해 {finalDamage} → HP {currentHP}/{MaxHP}");
 
         if (currentHP <= 0)
-        {
             Die();
-        }
     }
 
-    public void Heal(float amount)
-    {
-        currentHP = Mathf.Min(currentHP + amount, maxHP);
-    }
-
+    public void Heal(float amount) => currentHP = Mathf.Min(currentHP + amount, MaxHP);
     public bool UseMana(float amount)
     {
-        if (currentHP < amount) return false;
-        currentHP -= amount;
+        if (currentMP < amount) return false;
+        currentMP -= amount;
         return true;
     }
-
-    public void RestoreMana(float amount)
-    {
-        currentHP = Mathf.Min(currentHP + amount, maxMP);
-    }
+    public void RestoreMana(float amount) => currentMP = Mathf.Min(currentMP + amount, MaxMP);
 
     // === 전투 관련 ===
     public float CalculateDamage()
     {
-        float damage = atk;
-
-        // 치명타 판정
-        if (Random.value <= critChance)
+        float damage = Atk;
+        if (Random.value <= CritChance)
         {
-            damage *= critDamage;
+            damage *= CritDamage;
             Debug.Log($" 치명타! {damage} 데미지");
         }
-
         return damage;
     }
 
-    // === 사망 처리 ===
-    private void Die()
-    {
-        Debug.Log("Player Died!");
-        // TODO: 게임 오버, 리스폰 등 추가 로직
-    }
+    private void Die() => Debug.Log("Player Died!");
 }

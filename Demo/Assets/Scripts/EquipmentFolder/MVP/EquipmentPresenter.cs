@@ -8,6 +8,7 @@ public class EquipmentPresenter : MonoBehaviour
 
     [SerializeField] private Camera uiCamera;
     [SerializeField] private Transform targetCharacter;
+    [SerializeField] private PlayerCombatStats playerCombatStats;
 
     private bool isOpen;
 
@@ -20,6 +21,8 @@ public class EquipmentPresenter : MonoBehaviour
             Debug.LogError("EquipmentView를 찾을 수 없습니다! 씬에 EquipmentView가 있는지 확인하세요.");
             return;
         }
+
+        playerCombatStats = gameObject.GetComponent<PlayerCombatStats>();
 
         // UICharacter 레이어 카메라 자동 할당
         if (uiCamera == null)
@@ -45,14 +48,14 @@ public class EquipmentPresenter : MonoBehaviour
                 {
                     Debug.LogError("UICharacter 레이어를 가진 카메라를 찾을 수 없습니다! 카메라를 추가하세요.");
                 }
-
-
             }
         }
 
         view.Initialize(CloseEquipment);
+        InitializeEquippedItemsFromJson();
         RefreshEquipmentUI();
         isOpen = false;
+
     }
 
 
@@ -85,6 +88,63 @@ public class EquipmentPresenter : MonoBehaviour
 
         if (isOpen)
             RefreshEquipmentUI();
+    }
+
+    /// <summary>
+    /// JSON에 장착 데이터가 있는 슬롯만 캐릭터에 프리팹 장착
+    /// </summary>
+    private void InitializeEquippedItemsFromJson()
+    {
+        foreach (var slot in model.Slots)
+        {
+            if (slot.equipped != null && !string.IsNullOrEmpty(slot.equipped.prefabPath))
+            {
+                GameObject prefab = Resources.Load<GameObject>(slot.equipped.prefabPath);
+                if (prefab == null)
+                {
+                    Debug.LogWarning($"프리팹을 찾을 수 없음: {slot.equipped.prefabPath}");
+                    continue;
+                }
+
+                // 오른손 찾기
+                Transform hand = null;
+                foreach (var t in targetCharacter.GetComponentsInChildren<Transform>())
+                {
+                    if (t.name == "bone_HandR")
+                    {
+                        hand = t;
+                        break;
+                    }
+                }
+
+                if (hand == null)
+                {
+                    Debug.LogWarning("캐릭터 오른손(bone_HandR)을 찾을 수 없음");
+                    return;
+                }
+
+                if (hand != null)
+                {
+                    // 기존 무기 제거: 숫자 무기만 삭제하는 대신, 모든 기존 무기 제거
+                    for (int i = hand.childCount - 1; i >= 0; i--)
+                    {
+                        Transform child = hand.GetChild(i);
+                        // 이름이 숫자 또는 Clone 포함 여부 체크
+                        if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
+                            Destroy(child.gameObject);
+                    }
+
+                    // 새 무기 장착 (마지막 위치에)
+                    GameObject weaponInstance = Instantiate(prefab, hand);
+                    weaponInstance.transform.SetAsLastSibling(); // 가장 마지막 자식으로
+                    weaponInstance.transform.localPosition = Vector3.zero;
+                    weaponInstance.transform.localRotation = Quaternion.identity;
+                }
+            }
+        }
+        // 장비 스탯 합산
+        if (playerCombatStats != null)
+            playerCombatStats.RecalculateStats(model.Slots);
     }
 
     public void HandleEquipItem(InventoryItem item, int slotIndex)
@@ -137,15 +197,30 @@ public class EquipmentPresenter : MonoBehaviour
                 Debug.LogWarning($"프리팹을 찾을 수 없음: {item.prefabPath}");
             }
         }
+        // 장착 후
+        if (playerCombatStats != null)
+            playerCombatStats.RecalculateStats(model.Slots);
+
+        // 해제 후
+        if (playerCombatStats != null)
+            playerCombatStats.RecalculateStats(model.Slots);
+
 
         RefreshEquipmentUI();
     }
 
-
-
     public void HandleUnequipItem(string slotType)
     {
         model.UnequipItem(slotType);
+
+        // 장착 후
+        if (playerCombatStats != null)
+            playerCombatStats.RecalculateStats(model.Slots);
+
+        // 해제 후
+        if (playerCombatStats != null)
+            playerCombatStats.RecalculateStats(model.Slots);
+
         RefreshEquipmentUI();
     }
 
