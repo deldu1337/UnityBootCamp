@@ -116,13 +116,13 @@ public class EquipmentPresenter : MonoBehaviour
                 }
                 if (hand != null)
                 {
-                    // 기존 무기 제거: 마지막 자식만 제거
-                    if (hand.childCount > 0)
+                    // 기존 무기 제거: 숫자 무기만 삭제하는 대신, 모든 기존 무기 제거
+                    for (int i = hand.childCount - 1; i >= 0; i--)
                     {
-                        Transform lastChild = hand.GetChild(hand.childCount - 1);
-                        // 이름이 숫자인 경우만 제거
-                        if (int.TryParse(lastChild.name, out _))
-                            Destroy(lastChild.gameObject);
+                        Transform child = hand.GetChild(i);
+                        // 이름이 숫자 또는 Clone 포함 여부 체크
+                        if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
+                            Destroy(child.gameObject);
                     }
 
                     // 새 무기 장착 (마지막 위치에)
