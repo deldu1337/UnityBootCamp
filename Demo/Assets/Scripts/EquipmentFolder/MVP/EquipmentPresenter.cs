@@ -104,27 +104,7 @@ public class EquipmentPresenter : MonoBehaviour
     /// </summary>
     /// <param name="slotType">장착 슬롯 타입</param>
     /// <param name="item">장착할 아이템</param>
-    //private void HandleEquipFromInventory(string slotType, InventoryItem item)
-    //{
-    //    Debug.Log($"인벤토리 아이템 {item.data.name} → {slotType} 장착 시도");
 
-    //    // 모델에 반영
-    //    model.EquipItem(slotType, item);
-
-    //    // 캐릭터에 장착할 프리팹 로드 및 장착
-    //    if (!string.IsNullOrEmpty(item.prefabPath))
-    //    {
-    //        GameObject prefab = Resources.Load<GameObject>(item.prefabPath);
-    //        if (prefab != null)
-    //            Handle(prefab, slotType);
-    //    }
-
-    //    // 스탯 갱신
-    //    playerCombatStats?.RecalculateStats(model.Slots);
-
-    //    // UI 갱신
-    //    RefreshEquipmentUI();
-    //}
     private void HandleEquipFromInventory(string slotType, InventoryItem item)
     {
         Debug.Log($"인벤토리 아이템 {item.data.name} → {slotType} 장착 시도");
