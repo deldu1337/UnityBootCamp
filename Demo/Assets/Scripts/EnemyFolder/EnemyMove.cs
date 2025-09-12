@@ -22,7 +22,7 @@ public class EnemyMove : MonoBehaviour
         // TileMapGenerator 자동 할당
         if (mapGenerator == null)
         {
-            mapGenerator = FindObjectOfType<TileMapGenerator>();
+            mapGenerator = FindAnyObjectByType<TileMapGenerator>();
             if (mapGenerator == null)
                 Debug.LogError("씬에 TileMapGenerator가 없습니다!");
         }

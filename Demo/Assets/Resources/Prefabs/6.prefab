@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemInfo: 
   id: 6
-  icon: {fileID: 21300000, guid: 02f931fcb2d1c7647b6560b1b0bbfc4f, type: 3}
+  icon: {fileID: 21300000, guid: 02064d3abcf36d948a7f50595f6f4d05, type: 3}
   showDistance: 7
 --- !u!136 &765272891451230123
 CapsuleCollider:

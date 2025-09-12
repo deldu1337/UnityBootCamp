@@ -1,6 +1,9 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// 인벤토리 UI와 모델을 연결하고 입력/상호작용 처리
+/// </summary>
 public class InventoryPresenter : MonoBehaviour
 {
     private InventoryModel model;
@@ -9,7 +12,7 @@ public class InventoryPresenter : MonoBehaviour
 
     void Start()
     {
-        view = FindObjectOfType<InventoryView>();
+        view = FindAnyObjectByType<InventoryView>();
         if (view == null)
         {
             Debug.LogError("InventoryView를 찾을 수 없습니다!");
@@ -17,12 +20,13 @@ public class InventoryPresenter : MonoBehaviour
         }
 
         model = new InventoryModel();
-        view.Initialize(CloseInventory);
+        view.Initialize(CloseInventory); // 닫기 버튼 콜백
         isOpen = false;
     }
 
     void Update()
     {
+        // I 키로 인벤토리 토글
         if (Input.GetKeyDown(KeyCode.I))
             ToggleInventory();
     }
@@ -46,6 +50,9 @@ public class InventoryPresenter : MonoBehaviour
         view.Show(false);
     }
 
+    /// <summary>
+    /// 아이템 추가 (ID, 아이콘, 프리팹 경로)
+    /// </summary>
     public void AddItem(int id, Sprite icon, string prefabPath)
     {
         var dataManager = DataManager.Instance;
@@ -61,7 +68,7 @@ public class InventoryPresenter : MonoBehaviour
             id = id,
             data = dataManager.dicItemDatas[id],
             iconPath = "Icons/" + icon.name,
-            prefabPath = prefabPath // Resources 경로 문자열
+            prefabPath = prefabPath
         };
 
         model.AddItem(item);
@@ -70,24 +77,41 @@ public class InventoryPresenter : MonoBehaviour
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 
-    private void OnItemDropped(int fromIndex, int toIndex)
+    /// <summary>
+    /// 기존 InventoryItem 객체를 인벤토리에 추가 (uniqueId 유지)
+    /// </summary>
+    public void AddExistingItem(InventoryItem item)
     {
-        model.SwapItems(fromIndex, toIndex);
+        if (item == null)
+            return;
+
+        model.AddItem(item);
+
         if (isOpen)
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 
+
+    // 인벤토리 슬롯 간 이동
+    private void OnItemDropped(int fromIndex, int toIndex)
+    {
+        model.SwapItem(fromIndex, toIndex);
+        if (isOpen)
+            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
+    }
+
+    // 인벤토리 → 장비창
     private void OnItemEquipped(int index)
     {
         if (index < 0 || index >= model.Items.Count) return;
         var item = model.Items[index];
         Debug.Log($"OnItemEquipped - {index}번 슬롯 아이템 {item.data.name} 장착 시도");
 
-        // EquipmentPresenter 연결 → 실제 장착 처리
-        var equipPresenter = FindObjectOfType<EquipmentPresenter>();
+        var equipPresenter = FindAnyObjectByType<EquipmentPresenter>();
         equipPresenter?.HandleEquipItem(item, index);
     }
 
+    // 아이템 제거
     private void OnItemRemoved(int index)
     {
         if (index < 0 || index >= model.Items.Count) return;
@@ -98,5 +122,4 @@ public class InventoryPresenter : MonoBehaviour
         if (isOpen)
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
-
 }

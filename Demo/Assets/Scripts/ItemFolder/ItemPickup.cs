@@ -23,7 +23,7 @@ public class ItemPickup : MonoBehaviour
 
         // 씬에서 플레이어 찾기 (Player 레이어 기준)
         int playerLayer = LayerMask.NameToLayer("Player");
-        foreach (var obj in FindObjectsOfType<GameObject>())
+        foreach (var obj in FindObjectsByType<GameObject>(FindObjectsSortMode.None))
         {
             if (obj.layer == playerLayer)
             {
@@ -33,7 +33,7 @@ public class ItemPickup : MonoBehaviour
         }
 
         // InventoryPresenter 참조
-        inventoryPresenter = FindObjectOfType<InventoryPresenter>();
+        inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
         if (inventoryPresenter == null)
             Debug.LogError("InventoryPresenter를 찾을 수 없습니다! 씬에 InventoryPresenter가 있어야 합니다.");
     }

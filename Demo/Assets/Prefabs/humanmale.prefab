@@ -1342,6 +1342,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 8000120436547810999, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
+      propertyPath: m_Animation
+      value: 
+      objectReference: {fileID: -3101727492429954765, guid: f1b0a0f464a59aa4d844472cba0cd381, type: 3}
     - target: {fileID: 8036013517144044176, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -1459,6 +1463,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
       insertIndex: -1
       addedObject: {fileID: -7298492771729238487}
+    - targetCorrespondingSourceObject: {fileID: 8657109451575075048, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3305973987736447811}
   m_SourcePrefab: {fileID: 5058450713772209833, guid: d2d2a5cf00380324491950ac6d5797ae, type: 3}
 --- !u!4 &2761100263615861165 stripped
 Transform:
@@ -1552,7 +1559,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6914515128741021224}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b330489cbfa8af45b456ea07e9f7b0b, type: 3}
   m_Name: 
@@ -1628,3 +1635,29 @@ MonoBehaviour:
   targetEnemy: {fileID: 0}
   targetHealthBar: {fileID: 0}
   animationComponent: {fileID: 0}
+--- !u!114 &3305973987736447811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6914515128741021224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b97a2700a73264ca1c5ecbadb74ae4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    MaxHP: 0
+    MaxMP: 0
+    Atk: 0
+    Def: 0
+    Dex: 0
+    AttackSpeed: 0
+    CritChance: 0
+    CritDamage: 0
+    CurrentHP: 0
+    CurrentMP: 0
+    Level: 0
+    Exp: 0
+    ExpToNextLevel: 0

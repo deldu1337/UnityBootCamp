@@ -2,21 +2,21 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class EquipmentView : MonoBehaviour
 {
-    [SerializeField] private GameObject equipmentUI;
-    [SerializeField] private Button exitButton;
+    [SerializeField] private GameObject equipmentUI; // 장비 UI 전체
+    [SerializeField] private Button exitButton;      // 장비창 닫기 버튼
 
     [Header("장비 슬롯")]
-    [SerializeField] private Button headSlot; // 예시: 무기 슬롯 하나
-    [SerializeField] private Button rShoulderSlot;  // 예시: 방어구 슬롯
-    [SerializeField] private Button lShoulderSlot; // 예시: 무기 슬롯 하나
-    [SerializeField] private Button gemSlot;  // 예시: 방어구 슬롯
-    [SerializeField] private Button weaponSlot; // 예시: 무기 슬롯 하나
-    [SerializeField] private Button shieldSlot; // 예시: 무기 슬롯 하나
+    [SerializeField] private Button headSlot;
+    [SerializeField] private Button rShoulderSlot;
+    [SerializeField] private Button lShoulderSlot;
+    [SerializeField] private Button gemSlot;
+    [SerializeField] private Button weaponSlot;
+    [SerializeField] private Button shieldSlot;
 
+    /// <summary>초기화: 슬롯 연결, 종료 버튼 연결</summary>
     public void Initialize(Action onExit, Action<string, InventoryItem> onEquipDropped)
     {
         if (equipmentUI == null)
@@ -24,14 +24,11 @@ public class EquipmentView : MonoBehaviour
 
         if (equipmentUI != null)
         {
-            // ExitButton 찾기
             exitButton = equipmentUI.GetComponentInChildren<Button>();
-            Debug.Log(exitButton.name);
-
-            // 버튼 클릭 이벤트 등록
             exitButton.onClick.AddListener(() => onExit?.Invoke());
         }
 
+        // ButtonPanel 내 버튼들 순서대로 가져오기
         headSlot = GameObject.Find("ButtonPanel").transform.GetChild(0).GetComponentInChildren<Button>();
         rShoulderSlot = GameObject.Find("ButtonPanel").transform.GetChild(1).GetComponentInChildren<Button>();
         lShoulderSlot = GameObject.Find("ButtonPanel").transform.GetChild(2).GetComponentInChildren<Button>();
@@ -42,6 +39,7 @@ public class EquipmentView : MonoBehaviour
         Show(false);
     }
 
+    /// <summary>장비창 활성/비활성</summary>
     public void Show(bool show)
     {
         equipmentUI?.SetActive(show);
@@ -49,6 +47,7 @@ public class EquipmentView : MonoBehaviour
             exitButton.transform.SetAsLastSibling();
     }
 
+    /// <summary>슬롯 버튼에 아이템 드롭 이벤트 연결</summary>
     private void SetupSlot(Button button, string slotType, Action<string, InventoryItem> onEquipDropped)
     {
         if (button == null) return;
@@ -60,29 +59,25 @@ public class EquipmentView : MonoBehaviour
         slotView.onItemDropped = onEquipDropped;
     }
 
+    /// <summary>UI 갱신: 슬롯에 장착된 아이템 표시 및 클릭 이벤트 등록</summary>
     public void UpdateEquipmentUI(IReadOnlyList<EquipmentSlot> slots, Action<string> onSlotClicked)
     {
         foreach (var slot in slots)
         {
             Button btn = GetSlotButton(slot.slotType);
-            if (btn == null)
-                continue;
+            if (btn == null) continue;
 
             if (slot.equipped == null || string.IsNullOrEmpty(slot.equipped.iconPath))
             {
-                // 아이템 없으면 버튼 비활성화
-                btn.gameObject.SetActive(false);
+                btn.gameObject.SetActive(false); // 슬롯 비활성화
             }
             else
             {
-                // 아이템 있으면 버튼 활성화 및 아이콘 적용
                 btn.gameObject.SetActive(true);
                 var image = btn.GetComponent<Image>();
                 var icon = Resources.Load<Sprite>(slot.equipped.iconPath);
-                if (image != null)
-                    image.sprite = icon;
+                if (image != null) image.sprite = icon;
 
-                // 클릭 이벤트 연결
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(() => onSlotClicked?.Invoke(slot.slotType));
             }
@@ -103,40 +98,13 @@ public class EquipmentView : MonoBehaviour
         };
     }
 
+    /// <summary>슬롯 아이콘 설정</summary>
     public void SetEquipmentIcon(Sprite icon, string slotType)
     {
-        if (slotType == "head" && headSlot != null)
+        var button = GetSlotButton(slotType);
+        if (button != null)
         {
-            // 아이콘 적용
-            var image = headSlot.GetComponent<Image>();
-            image.sprite = icon;
-        }
-        else if (slotType == "rshoulder" && rShoulderSlot != null)
-        {
-            // 아이콘 적용
-            var image = rShoulderSlot.GetComponent<Image>();
-            image.sprite = icon;
-        }
-        else if (slotType == "lshoulder" && lShoulderSlot != null)
-        {
-            // 아이콘 적용
-            var image = lShoulderSlot.GetComponent<Image>();
-            image.sprite = icon;
-        }
-        else if (slotType == "gem" && gemSlot != null)
-        {
-            // 아이콘 적용
-            var image = gemSlot.GetComponent<Image>();
-            image.sprite = icon;
-        }
-        else if (slotType == "weapon" && weaponSlot != null)
-        {
-            var image = weaponSlot.GetComponent<Image>();
-            image.sprite = icon;
-        }
-        else if (slotType == "shield" && shieldSlot != null)
-        {
-            var image = shieldSlot.GetComponent<Image>();
+            var image = button.GetComponent<Image>();
             image.sprite = icon;
         }
     }
