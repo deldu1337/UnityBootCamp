@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -14,117 +13,84 @@ public class InventoryController : MonoBehaviour
     public InventoryView inventoryView; // 인벤토리 UI
     public EquipmentView equipmentView; // 장비창 UI
 
-    /// <summary>
-    /// 시작 시 UI 초기화
-    /// </summary>
     private void Start()
     {
         RefreshUI();
     }
 
     /// <summary>
-    /// 인벤토리/장비창 UI 갱신
+    /// 인벤토리와 장비창 UI 전체 갱신
     /// </summary>
     private void RefreshUI()
     {
-        // 인벤토리 UI 갱신
+        // 인벤토리 UI
         inventoryView.UpdateInventoryUI(
-            inventory.Items,           // 아이템 리스트
-            OnItemDropped,             // 드래그앤드롭 이벤트
-            OnItemRemoved,             // 인벤토리 외부 삭제 이벤트
-            (idx) => OnEquipRequest(idx, ItemOrigin.Inventory) // 장착 요청 이벤트
+            inventory.Items,
+            OnItemDropped,   // 드래그 후 위치 변경
+            OnItemRemoved,   // 외부로 드래그 → 삭제
+            OnEquipRequest   // 아이템 장착
         );
 
-        // 장비창 UI 갱신
+        // 장비창 UI
         equipmentView.UpdateEquipmentUI(
-            equipment.Slots,                   // 장비 슬롯 리스트
-            slotType => OnUnequipRequestBySlot(slotType) // 슬롯 타입 기반 장비 해제 이벤트
+            equipment.Slots,
+            OnUnequipRequest // 슬롯 클릭 → 아이템 해제
         );
     }
 
     /// <summary>
-    /// 인벤토리 아이템 위치 변경 처리 (드래그앤드롭)
+    /// 인벤토리 아이템 위치 변경 (드래그 앤 드롭)
     /// </summary>
-    /// <param name="from">이동 전 인덱스</param>
-    /// <param name="to">이동 후 인덱스</param>
-    private void OnItemDropped(int from, int to)
+    private void OnItemDropped(string fromId, string toId)
     {
-        inventory.SwapItem(from, to); // 모델에서 아이템 위치 교체
-        RefreshUI();                  // UI 갱신
+        inventory.ReorderByUniqueId(fromId, toId);
+        RefreshUI();
     }
 
     /// <summary>
-    /// 인벤토리 아이템 삭제 처리 (인벤토리 외부로 드래그)
+    /// 인벤토리 아이템 삭제
     /// </summary>
-    /// <param name="index">삭제할 아이템 인덱스</param>
-    private void OnItemRemoved(int index)
+    private void OnItemRemoved(string uniqueId)
     {
-        inventory.RemoveAt(index); // 모델에서 아이템 제거
-        RefreshUI();               // UI 갱신
+        inventory.RemoveById(uniqueId);
+        RefreshUI();
     }
 
     /// <summary>
-    /// 장비창에서 슬롯 타입 기반 장비 해제 처리
+    /// 인벤토리에서 장비창으로 아이템 장착
     /// </summary>
-    /// <param name="slotType">해제할 장비 슬롯 타입</param>
-    private void OnUnequipRequestBySlot(string slotType)
+    private void OnEquipRequest(string uniqueId)
     {
-        // 슬롯 타입에 해당하는 인덱스 찾기
-        int index = equipment.Slots.ToList().FindIndex(s => s.slotType == slotType);
-        if (index < 0) return;
-
-        var item = equipment.Slots[index].equipped;
-        if (item == null) return;
-
-        // 인벤토리에 공간이 있으면 장비 해제 후 인벤토리에 추가
-        if (inventory.Add(item))
-        {
-            equipment.Unequip(index); // 모델에서 장비 해제
-            Debug.Log($"해제: {item.data.name}");
-        }
-        RefreshUI(); // UI 갱신
-    }
-
-    /// <summary>
-    /// 인벤토리에서 장비창으로 장착 요청 처리
-    /// </summary>
-    /// <param name="index">인벤토리 아이템 인덱스</param>
-    /// <param name="origin">아이템 출처 (Inventory/Equipment)</param>
-    private void OnEquipRequest(int index, ItemOrigin origin)
-    {
-        if (origin != ItemOrigin.Inventory) return;
-
-        var item = inventory.Items[index];
+        var item = inventory.GetItemById(uniqueId);
         if (item == null) return;
 
         var slotType = item.data.type;
 
-        // 장비 모델에 장착하고 인벤토리에서 제거
+        // 해당 슬롯에 아이템 장착
         equipment.EquipItem(slotType, item);
-        inventory.RemoveAt(index);
-        Debug.Log($"장착: {item.data.name}");
+        inventory.RemoveById(uniqueId);
 
-        RefreshUI(); // UI 갱신
+        Debug.Log($"장착: {item.data.name}");
+        RefreshUI();
     }
 
     /// <summary>
-    /// 장비창에서 인벤토리로 장비 해제 요청 처리
+    /// 장비창에서 아이템 해제 → 인벤토리로 이동
     /// </summary>
-    /// <param name="index">장비 슬롯 인덱스</param>
-    /// <param name="origin">아이템 출처 (Inventory/Equipment)</param>
-    private void OnUnequipRequest(int index, ItemOrigin origin)
+    private void OnUnequipRequest(string slotType)
     {
-        if (origin != ItemOrigin.Equipment) return;
+        var slot = equipment.GetSlot(slotType);
+        if (slot == null || slot.equipped == null) return;
 
-        var item = equipment.Slots[index].equipped;
-        if (item == null) return;
+        var item = slot.equipped;
 
-        // 인벤토리에 공간이 있으면 장비 해제 후 인벤토리에 추가
         if (inventory.Add(item))
         {
-            equipment.Unequip(index); // 모델에서 장비 해제
+            equipment.UnequipItem(slotType);
             Debug.Log($"해제: {item.data.name}");
         }
-        RefreshUI(); // UI 갱신
+
+        RefreshUI();
     }
 }
+

@@ -1,9 +1,6 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// 인벤토리 UI와 모델을 연결하고 입력/상호작용 처리
-/// </summary>
 public class InventoryPresenter : MonoBehaviour
 {
     private InventoryModel model;
@@ -13,20 +10,15 @@ public class InventoryPresenter : MonoBehaviour
     void Start()
     {
         view = FindAnyObjectByType<InventoryView>();
-        if (view == null)
-        {
-            Debug.LogError("InventoryView를 찾을 수 없습니다!");
-            return;
-        }
+        if (view == null) return;
 
         model = new InventoryModel();
-        view.Initialize(CloseInventory); // 닫기 버튼 콜백
+        view.Initialize(CloseInventory);
         isOpen = false;
     }
 
     void Update()
     {
-        // I 키로 인벤토리 토글
         if (Input.GetKeyDown(KeyCode.I))
             ToggleInventory();
     }
@@ -34,25 +26,18 @@ public class InventoryPresenter : MonoBehaviour
     private void ToggleInventory()
     {
         if (view == null) return;
-
         isOpen = !isOpen;
         view.Show(isOpen);
-
         if (isOpen)
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 
     private void CloseInventory()
     {
-        if (view == null) return;
-
         isOpen = false;
         view.Show(false);
     }
 
-    /// <summary>
-    /// 아이템 추가 (ID, 아이콘, 프리팹 경로)
-    /// </summary>
     public void AddItem(int id, Sprite icon, string prefabPath)
     {
         var dataManager = DataManager.Instance;
@@ -72,54 +57,48 @@ public class InventoryPresenter : MonoBehaviour
         };
 
         model.AddItem(item);
-
-        if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
+        Refresh();
     }
 
-    /// <summary>
-    /// 기존 InventoryItem 객체를 인벤토리에 추가 (uniqueId 유지)
-    /// </summary>
-    public void AddExistingItem(InventoryItem item)
+    public void ForceRefresh() => view?.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
+
+    private void OnItemEquipped(string uniqueId)
     {
-        if (item == null)
-            return;
-
-        model.AddItem(item);
-
-        if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
-    }
-
-
-    // 인벤토리 슬롯 간 이동
-    private void OnItemDropped(int fromIndex, int toIndex)
-    {
-        model.SwapItem(fromIndex, toIndex);
-        if (isOpen)
-            view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
-    }
-
-    // 인벤토리 → 장비창
-    private void OnItemEquipped(int index)
-    {
-        if (index < 0 || index >= model.Items.Count) return;
-        var item = model.Items[index];
-        Debug.Log($"OnItemEquipped - {index}번 슬롯 아이템 {item.data.name} 장착 시도");
+        var item = model.GetItemById(uniqueId);
+        if (item == null) return;
 
         var equipPresenter = FindAnyObjectByType<EquipmentPresenter>();
-        equipPresenter?.HandleEquipItem(item, index);
+        equipPresenter?.HandleEquipItem(item);
+
+        Refresh();
     }
 
-    // 아이템 제거
-    private void OnItemRemoved(int index)
+    private void OnItemRemoved(string uniqueId)
     {
-        if (index < 0 || index >= model.Items.Count) return;
-        var item = model.Items[index];
-        model.RemoveItem(item.uniqueId);
-        Debug.Log("OnItemRemoved");
+        model.RemoveById(uniqueId);
+        Refresh();
+    }
 
+    private void OnItemDropped(string fromId, string toId)
+    {
+        model.ReorderByUniqueId(fromId, toId);
+        Refresh();
+    }
+
+    public void AddExistingItem(InventoryItem item)
+    {
+        model.Add(item);
+        Refresh();
+    }
+
+    public void RemoveItemFromInventory(string uniqueId) => model.RemoveById(uniqueId);
+
+    public void Refresh()
+    {
         if (isOpen)
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 }
+
+
+
