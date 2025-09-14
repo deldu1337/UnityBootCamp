@@ -82,7 +82,7 @@ public class AttackingStates : IPlayerStates
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f))
             {
-                EnemyStats clickedEnemy = hit.collider.GetComponent<EnemyStats>();
+                EnemyStatsManager clickedEnemy = hit.collider.GetComponent<EnemyStatsManager>();
                 if (clickedEnemy == null || ((1 << hit.collider.gameObject.layer) & player.enemyLayer) == 0)
                 {
                     player.ClearTarget();

@@ -7,7 +7,6 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
 
     public EnemyData Data { get; private set; }
     public float CurrentHP { get; private set; }
-
     public float MaxHP => Data.hp;
 
     private ItemDropManager dropManager;
@@ -42,7 +41,7 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
 
     public void TakeDamage(float damage)
     {
-        damage = Mathf.Max(damage - Data.def, 1f); // ¹æ¾î·Â Àû¿ë
+        damage = Mathf.Max(damage - Data.def, 1f);
         CurrentHP = Mathf.Max(CurrentHP - damage, 0);
         Debug.Log($"{Data.name} HP: {CurrentHP}/{Data.hp}");
 
@@ -50,16 +49,25 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
             Die();
     }
 
+    private void Die()
+    {
+        Debug.Log($"{Data.name} »ç¸Á!");
+
+        // EXP Áö±Þ
+        var player = FindAnyObjectByType<PlayerStatsManager>();
+        if (player != null)
+        {
+            player.GainExp(Data.exp);
+            Debug.Log($"ÇÃ·¹ÀÌ¾î°¡ {Data.exp} EXP¸¦ È¹µæ!");
+        }
+
+        dropManager?.DropItems();
+        Destroy(gameObject);
+    }
+
     public void Heal(float amount)
     {
         if (CurrentHP <= 0) return;
         CurrentHP = Mathf.Min(CurrentHP + amount, Data.hp);
-    }
-
-    private void Die()
-    {
-        Debug.Log($"{Data.name} »ç¸Á!");
-        dropManager?.DropItems();
-        Destroy(gameObject);
     }
 }
