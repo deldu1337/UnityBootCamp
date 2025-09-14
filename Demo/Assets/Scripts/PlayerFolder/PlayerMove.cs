@@ -16,7 +16,7 @@ public class PlayerMove : MonoBehaviour
     // 컴포넌트 참조
     private Rigidbody rb;
     private Animation animationComponent;
-    private PlayerCombatStats stats;
+    private PlayerStatsManager stats;
 
     // Wall 레이어
     private LayerMask wallLayer;
@@ -27,7 +27,7 @@ public class PlayerMove : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation;
 
         animationComponent = GetComponent<Animation>();
-        stats = GetComponent<PlayerCombatStats>();
+        stats = GetComponent<PlayerStatsManager>();
 
         if (animationComponent == null)
             Debug.LogError("Animation 컴포넌트가 없습니다!");
@@ -89,8 +89,8 @@ public class PlayerMove : MonoBehaviour
     void MovePlayer()
     {
         // === PlayerCombatStats에서 이동 속도 가져오기 ===
-        float moveSpeed = stats.Dex; // 민첩 수치가 곧 이동속도
-        float rotationSpeed = baseRotationSpeed + stats.Dex * 0.5f; // 민첩에 비례해 회전속도 증가
+        float moveSpeed = stats.Data.Dex; // 민첩 수치가 곧 이동속도
+        float rotationSpeed = baseRotationSpeed + stats.Data.Dex * 0.5f; // 민첩에 비례해 회전속도 증가
 
         Vector3 direction = (targetPosition - rb.position).normalized;
         Vector3 moveDelta = direction * moveSpeed * Time.fixedDeltaTime;

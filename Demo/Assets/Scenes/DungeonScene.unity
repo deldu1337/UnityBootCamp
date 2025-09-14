@@ -7880,7 +7880,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3af492637f03cd44b9686395ccd59f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 2049026547032071048, guid: 9da7aca8b7e0600459ce0dba39c619df, type: 3}
+  enemyPrefab: {fileID: 3684642728859710217, guid: 2b6d5b0bbb87991478993b29f3a09661, type: 3}
   mapGenerator: {fileID: 1080398098}
   spawnFactor: 70
 --- !u!4 &1827502802

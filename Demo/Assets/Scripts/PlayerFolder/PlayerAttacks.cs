@@ -28,7 +28,7 @@ public class IdleStates : IPlayerStates
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f))
             {
-                EnemyStats clickedEnemy = hit.collider.GetComponent<EnemyStats>();
+                EnemyStatsManager clickedEnemy = hit.collider.GetComponent<EnemyStatsManager>();
                 if (clickedEnemy != null && ((1 << hit.collider.gameObject.layer) & player.enemyLayer) != 0)
                 {
                     player.SetTarget(clickedEnemy);
@@ -51,51 +51,9 @@ public class AttackingStates : IPlayerStates
 
     public void Exit(PlayerAttacks player) { }
 
-    //public void Update(PlayerAttacks player)
-    //{
-    //    if (player.targetEnemy == null || player.targetEnemy.currentHP <= 0)
-    //    {
-    //        player.ClearTarget();
-    //        player.ChangeState(new IdleStates());
-    //        return;
-    //    }
-
-    //    // 타겟 방향 회전
-    //    player.RotateTowardsTarget(player.targetEnemy.transform.position);
-
-    //    // 공격 쿨타임 체크
-    //    if (Time.time >= player.lastAttackTime)
-    //    {
-    //        Collider enemyCollider = player.targetEnemy.GetComponent<Collider>();
-    //        Vector3 playerOrigin = player.transform.position + Vector3.up * player.raycastYOffset;
-    //        Vector3 closest = enemyCollider.ClosestPoint(playerOrigin);
-    //        float distance = Vector3.Distance(playerOrigin, closest);
-
-    //        if (distance <= player.GetAttackRange())
-    //        {
-    //            player.PerformAttack();
-    //            player.lastAttackTime = Time.time + player.GetAttackCooldown();
-    //        }
-    //    }
-
-    //    // 마우스 클릭 시 타겟 해제
-    //    if (Input.GetMouseButtonDown(1))
-    //    {
-    //        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-    //        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-    //        {
-    //            EnemyStats clickedEnemy = hit.collider.GetComponent<EnemyStats>();
-    //            if (clickedEnemy == null || ((1 << hit.collider.gameObject.layer) & player.enemyLayer) == 0)
-    //            {
-    //                player.ClearTarget();
-    //                player.ChangeState(new IdleStates());
-    //            }
-    //        }
-    //    }
-    //}
     public void Update(PlayerAttacks player)
     {
-        bool targetDead = player.targetEnemy == null || player.targetEnemy.currentHP <= 0;
+        bool targetDead = player.targetEnemy == null || player.targetEnemy.CurrentHP <= 0;
 
         if (!targetDead)
         {
@@ -154,19 +112,19 @@ public class PlayerAttacks : MonoBehaviour
     [Header("쿨타임")]
     [HideInInspector] public float lastAttackTime;
 
-    [HideInInspector] public EnemyStats targetEnemy;
+    [HideInInspector] public EnemyStatsManager targetEnemy;
     [HideInInspector] public HealthBarUI targetHealthBar;
     [HideInInspector] public Animation animationComponent;
 
     private IPlayerStates currentState;
-    private PlayerCombatStats stats;
+    private PlayerStatsManager stats;
 
     [HideInInspector] public bool isAttacking = false; // 공격 중 여부
 
     void Awake()
     {
         animationComponent = GetComponent<Animation>();
-        stats = GetComponent<PlayerCombatStats>();
+        stats = GetComponent<PlayerStatsManager>();
 
         if (animationComponent == null)
             Debug.LogError("Animation 컴포넌트가 Player 프리팹 또는 자식에 없습니다!");
@@ -192,7 +150,7 @@ public class PlayerAttacks : MonoBehaviour
         currentState.Enter(this);
     }
 
-    public void SetTarget(EnemyStats enemy)
+    public void SetTarget(EnemyStatsManager enemy)
     {
         targetEnemy = enemy;
         targetHealthBar = enemy?.GetComponentInChildren<HealthBarUI>();
@@ -215,25 +173,6 @@ public class PlayerAttacks : MonoBehaviour
         }
     }
 
-    //public void PerformAttack()
-    //{
-    //    if (targetEnemy == null) return;
-
-    //    string animName = "Attack1H (ID 17 variation 0)";
-    //    if (animationComponent.GetClip(animName) != null)
-    //    {
-    //        // 애니메이션 속도 설정
-    //        animationComponent[animName].speed = stats.AttackSpeed; // 조금 빠르게
-    //        animationComponent.Play(animName);
-
-    //        // 공격 쿨타임은 Stats 기준
-    //        lastAttackTime = Time.time + GetAttackCooldown();
-
-    //        // 애니메이션 임팩트 시점에 데미지 적용
-    //        float impactTime = 0.2f; // 공격 모션에서 실제 타격이 일어나는 시간 (초)
-    //        StartCoroutine(DelayedDamage(impactTime));
-    //    }
-    //}
     public void PerformAttack()
     {
         if (targetEnemy == null) return;
@@ -245,7 +184,7 @@ public class PlayerAttacks : MonoBehaviour
             isAttacking = true;
 
             // 애니메이션 속도 적용
-            animationComponent[animName].speed = stats.AttackSpeed;
+            animationComponent[animName].speed = stats.Data.AttackSpeed;
             animationComponent.Play(animName);
 
             // 공격 쿨타임
@@ -276,9 +215,9 @@ public class PlayerAttacks : MonoBehaviour
         if (targetEnemy == null) yield break;
 
         float damage = stats.CalculateDamage();
-        Debug.Log($"Before Attack: {targetEnemy.name} HP={targetEnemy.currentHP}");
+        Debug.Log($"Before Attack: {targetEnemy.name} HP={targetEnemy.CurrentHP}");
         targetEnemy.TakeDamage(damage);
-        Debug.Log($"After Attack: {targetEnemy.name} HP={targetEnemy.currentHP}");
+        Debug.Log($"After Attack: {targetEnemy.name} HP={targetEnemy.CurrentHP}");
 
         targetHealthBar?.CheckHp();
     }
@@ -292,6 +231,6 @@ public class PlayerAttacks : MonoBehaviour
 
     public float GetAttackCooldown()
     {
-        return 1f / stats.AttackSpeed; // 공격 속도가 높으면 쿨타임 짧아짐
+        return 1f / stats.Data.AttackSpeed; // 공격 속도가 높으면 쿨타임 짧아짐
     }
 }

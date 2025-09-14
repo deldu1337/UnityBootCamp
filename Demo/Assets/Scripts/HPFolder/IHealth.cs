@@ -1,5 +1,5 @@
 public interface IHealth
 {
-    float currentHP { get; }
-    float maxHP { get; }
+    float CurrentHP { get; }
+    float MaxHP { get; }
 }

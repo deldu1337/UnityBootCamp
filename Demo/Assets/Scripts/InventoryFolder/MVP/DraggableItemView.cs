@@ -169,8 +169,6 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
             transform.SetParent(originalParent);
             transform.SetSiblingIndex(originalIndex);
             onItemDropped?.Invoke(uniqueId, toId);
-
-            Destroy(placeholder);
         }
         // 4. ÀåºñÃ¢ ½½·Ô ¡æ ÀåÂø Ã³¸®
         else if (inEquipmentSlot)
@@ -198,6 +196,7 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
             onItemRemoved?.Invoke(uniqueId);
             Debug.Log("OnEndDrag - Removed Item (Outside Inventory & Equipment)");
         }
+        Destroy(placeholder);
     }
 }
 

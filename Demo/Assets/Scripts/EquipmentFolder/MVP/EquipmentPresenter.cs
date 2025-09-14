@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -12,14 +13,14 @@ public class EquipmentPresenter : MonoBehaviour
 
     [SerializeField] private Camera uiCamera;           // 장비 UI 전용 카메라
     [SerializeField] private Transform targetCharacter; // 캐릭터 모델
-    [SerializeField] private PlayerCombatStats playerCombatStats; // 캐릭터 스탯 계산용
+    [SerializeField] private PlayerStatsManager playerStats; // 캐릭터 스탯 계산용
 
     void Start()
     {
         model = new EquipmentModel();
         view = FindAnyObjectByType<EquipmentView>();
         inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
-        playerCombatStats = GetComponent<PlayerCombatStats>();
+        playerStats = GetComponent<PlayerStatsManager>();
 
         // UI 초기화
         if (view != null)
@@ -32,6 +33,11 @@ public class EquipmentPresenter : MonoBehaviour
         InitializeEquippedItemsFromJson();
 
         RefreshEquipmentUI();
+    }
+
+    public IReadOnlyList<EquipmentSlot> GetEquipmentSlots()
+    {
+        return model?.Slots; // EquipmentModel에서 슬롯 리스트 가져오기
     }
 
     void Update()
@@ -112,7 +118,7 @@ public class EquipmentPresenter : MonoBehaviour
         }
 
         // UI & 스탯 갱신
-        playerCombatStats?.RecalculateStats(model.Slots);
+        ApplyStatsAndSave();
         inventoryPresenter?.Refresh();
         RefreshEquipmentUI();
     }
@@ -143,8 +149,15 @@ public class EquipmentPresenter : MonoBehaviour
         RemovePrefabFromCharacter(slotType);
 
         inventoryPresenter?.Refresh();
-        playerCombatStats?.RecalculateStats(model.Slots);
+        ApplyStatsAndSave();
         RefreshEquipmentUI();
+    }
+
+    // 장비 변경 시 즉시 스탯 갱신 + 저장
+    private void ApplyStatsAndSave()
+    {
+        playerStats?.RecalculateStats(model.Slots);
+        SaveLoadManager.SavePlayerData(playerStats.Data);
     }
 
     /// <summary>JSON 저장된 장비 데이터 복원</summary>
@@ -159,7 +172,7 @@ public class EquipmentPresenter : MonoBehaviour
                     AttachPrefabToCharacter(prefab, slot.slotType);
             }
         }
-        playerCombatStats?.RecalculateStats(model.Slots);
+        playerStats?.RecalculateStats(model.Slots);
     }
 
     /// <summary>장비 프리팹 캐릭터 본에 장착</summary>
