@@ -11,12 +11,11 @@ public class PlayerController : MonoBehaviour
         equipmentPresenter = FindAnyObjectByType<EquipmentPresenter>();
 
         var loadedData = SaveLoadManager.LoadPlayerData();
-        bool isNewGame = loadedData == null;
 
         stats.LoadData(loadedData);
 
         if (equipmentPresenter != null)
-            stats.RecalculateStats(equipmentPresenter.GetEquipmentSlots(), isNewGame);
+            stats.RecalculateStats(equipmentPresenter.GetEquipmentSlots());
     }
 
     void OnApplicationQuit()

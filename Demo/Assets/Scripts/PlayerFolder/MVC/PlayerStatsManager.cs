@@ -15,11 +15,19 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public event Action<int, float> OnExpChanged;
     public event Action<int> OnLevelUp;
 
+
     void Awake()
     {
         levelUpStrategy = new DefaultLevelUpStrategy();
-        // 여기서 초기값 세팅
-        // LoadData에서 세팅하게 바꿈
+        // 씬 시작 시 바로 로드
+
+        PlayerData loaded = SaveLoadManager.LoadPlayerData();
+        LoadData(loaded);
+    }
+
+    void Start()
+    {
+        Debug.Log(Data.Level);
     }
 
     /// <summary>저장된 데이터 불러오기</summary>
@@ -54,58 +62,57 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     }
 
     /// <summary>장비 기반으로 MaxHP만 계산</summary>
-    public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots, bool isNewGame = false)
+    public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
     {
         float prevHP = Data.CurrentHP;
         float prevMP = Data.CurrentMP;
 
-        // 기본값
-        float baseHP = 100f, baseMP = 50f, baseAtk = 5f, baseDef = 5f, baseDex = 10f;
-        float baseAS = 2f, baseCC = 0.1f, baseCD = 1.5f;
+        // 기본값(레벨업 반영된 값)으로 초기화
+        // 저장된 JSON에서 불러온 값이 이미 레벨업까지 반영된 값이므로,
+        // "기본값"은 PlayerData의 MaxHP, MaxMP, Atk, Def 등을 복사해서 사용
+        float baseHP = 100f + (Data.Level - 1) * 10f; // 레벨당 10씩 증가 (레벨업 로직과 맞춤)
+        float baseMP = 50f;                           // 레벨업으로 MP가 변하는 로직이 있으면 수정
+        float baseAtk = 5f + (Data.Level - 1) * 2f;   // 레벨당 2씩 증가
+        float baseDef = 5f + (Data.Level - 1) * 1f;   // 레벨당 1씩 증가
+        float baseDex = 10f;                          // 기본값 그대로
+        float baseAS = 2f;                            // 기본값 그대로
+        float baseCC = 0.1f;
+        float baseCD = 1.5f;
 
-        Data.MaxHP = baseHP;
-        Data.MaxMP = baseMP;
-        Data.Atk = baseAtk;
-        Data.Def = baseDef;
-        Data.Dex = baseDex;
-        Data.AttackSpeed = baseAS;
-        Data.CritChance = baseCC;
-        Data.CritDamage = baseCD;
+        // 장비 스탯 합산
+        float equipHP = 0f, equipMP = 0f, equipAtk = 0f, equipDef = 0f, equipDex = 0f;
+        float equipAS = 0f, equipCC = 0f, equipCD = 0f;
 
-        // 장비 스탯 적용
         if (equippedSlots != null)
         {
             foreach (var slot in equippedSlots)
             {
                 if (slot.equipped == null || slot.equipped.data == null) continue;
                 var eq = slot.equipped.data;
-                Data.MaxHP += eq.hp;
-                Data.MaxMP += eq.mp;
-                Data.Atk += eq.atk;
-                Data.Def += eq.def;
-                Data.Dex += eq.dex;
-                Data.AttackSpeed += eq.As;
-                Data.CritChance += eq.cc;
-                Data.CritDamage += eq.cd;
+                equipHP += eq.hp;
+                equipMP += eq.mp;
+                equipAtk += eq.atk;
+                equipDef += eq.def;
+                equipDex += eq.dex;
+                equipAS += eq.As;
+                equipCC += eq.cc;
+                equipCD += eq.cd;
             }
         }
 
-        // HP/MP는 덮지 않음 (게임 시작 상태 유지)
-        if (isNewGame)
-        {
-            Data.CurrentHP = Data.MaxHP;
-            Data.CurrentMP = Data.MaxMP;
-        }
-        else
-        {
-            Data.CurrentHP = Mathf.Clamp(prevHP, 0, Data.MaxHP);
-            Data.CurrentMP = Mathf.Clamp(prevMP, 0, Data.MaxMP);
-        }
+        // 최종 스탯 = 기본값 + 장비값
+        Data.MaxHP = baseHP + equipHP;
+        Data.MaxMP = baseMP + equipMP;
+        Data.Atk = baseAtk + equipAtk;
+        Data.Def = baseDef + equipDef;
+        Data.Dex = baseDex + equipDex;
+        Data.AttackSpeed = baseAS + equipAS;
+        Data.CritChance = baseCC + equipCC;
+        Data.CritDamage = baseCD + equipCD;
 
         SaveLoadManager.SavePlayerData(Data);
         UpdateUI();
     }
-
 
     public void TakeDamage(float damage)
     {

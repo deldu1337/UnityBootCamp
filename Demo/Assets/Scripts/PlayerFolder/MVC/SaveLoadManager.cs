@@ -13,34 +13,13 @@ public static class SaveLoadManager
         Debug.Log($"플레이어 데이터 저장 완료: {playerDataPath}");
     }
 
-    // 플레이어 데이터 로드 (없으면 기본값 생성)
+    // 플레이어 데이터 로드 (없으면 null 반환)
     public static PlayerData LoadPlayerData()
     {
         if (!File.Exists(playerDataPath))
         {
-            Debug.LogWarning("저장된 플레이어 데이터가 없습니다. 기본 데이터 생성!");
-
-            // 기본 데이터 생성
-            PlayerData newData = new PlayerData
-            {
-                Level = 1,
-                Exp = 0,
-                ExpToNextLevel = 50f,
-                MaxHP = 100f,
-                MaxMP = 50f,
-                Atk = 5f,
-                Def = 5f,
-                Dex = 10f,
-                AttackSpeed = 2f,
-                CritChance = 0.1f,
-                CritDamage = 1.5f,
-                CurrentHP = 100f,
-                CurrentMP = 50f
-            };
-
-            // 파일로 바로 저장
-            SavePlayerData(newData);
-            return newData;
+            Debug.LogWarning("저장된 플레이어 데이터가 없습니다. 새 게임으로 시작합니다.");
+            return null; // null 반환
         }
 
         string json = File.ReadAllText(playerDataPath);
