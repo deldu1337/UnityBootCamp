@@ -176,6 +176,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         Data.Def += 1f;
 
         Data.CurrentHP = Data.MaxHP; // 레벨업 시 풀피 회복
+        Data.CurrentMP = Data.MaxMP;
         Debug.Log($"레벨업! 현재 레벨 {Data.Level}");
 
         OnLevelUp?.Invoke(Data.Level);

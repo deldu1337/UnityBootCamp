@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class ProjectileSkill : ISkill
@@ -6,6 +7,8 @@ public class ProjectileSkill : ISkill
     public string Name { get; private set; }
     public float Cooldown { get; private set; }
     public float MpCost { get; private set; }
+    public float Range { get; private set; }
+    public float ImpactDelay { get; private set; }
 
     private float damage;
     private string animationName;
@@ -16,7 +19,9 @@ public class ProjectileSkill : ISkill
         Name = data.name;
         Cooldown = data.cooldown;
         MpCost = data.mpCost;
+        Range = data.range;
         damage = data.damage;
+        ImpactDelay = data.impactDelay;
         animationName = data.animation;
     }
 
@@ -29,20 +34,67 @@ public class ProjectileSkill : ISkill
         }
 
         Animation anim = user.GetComponent<Animation>();
-        if (anim && !string.IsNullOrEmpty(animationName))
-            anim.CrossFade(animationName, 0.1f);
+        PlayerAttacks attackComp = user.GetComponent<PlayerAttacks>();
+        PlayerMove moveComp = user.GetComponent<PlayerMove>();
 
-        // 주변 적 탐지 (반경 5f)
-        Collider[] hits = Physics.OverlapSphere(user.transform.position, 5f, LayerMask.GetMask("Enemy"));
+        float animDuration = 0.5f; // 기본값 (애니 없음 대비)
+        if (anim && !string.IsNullOrEmpty(animationName))
+        {
+            anim.CrossFade(animationName, 0.1f);
+            AnimationState state = anim[animationName];
+            if (state != null)
+                animDuration = state.length / Mathf.Max(state.speed, 0.0001f);
+        }
+
+        // 이동/공격 잠금
+        if (attackComp != null) attackComp.isAttacking = true;
+        if (moveComp != null) moveComp.SetMovementLocked(true);
+
+        // 임팩트 타이밍: ActiveSkill과 동일하게 고정값 사용
+        float impactDelay = animDuration * 0.5f;
+        // 참고) 애니 기준 비율로 쓰고 싶다면 아래로 교체:
+
+        // 임팩트 시점에 AoE 적용
+        var host = user.GetComponent<MonoBehaviour>();
+        if (host != null)
+        {
+            host.StartCoroutine(ApplyAoEAfterDelay(user.transform, stats, impactDelay));
+            host.StartCoroutine(UnlockAfterDelay(attackComp, moveComp, animDuration));
+        }
+    }
+
+    private IEnumerator ApplyAoEAfterDelay(Transform userTf, PlayerStatsManager stats, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // 임팩트 순간의 현재 위치를 기준으로 범위 내 적 탐지
+        Collider[] hits = Physics.OverlapSphere(userTf.position, Range, LayerMask.GetMask("Enemy"));
         foreach (var hit in hits)
         {
             EnemyStatsManager enemy = hit.GetComponent<EnemyStatsManager>();
-            if (enemy != null)
+            if (enemy != null && enemy.CurrentHP > 0)
             {
-                float finalDamage = stats.CalculateDamage() + damage;
+                float finalDamage = stats.CalculateDamage() * damage;
                 enemy.TakeDamage(finalDamage);
                 Debug.Log($"{enemy.name}에게 {finalDamage} 피해! (광역)");
             }
         }
+    }
+
+    private IEnumerator UnlockAfterDelay(PlayerAttacks attack, PlayerMove move, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (attack != null)
+        {
+            attack.isAttacking = false;
+            if (attack.targetEnemy != null && attack.targetEnemy.CurrentHP > 0)
+                attack.ChangeState(new AttackingStates());
+            else
+                attack.ChangeState(new IdleStates());
+        }
+
+        if (move != null)
+            move.SetMovementLocked(false);
     }
 }

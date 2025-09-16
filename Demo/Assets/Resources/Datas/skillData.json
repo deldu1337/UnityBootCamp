@@ -2,19 +2,23 @@
   "warrior": [
     {
       "id": "slash",
-      "name": "¿œ∞›",
+      "name": "ÏùºÍ≤©",
       "cooldown": 3.0,
-      "damage": 20,
+      "damage": 2,
       "mpCost": 5,
+      "range": 4.5,
+      "impactDelay": 0.5,
       "type": "ActiveSkill",
       "animation": "Attack2H (ID 18 variation 1)"
     },
     {
       "id": "smash",
-      "name": "∫–º‚",
+      "name": "Î∂ÑÏáÑ",
       "cooldown": 7.0,
-      "damage": 15,
+      "damage": 1,
       "mpCost": 10,
+      "range": 5,
+      "impactDelay": 0.6,
       "type": "ProjectileSkill",
       "animation": "Attack2HL (ID 19 variation 1)"
     }

@@ -6,6 +6,8 @@ public class SkillData
     public float cooldown;
     public float damage;
     public float mpCost;
+    public float range;
+    public float impactDelay;
     public string type;
     public string animation;
 }

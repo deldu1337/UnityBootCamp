@@ -1,25 +1,157 @@
+//using UnityEngine;
+//using UnityEngine.EventSystems; // 추가 필요
+
+
+//// Rigidbody 컴포넌트가 반드시 필요함을 명시
+//[RequireComponent(typeof(Rigidbody))]
+//public class PlayerMove : MonoBehaviour
+//{
+//    // 회전 속도 기본값 (Dex 기반 보정)
+//    [SerializeField] private float baseRotationSpeed = 10f;
+
+//    // 목표 지점
+//    private Vector3 targetPosition;
+//    private bool isMoving = false;
+
+//    // 컴포넌트 참조
+//    private Rigidbody rb;
+//    private Animation animationComponent;
+//    private PlayerStatsManager stats;
+
+//    // Wall 레이어
+//    private LayerMask wallLayer;
+
+//    void Awake()
+//    {
+//        rb = GetComponent<Rigidbody>();
+//        rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+//        animationComponent = GetComponent<Animation>();
+//        stats = GetComponent<PlayerStatsManager>();
+
+//        if (animationComponent == null)
+//            Debug.LogError("Animation 컴포넌트가 없습니다!");
+//        if (stats == null)
+//            Debug.LogError("PlayerCombatStats 컴포넌트가 없습니다!");
+
+//        wallLayer = LayerMask.GetMask("Wall");
+//    }
+
+//    void Update()
+//    {
+//        HandleMovementInput();
+
+//        if (isMoving)
+//        {
+//            // 디버그 라인 & 목표 지점 시각화
+//            Debug.DrawLine(transform.position, targetPosition, Color.green);
+//            Debug.DrawRay(targetPosition + Vector3.up * 0.1f, Vector3.up * 0.2f, Color.green);
+//        }
+//    }
+
+//    void FixedUpdate()
+//    {
+//        if (isMoving)
+//            MovePlayer();
+//    }
+
+//    // 마우스 입력을 받아 목표 위치 설정
+//    void HandleMovementInput()
+//    {
+//        // UI 위에서 우클릭 시 이동 입력 무시
+//        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+//            return;
+
+//        // 마우스 우클릭으로 이동
+//        if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(1))
+//        {
+//            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+//            if (Physics.Raycast(ray, out RaycastHit hit))
+//            {
+//                targetPosition = hit.point;
+//                targetPosition.y = transform.position.y;
+//                isMoving = true;
+//            }
+//        }
+
+//        // 이동 애니메이션 처리
+//        if (isMoving && animationComponent != null)
+//        {
+//            if (!animationComponent.IsPlaying("Attack1H (ID 17 variation 0)") &&
+//                !animationComponent.IsPlaying("Run (ID 5 variation 0)"))
+//            {
+//                animationComponent.Play("Run (ID 5 variation 0)");
+//            }
+//        }
+//    }
+
+//    // 실제 이동 처리
+//    void MovePlayer()
+//    {
+//        // === PlayerCombatStats에서 이동 속도 가져오기 ===
+//        float moveSpeed = stats.Data.Dex; // 민첩 수치가 곧 이동속도
+//        float rotationSpeed = baseRotationSpeed + stats.Data.Dex * 0.5f; // 민첩에 비례해 회전속도 증가
+
+//        Vector3 direction = (targetPosition - rb.position).normalized;
+//        Vector3 moveDelta = direction * moveSpeed * Time.fixedDeltaTime;
+//        Vector3 nextPos = rb.position + moveDelta;
+
+//        if (Physics.SphereCast(rb.position, 0.1f, direction, out _, moveDelta.magnitude + 0.1f, wallLayer))
+//        {
+//            isMoving = false;
+//            if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
+//                animationComponent.Play("Stand (ID 0 variation 0)");
+//            return;
+//        }
+//        if (moveDelta.magnitude < 0.001f)
+//        {
+//            isMoving = false;
+//            if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
+//                animationComponent.Play("Stand (ID 0 variation 0)");
+//            return;
+//        }
+
+//        rb.MovePosition(nextPos);
+
+//        // 방향 회전
+//        if (direction != Vector3.zero)
+//        {
+//            Quaternion targetRotation = Quaternion.LookRotation(direction);
+//            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
+//        }
+
+//        // 목표 지점 도달 시 Idle
+//        if (Vector3.Distance(rb.position, targetPosition) < 0.2f)
+//        {
+//            isMoving = false;
+//            if (animationComponent != null && !animationComponent.IsPlaying("Attack1H (ID 17 variation 0)"))
+//                animationComponent.Play("Stand (ID 0 variation 0)");
+//        }
+//    }
+
+//    // 외부 접근용
+//    public bool IsMoving() => isMoving;
+//    public Animation GetAnimation() => animationComponent;
+//}
 using UnityEngine;
 using UnityEngine.EventSystems; // 추가 필요
 
-
-// Rigidbody 컴포넌트가 반드시 필요함을 명시
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMove : MonoBehaviour
 {
-    // 회전 속도 기본값 (Dex 기반 보정)
     [SerializeField] private float baseRotationSpeed = 10f;
 
-    // 목표 지점
     private Vector3 targetPosition;
     private bool isMoving = false;
 
-    // 컴포넌트 참조
     private Rigidbody rb;
     private Animation animationComponent;
     private PlayerStatsManager stats;
 
-    // Wall 레이어
     private LayerMask wallLayer;
+
+    // 추가: 이동 잠금 플래그
+    private bool movementLocked = false;
 
     void Awake()
     {
@@ -39,11 +171,12 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        HandleMovementInput();
+        // 잠금 중에는 입력 자체를 받지 않음
+        if (!movementLocked)
+            HandleMovementInput();
 
         if (isMoving)
         {
-            // 디버그 라인 & 목표 지점 시각화
             Debug.DrawLine(transform.position, targetPosition, Color.green);
             Debug.DrawRay(targetPosition + Vector3.up * 0.1f, Vector3.up * 0.2f, Color.green);
         }
@@ -51,18 +184,20 @@ public class PlayerMove : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isMoving)
+        // 잠금 중에는 실제 이동도 수행하지 않음
+        if (isMoving && !movementLocked)
             MovePlayer();
     }
 
-    // 마우스 입력을 받아 목표 위치 설정
     void HandleMovementInput()
     {
-        // UI 위에서 우클릭 시 이동 입력 무시
+        // 방어 로직 (중복 안전장치)
+        if (movementLocked) return;
+
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
-        // 마우스 우클릭으로 이동
+        // 마우스 우클릭 이동
         if (Input.GetMouseButton(1) || Input.GetMouseButtonDown(1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -85,12 +220,10 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    // 실제 이동 처리
     void MovePlayer()
     {
-        // === PlayerCombatStats에서 이동 속도 가져오기 ===
-        float moveSpeed = stats.Data.Dex; // 민첩 수치가 곧 이동속도
-        float rotationSpeed = baseRotationSpeed + stats.Data.Dex * 0.5f; // 민첩에 비례해 회전속도 증가
+        float moveSpeed = stats.Data.Dex;
+        float rotationSpeed = baseRotationSpeed + stats.Data.Dex * 0.5f;
 
         Vector3 direction = (targetPosition - rb.position).normalized;
         Vector3 moveDelta = direction * moveSpeed * Time.fixedDeltaTime;
@@ -113,14 +246,12 @@ public class PlayerMove : MonoBehaviour
 
         rb.MovePosition(nextPos);
 
-        // 방향 회전
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
 
-        // 목표 지점 도달 시 Idle
         if (Vector3.Distance(rb.position, targetPosition) < 0.2f)
         {
             isMoving = false;
@@ -129,7 +260,30 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    // 외부 접근용
+    // === 외부 접근용 ===
     public bool IsMoving() => isMoving;
     public Animation GetAnimation() => animationComponent;
+
+    // 추가: 스킬 등이 호출하는 이동 잠금 토글
+    public void SetMovementLocked(bool locked)
+    {
+        movementLocked = locked;
+
+        if (locked)
+        {
+            // 즉시 이동 정지 (물리 속도도 0으로)
+            isMoving = false;
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+            //주의: 여기서 Stand를 강제로 재생하지 않습니다.
+            // 스킬 애니메이션(또는 다른 애니메이션)이 이미 재생 중일 수 있으므로 간섭 금지.
+        }
+        // 잠금 해제 시엔 입력/이동 루틴이 자연스럽게 재개됩니다.
+    }
+
+    // (선택) 외부에서 상태 확인하고 싶다면:
+    public bool IsMovementLocked() => movementLocked;
 }
