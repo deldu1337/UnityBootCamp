@@ -1632,7 +1632,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 2
-  attackAnimName: AttackUnarmed
   damageDelay: 0.3
 --- !u!114 &2488820109060771984
 MonoBehaviour:

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 // 상태 인터페이스
 public interface IPlayerStates
@@ -22,22 +23,15 @@ public class IdleStates : IPlayerStates
 
     public void Update(PlayerAttacks player)
     {
-        // 마우스 클릭 시 타겟 지정
         if (Input.GetMouseButtonDown(1))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            if (player.TryPickEnemyUnderMouse(out var clickedEnemy))
             {
-                EnemyStatsManager clickedEnemy = hit.collider.GetComponent<EnemyStatsManager>();
-                if (clickedEnemy != null && ((1 << hit.collider.gameObject.layer) & player.enemyLayer) != 0)
-                {
-                    player.SetTarget(clickedEnemy);
-                    player.ChangeState(new AttackingStates());
-                }
+                player.SetTarget(clickedEnemy);
+                player.ChangeState(new AttackingStates());
             }
         }
     }
-
 }
 
 // Attacking 상태
@@ -57,10 +51,8 @@ public class AttackingStates : IPlayerStates
 
         if (!targetDead)
         {
-            // 타겟 회전
             player.RotateTowardsTarget(player.targetEnemy.transform.position);
 
-            // 공격 쿨타임 체크
             if (Time.time >= player.lastAttackTime)
             {
                 Collider enemyCollider = player.targetEnemy.GetComponent<Collider>();
@@ -76,22 +68,23 @@ public class AttackingStates : IPlayerStates
             }
         }
 
-        // 마우스 클릭 시 타겟 해제
+        // 우클릭: 다른 적으로 전환 또는 해제
         if (Input.GetMouseButtonDown(1))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            if (player.TryPickEnemyUnderMouse(out var clickedEnemy))
             {
-                EnemyStatsManager clickedEnemy = hit.collider.GetComponent<EnemyStatsManager>();
-                if (clickedEnemy == null || ((1 << hit.collider.gameObject.layer) & player.enemyLayer) == 0)
-                {
-                    player.ClearTarget();
-                    player.ChangeState(new IdleStates());
-                }
+                // 다른 적을 눌렀으면 타겟 교체
+                if (clickedEnemy != player.targetEnemy)
+                    player.SetTarget(clickedEnemy);
+            }
+            else
+            {
+                // 적이 아닌 곳을 눌렀다면 타겟 해제
+                player.ClearTarget();
+                player.ChangeState(new IdleStates());
             }
         }
 
-        // 적이 죽었고 공격 애니메이션도 끝났다면 Idle 전환
         if (targetDead && !player.isAttacking)
         {
             player.ClearTarget();
@@ -171,6 +164,67 @@ public class PlayerAttacks : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
+    }
+
+    // 마우스 아래 적 선택 (근접 보정 포함)
+    public bool TryPickEnemyUnderMouse(out EnemyStatsManager enemy)
+    {
+        enemy = null;
+
+        // UI 위면 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return false;
+
+        if (Camera.main == null) return false;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        int mask = enemyLayer; // Enemy 레이어만
+
+        // 1) RaycastAll: 가장 가까운 Enemy 히트 선택
+        RaycastHit[] hits = Physics.RaycastAll(ray, 100f, mask, QueryTriggerInteraction.Collide);
+        if (hits.Length > 0)
+        {
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            foreach (var h in hits)
+            {
+                var esm = h.collider.GetComponentInParent<EnemyStatsManager>();
+                if (esm != null && esm.CurrentHP > 0)
+                {
+                    enemy = esm;
+                    return true;
+                }
+            }
+        }
+
+        // 2) 근접 보정: SphereCast
+        RaycastHit sh;
+        if (Physics.SphereCast(ray, 0.3f, out sh, 100f, mask, QueryTriggerInteraction.Collide))
+        {
+            var esm = sh.collider.GetComponentInParent<EnemyStatsManager>();
+            if (esm != null && esm.CurrentHP > 0)
+            {
+                enemy = esm;
+                return true;
+            }
+        }
+
+        // 3) 최후 보정: 플레이어 주변에서 가장 가까운 Enemy
+        Collider[] near = Physics.OverlapSphere(transform.position, 1.5f, mask, QueryTriggerInteraction.Collide);
+        float best = float.MaxValue;
+        foreach (var c in near)
+        {
+            var esm = c.GetComponentInParent<EnemyStatsManager>();
+            if (esm == null || esm.CurrentHP <= 0) continue;
+
+            // 콜라이더까지의 최단거리 기준(겹침/초근접 보정)
+            Vector3 origin = transform.position + Vector3.up * 1f;
+            float d = Vector3.Distance(origin, c.ClosestPoint(origin));
+            if (d < best)
+            {
+                best = d;
+                enemy = esm;
+            }
+        }
+        return enemy != null;
     }
 
     public void PerformAttack()

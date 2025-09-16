@@ -278,15 +278,44 @@ public class TileMapGenerator : MonoBehaviour
     }
 
     // ¸Ê ·»´õ¸µ: º®/¹Ù´Ú ÇÁ¸®ÆÕ »ý¼º
+    //void RenderMap()
+    //{
+    //    for (int x = 0; x < width; x++)
+    //        for (int y = 0; y < height; y++)
+    //        {
+    //            GameObject prefab = (map[x, y] == 1) ? wallPrefab : floorPrefab;
+    //            Instantiate(prefab, new Vector3(x, 0, y), Quaternion.identity, transform);
+    //        }
+    //}
     void RenderMap()
     {
+        float floorSize = 10f; // ¹Ù´Ú ÇÁ¸®ÆÕ Å©±â (10¡¿10)
+
         for (int x = 0; x < width; x++)
+        {
             for (int y = 0; y < height; y++)
             {
-                GameObject prefab = (map[x, y] == 1) ? wallPrefab : floorPrefab;
-                Instantiate(prefab, new Vector3(x, 0, y), Quaternion.identity, transform);
+                // === ¹Ù´Ú »ý¼º (10Ä­¸¶´Ù ÇÑ ¹ø¸¸) ===
+                if (x % (int)floorSize == 0 && y % (int)floorSize == 0)
+                {
+                    Vector3 floorPos = new Vector3(x + 5, 0, y + 5);
+                    Instantiate(floorPrefab, floorPos, Quaternion.identity, transform);
+                }
+
+                // === º® »ý¼º (1¡¿1 ´ÜÀ§) ===
+                if (map[x, y] == 1)
+                {
+                    float wallHeight = wallPrefab.transform.localScale.y;
+                    Vector3 wallPos = new Vector3(x, wallHeight / 5f, y);
+                    Instantiate(wallPrefab, wallPos, Quaternion.identity, transform);
+                }
             }
+        }
     }
+
+
+
+
 
     // ÁöÁ¤ ÁÂÇ¥°¡ ¹Ù´ÚÀÎÁö È®ÀÎ
     public bool IsFloor(int x, int y)
