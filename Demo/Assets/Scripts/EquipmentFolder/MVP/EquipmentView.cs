@@ -78,11 +78,32 @@ public class EquipmentView : MonoBehaviour
                 var icon = Resources.Load<Sprite>(slot.equipped.iconPath);
                 if (image != null) image.sprite = icon;
 
+                // 기존 이벤트 제거
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(() => onSlotClicked?.Invoke(slot.slotType));
+
+                // DraggableItemView 세팅
+                var draggable = btn.GetComponent<DraggableItemView>();
+                if (draggable == null)
+                    draggable = btn.gameObject.AddComponent<DraggableItemView>();
+
+                draggable.Initialize(
+                    slot.equipped,
+                    ItemOrigin.Equipment,
+                    dropCallback: null,
+                    removeCallback: null,
+                    equipCallback: null,
+                    unequipCallback: (slotType, origin) =>
+                    {
+                        Debug.Log($"[BindTest] Unequip callback 바인딩됨: {slotType}, {origin}");
+                        // onSlotClicked가 EquipmentPresenter.HandleUnequipItem 이랑 연결돼 있음
+                        onSlotClicked?.Invoke(slotType);
+                    }
+                );
             }
         }
     }
+
 
     private Button GetSlotButton(string slotType)
     {

@@ -25,7 +25,7 @@ public class ActiveSkill : ISkill
         animationName = data.animation;
     }
 
-    public void Execute(GameObject user, PlayerStatsManager stats)
+    public bool Execute(GameObject user, PlayerStatsManager stats)
     {
         var anim = user.GetComponent<Animation>();
         var attackComp = user.GetComponent<PlayerAttacks>();
@@ -47,7 +47,7 @@ public class ActiveSkill : ISkill
         if (target == null || target.CurrentHP <= 0)
         {
             Debug.LogWarning($"{Name} 실패: 유효한 타겟이 없습니다.");
-            return;
+            return false;
         }
 
         // === 3) 사거리 체크 ===
@@ -55,14 +55,20 @@ public class ActiveSkill : ISkill
         if (dist > Range)
         {
             Debug.LogWarning($"{Name} 실패: 사거리({Range}m) 밖입니다. (현재 {dist:F2}m)");
-            return;
+            return false;
         }
 
         // === 4) 마나 차감 ===
         if (!stats.UseMana(MpCost))
         {
             Debug.LogWarning($"{Name} 실패: MP 부족");
-            return;
+            return false;
+        }
+
+        if (attackComp != null)
+        {
+            attackComp.ForceStopAttack(); // 일반 공격 즉시 중단
+            attackComp.isCastingSkill = true; // 스킬 우선 모드
         }
 
         // === 5) 스킬 시작 시 타겟 방향으로 회전 ===
@@ -90,6 +96,8 @@ public class ActiveSkill : ISkill
         // === 8) 시전 종료 후 잠금 해제 ===
         user.GetComponent<MonoBehaviour>()
             .StartCoroutine(UnlockAfterDelay(attackComp, moveComp, animDuration));
+
+        return true;
     }
 
     // 즉시 목표를 바라보게 (y축 고정)
@@ -127,6 +135,7 @@ public class ActiveSkill : ISkill
 
         if (attack != null)
         {
+            attack.isCastingSkill = false;  // 스킬 종료
             attack.isAttacking = false;
             if (attack.targetEnemy != null && attack.targetEnemy.CurrentHP > 0)
                 attack.ChangeState(new AttackingStates());

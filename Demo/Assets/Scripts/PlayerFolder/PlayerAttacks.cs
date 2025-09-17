@@ -47,6 +47,8 @@ public class AttackingStates : IPlayerStates
 
     public void Update(PlayerAttacks player)
     {
+        if (player.isCastingSkill) return; // 스킬 시전 중이면 공격 로직 중단
+
         bool targetDead = player.targetEnemy == null || player.targetEnemy.CurrentHP <= 0;
 
         if (!targetDead)
@@ -113,6 +115,7 @@ public class PlayerAttacks : MonoBehaviour
     private PlayerStatsManager stats;
 
     [HideInInspector] public bool isAttacking = false; // 공격 중 여부
+    [HideInInspector] public bool isCastingSkill = false;
 
     void Awake()
     {
@@ -274,6 +277,15 @@ public class PlayerAttacks : MonoBehaviour
         Debug.Log($"After Attack: {targetEnemy.name} HP={targetEnemy.CurrentHP}");
 
         targetHealthBar?.CheckHp();
+    }
+
+    // PlayerAttacks.cs
+    public void ForceStopAttack()
+    {
+        StopAllCoroutines();        // 공격 관련 코루틴 중단
+        isAttacking = false;
+        if (animationComponent != null)
+            animationComponent.Stop(); // 현재 공격 모션 중단
     }
 
 

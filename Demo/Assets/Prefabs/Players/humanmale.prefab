@@ -1697,3 +1697,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerClass: warrior
+  quickSlotCooldowns:
+  - {fileID: 0}

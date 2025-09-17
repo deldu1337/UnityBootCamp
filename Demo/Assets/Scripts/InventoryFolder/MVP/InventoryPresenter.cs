@@ -21,6 +21,8 @@ public class InventoryPresenter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
             ToggleInventory();
+        if(Input.GetKeyDown(KeyCode.Escape))
+            CloseInventory();
     }
 
     private void ToggleInventory()

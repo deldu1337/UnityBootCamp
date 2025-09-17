@@ -25,17 +25,23 @@ public class ProjectileSkill : ISkill
         animationName = data.animation;
     }
 
-    public void Execute(GameObject user, PlayerStatsManager stats)
+    public bool Execute(GameObject user, PlayerStatsManager stats)
     {
         if (!stats.UseMana(MpCost))
         {
             Debug.LogWarning($"{Name} 사용 실패: MP 부족");
-            return;
+            return false;
         }
 
         Animation anim = user.GetComponent<Animation>();
         PlayerAttacks attackComp = user.GetComponent<PlayerAttacks>();
         PlayerMove moveComp = user.GetComponent<PlayerMove>();
+
+        if (attackComp != null)
+        {
+            attackComp.ForceStopAttack(); // 일반 공격 즉시 중단
+            attackComp.isCastingSkill = true; // 스킬 우선 모드
+        }
 
         float animDuration = 0.5f; // 기본값 (애니 없음 대비)
         if (anim && !string.IsNullOrEmpty(animationName))
@@ -61,6 +67,7 @@ public class ProjectileSkill : ISkill
             host.StartCoroutine(ApplyAoEAfterDelay(user.transform, stats, impactDelay));
             host.StartCoroutine(UnlockAfterDelay(attackComp, moveComp, animDuration));
         }
+        return true;
     }
 
     private IEnumerator ApplyAoEAfterDelay(Transform userTf, PlayerStatsManager stats, float delay)
@@ -87,6 +94,7 @@ public class ProjectileSkill : ISkill
 
         if (attack != null)
         {
+            attack.isCastingSkill = false;  // 스킬 종료
             attack.isAttacking = false;
             if (attack.targetEnemy != null && attack.targetEnemy.CurrentHP > 0)
                 attack.ChangeState(new AttackingStates());

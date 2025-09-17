@@ -14,7 +14,9 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
     IDragHandler, IEndDragHandler
 {
     public Action<string, ItemOrigin> onItemEquipped;    // 인벤토리 → 장비창
+
     public Action<string, ItemOrigin> onItemUnequipped;  // 장비창 → 인벤토리
+
     public Action<string, string> onItemDropped;         // 순서 변경 (fromId, toId)
     public Action<string> onItemRemoved;                // 삭제 이벤트
 
@@ -54,24 +56,60 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
         onItemRemoved = removeCallback;
         onItemEquipped = equipCallback;
         onItemUnequipped = unequipCallback;
+
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log($"[OnPointerClick] obj={gameObject.name}, origin={originType}, button={eventData.button}");
+
         if (eventData.button != PointerEventData.InputButton.Right) return;
 
-        if (originType == ItemOrigin.Inventory)
+        // 1. 장비창 슬롯 안에서 눌렀는지 직접 검사
+        bool inEquipmentSlot = false;
+        string slotType = null;
+
+        var equipmentUI = GameObject.Find("EquipmentUI");
+        if (equipmentUI != null)
+        {
+            var buttonPanel = equipmentUI.transform.Find("ButtonPanel");
+            if (buttonPanel != null)
+            {
+                foreach (var button in buttonPanel.GetComponentsInChildren<Button>(true))
+                {
+                    RectTransform btnRect = button.GetComponent<RectTransform>();
+                    if (RectTransformUtility.RectangleContainsScreenPoint(btnRect, eventData.position, canvas.worldCamera))
+                    {
+                        inEquipmentSlot = true;
+                        slotType = button.name.Replace("Button", "").ToLower();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 2. 인벤토리 아이템이면 → 장착 시도
+        if (originType == ItemOrigin.Inventory && !inEquipmentSlot)
         {
             onItemEquipped?.Invoke(uniqueId, originType);
         }
-        else if (originType == ItemOrigin.Equipment)
+        // 3. 장비창 슬롯 안에서 우클릭 → 해제 시도
+        else if (inEquipmentSlot)
         {
-            onItemUnequipped?.Invoke(uniqueId, originType);
+            Debug.Log($"[Equipment] {uniqueId} → {slotType} 해제 시도");
+            onItemUnequipped?.Invoke(slotType, ItemOrigin.Equipment);
         }
     }
 
+
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (originType == ItemOrigin.Equipment)
+        {
+            // 장비창에서는 드래그 금지
+            return;
+        }
+
         originalParent = transform.parent;
         originalIndex = transform.GetSiblingIndex();
 
@@ -96,11 +134,23 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (originType == ItemOrigin.Equipment)
+        {
+            // 장비창에서는 드래그 금지
+            return;
+        }
+
         rectTransform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (originType == ItemOrigin.Equipment)
+        {
+            // 장비창에서는 드래그 금지
+            return;
+        }
+
         canvasGroup.blocksRaycasts = true;
 
         // 1. 인벤토리 영역 확인
@@ -177,6 +227,7 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
             {
                 transform.SetParent(originalParent, false);
                 transform.SetSiblingIndex(originalIndex);
+
                 onItemEquipped?.Invoke(uniqueId, originType);
                 Debug.Log($"드래그 장착 → 인벤토리 슬롯 {originalIndex} 제거, 장비창 슬롯 '{targetSlot.name}' 장착");
             }

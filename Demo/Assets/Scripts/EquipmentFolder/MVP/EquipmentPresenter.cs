@@ -44,6 +44,8 @@ public class EquipmentPresenter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
             ToggleEquipment();
+        if(Input.GetKeyDown(KeyCode.Escape))
+            CloseEquipment();
     }
 
     void LateUpdate()
@@ -91,9 +93,24 @@ public class EquipmentPresenter : MonoBehaviour
             RefreshEquipmentUI();
     }
 
+    private int GetPlayerLevel()
+    {
+        return playerStats != null ? playerStats.Data.Level : 1;
+    }
+
     /// <summary>아이템 장착 (uniqueId 기반)</summary>
     public void HandleEquipItem(InventoryItem item)
     {
+        // === 레벨 제한 체크 ===
+        int reqLevel = Mathf.Max(1, item.data.level);
+        int curLevel = GetPlayerLevel();
+        if (curLevel < reqLevel)
+        {
+            Debug.LogWarning($"[장착 실패] 요구 레벨 {reqLevel}, 현재 레벨 {curLevel} → '{item.data.name}' 장착 불가");
+            // 필요하면 여기서 UI 토스트/사운드/버튼 흔들기 등 피드백 호출
+            return;
+        }
+
         string slotType = item.data.type;
         var slot = model.GetSlot(slotType);
 
@@ -122,8 +139,6 @@ public class EquipmentPresenter : MonoBehaviour
         inventoryPresenter?.Refresh();
         RefreshEquipmentUI();
     }
-
-
 
     /// <summary>드래그앤드롭으로 장비 장착</summary>
     private void HandleEquipFromInventory(string slotType, InventoryItem item)
