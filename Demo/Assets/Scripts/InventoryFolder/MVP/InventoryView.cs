@@ -54,6 +54,10 @@ public class InventoryView : MonoBehaviour
                 wrappedEquip = (uid, origin) => onItemEquipped.Invoke(uid);
 
             draggable.Initialize(item, ItemOrigin.Inventory, onItemDropped, onItemRemoved, wrappedEquip, null);
+
+            var hover = button.GetComponent<ItemHoverTooltip>();
+            if (hover == null) hover = button.gameObject.AddComponent<ItemHoverTooltip>();
+            hover.SetItem(item);
         }
     }
 }

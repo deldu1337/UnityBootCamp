@@ -62,6 +62,10 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log($"[OnPointerClick] obj={gameObject.name}, origin={originType}, button={eventData.button}");
+        
+        // 좌클릭은 장비 해제 금지 → 그냥 리턴
+        if (eventData.button == PointerEventData.InputButton.Left)
+            return;
 
         if (eventData.button != PointerEventData.InputButton.Right) return;
 
@@ -104,6 +108,8 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        ItemTooltipUI.Instance?.Hide(); // ← 추가
+
         if (originType == ItemOrigin.Equipment)
         {
             // 장비창에서는 드래그 금지
@@ -145,6 +151,8 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        ItemTooltipUI.Instance?.Hide(); // ← 추가
+
         if (originType == ItemOrigin.Equipment)
         {
             // 장비창에서는 드래그 금지

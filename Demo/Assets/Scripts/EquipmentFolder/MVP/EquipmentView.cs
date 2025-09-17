@@ -60,6 +60,52 @@ public class EquipmentView : MonoBehaviour
     }
 
     /// <summary>UI 갱신: 슬롯에 장착된 아이템 표시 및 클릭 이벤트 등록</summary>
+    //public void UpdateEquipmentUI(IReadOnlyList<EquipmentSlot> slots, Action<string> onSlotClicked)
+    //{
+    //    foreach (var slot in slots)
+    //    {
+    //        Button btn = GetSlotButton(slot.slotType);
+    //        if (btn == null) continue;
+
+    //        if (slot.equipped == null || string.IsNullOrEmpty(slot.equipped.iconPath))
+    //        {
+    //            btn.gameObject.SetActive(false); // 슬롯 비활성화
+    //        }
+    //        else
+    //        {
+    //            btn.gameObject.SetActive(true);
+    //            var image = btn.GetComponent<Image>();
+    //            var icon = Resources.Load<Sprite>(slot.equipped.iconPath);
+    //            if (image != null) image.sprite = icon;
+
+    //            // 기존 이벤트 제거
+    //            btn.onClick.RemoveAllListeners();
+    //            btn.onClick.AddListener(() => onSlotClicked?.Invoke(slot.slotType));
+
+    //            // DraggableItemView 세팅
+    //            var draggable = btn.GetComponent<DraggableItemView>();
+    //            if (draggable == null)
+    //                draggable = btn.gameObject.AddComponent<DraggableItemView>();
+
+    //            draggable.Initialize(
+    //                slot.equipped,
+    //                ItemOrigin.Equipment,
+    //                dropCallback: null,
+    //                removeCallback: null,
+    //                equipCallback: null,
+    //                unequipCallback: (slotType, origin) =>
+    //                {
+    //                    Debug.Log($"[BindTest] Unequip callback 바인딩됨: {slotType}, {origin}");
+    //                    // onSlotClicked가 EquipmentPresenter.HandleUnequipItem 이랑 연결돼 있음
+    //                    onSlotClicked?.Invoke(slotType);
+    //                }
+    //            );
+    //            var hover = btn.GetComponent<ItemHoverTooltip>();
+    //            if (hover == null) hover = btn.gameObject.AddComponent<ItemHoverTooltip>();
+    //            hover.SetItem(slot.equipped);
+    //        }
+    //    }
+    //}
     public void UpdateEquipmentUI(IReadOnlyList<EquipmentSlot> slots, Action<string> onSlotClicked)
     {
         foreach (var slot in slots)
@@ -74,13 +120,20 @@ public class EquipmentView : MonoBehaviour
             else
             {
                 btn.gameObject.SetActive(true);
+
+                // 아이콘 세팅
                 var image = btn.GetComponent<Image>();
                 var icon = Resources.Load<Sprite>(slot.equipped.iconPath);
                 if (image != null) image.sprite = icon;
 
-                // 기존 이벤트 제거
+                // 기본 onClick 제거 (좌클릭 해제 방지)
                 btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(() => onSlotClicked?.Invoke(slot.slotType));
+
+                // 슬롯 뷰 세팅
+                var slotView = btn.GetComponent<EquipmentSlotView>();
+                if (slotView == null) slotView = btn.gameObject.AddComponent<EquipmentSlotView>();
+                slotView.slotType = slot.slotType;
+                slotView.onItemDropped = null;
 
                 // DraggableItemView 세팅
                 var draggable = btn.GetComponent<DraggableItemView>();
@@ -95,14 +148,40 @@ public class EquipmentView : MonoBehaviour
                     equipCallback: null,
                     unequipCallback: (slotType, origin) =>
                     {
-                        Debug.Log($"[BindTest] Unequip callback 바인딩됨: {slotType}, {origin}");
-                        // onSlotClicked가 EquipmentPresenter.HandleUnequipItem 이랑 연결돼 있음
+                        Debug.Log($"[EquipmentView] 우클릭 해제: {slotType}, {origin}");
                         onSlotClicked?.Invoke(slotType);
                     }
                 );
+
+                // Hover tooltip 세팅
+                var hover = btn.GetComponent<ItemHoverTooltip>();
+                if (hover == null) hover = btn.gameObject.AddComponent<ItemHoverTooltip>();
+                hover.SetItem(slot.equipped);
+
+                // PointerClick 이벤트 직접 등록 (우클릭만 처리)
+                var trigger = btn.GetComponent<UnityEngine.EventSystems.EventTrigger>();
+                if (trigger == null) trigger = btn.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+                trigger.triggers.Clear();
+
+                var entry = new UnityEngine.EventSystems.EventTrigger.Entry
+                {
+                    eventID = UnityEngine.EventSystems.EventTriggerType.PointerClick
+                };
+                entry.callback.AddListener((data) =>
+                {
+                    var ev = (UnityEngine.EventSystems.PointerEventData)data;
+                    if (ev.button == UnityEngine.EventSystems.PointerEventData.InputButton.Right)
+                    {
+                        Debug.Log($"우클릭 → {slot.slotType} 해제");
+                        onSlotClicked?.Invoke(slot.slotType);
+                    }
+                    // 좌클릭은 무시
+                });
+                trigger.triggers.Add(entry);
             }
         }
     }
+
 
 
     private Button GetSlotButton(string slotType)
