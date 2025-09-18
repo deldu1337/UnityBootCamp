@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ResourceManager
+public class ResouceManager
 {
     public T Load<T>(string path) where T : Object
     {
@@ -10,7 +10,7 @@ public class ResourceManager
     public GameObject Instantiate(string path, Transform parent = null)
     {
         GameObject prefab = Load<GameObject>($"Prefabs/{path}");
-        if(prefab == null)
+        if (prefab == null)
         {
             Debug.LogError($"ÇÁ¸®ÆÕ ¾øÀ½ : {path}");
         }
@@ -20,7 +20,7 @@ public class ResourceManager
 
     public void Destroy(GameObject go)
     {
-        if(go == null)
+        if (go == null)
             return;
 
         Object.Destroy(go);

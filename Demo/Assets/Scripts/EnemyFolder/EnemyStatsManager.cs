@@ -49,12 +49,26 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
             Die();
     }
 
+    //private void Die()
+    //{
+    //    Debug.Log($"{Data.name} »ç¸Á!");
+
+    //    // EXP Áö±Þ
+    //    var player = FindAnyObjectByType<PlayerStatsManager>();
+    //    if (player != null)
+    //    {
+    //        player.GainExp(Data.exp);
+    //        Debug.Log($"ÇÃ·¹ÀÌ¾î°¡ {Data.exp} EXP¸¦ È¹µæ!");
+    //    }
+
+    //    dropManager?.DropItems();
+    //    Destroy(gameObject);
+    //}
     private void Die()
     {
         Debug.Log($"{Data.name} »ç¸Á!");
 
-        // EXP Áö±Þ
-        var player = FindAnyObjectByType<PlayerStatsManager>();
+        var player = PlayerStatsManager.Instance;   // ¡ç º¯°æ
         if (player != null)
         {
             player.GainExp(Data.exp);
@@ -64,6 +78,7 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
         dropManager?.DropItems();
         Destroy(gameObject);
     }
+
 
     public void Heal(float amount)
     {

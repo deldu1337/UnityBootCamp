@@ -2,7 +2,8 @@
   "items": [
     {
       "id": 1,
-      "name": "날카로운 칼",
+      "name": "도끼",
+      "uniqueName": "Axe",
       "level": 1,
       "hp": 0,
       "mp": 0,
@@ -16,7 +17,8 @@
     },
     {
       "id": 2,
-      "name": "개 쎈 망치",
+      "name": "스컬 도끼",
+      "uniqueName": "SkullAxe",
       "level": 5,
       "hp": 0,
       "mp": 0,
@@ -30,7 +32,8 @@
     },
     {
       "id": 3,
-      "name": "단단뚜껑",
+      "name": "일반 헬멧",
+      "uniqueName": "CommonHelmet",
       "level": 3,
       "hp": 10,
       "mp": 0,
@@ -45,6 +48,7 @@
     {
       "id": 4,
       "name": "뿔뚜껑",
+      "uniqueName": "HornHead",
       "level": 8,
       "hp": 10,
       "mp": 0,
@@ -59,6 +63,7 @@
     {
       "id": 5,
       "name": "철방패",
+      "uniqueName": "IronShield",
       "level": 5,
       "hp": 20,
       "mp": 0,
@@ -73,6 +78,7 @@
     {
       "id": 6,
       "name": "(왼)가죽어깨보호대",
+      "uniqueName": "(L)Shoulder",
       "level": 7,
       "hp": 5,
       "mp": 0,
@@ -87,6 +93,7 @@
     {
       "id": 7,
       "name": "(오)가죽어깨보호대",
+      "uniqueName": "(R)Shoulder",
       "level": 7,
       "hp": 5,
       "mp": 0,

@@ -1647,7 +1647,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dropTable:
   - itemPrefab: {fileID: 584906182147590915, guid: f7128b2b33a81bc4f824c4f81712c9f6, type: 3}
-    dropChance: 10
+    dropChance: 100
     minAmount: 1
     maxAmount: 1
   - itemPrefab: {fileID: 8624671125184764664, guid: 73d8eca41216b8345b2f597e8419ed18, type: 3}

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+public class InputManager
 {
     public Action KeyAction = null;
 
@@ -10,7 +10,7 @@ public class InputManager : MonoBehaviour
         if (Input.anyKey == false)
             return;
 
-        if(KeyAction != null)
+        if (KeyAction != null)
             KeyAction.Invoke();
     }
 }

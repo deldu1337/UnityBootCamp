@@ -20,11 +20,16 @@ public class ItemTooltipUI : MonoBehaviour
     [SerializeField] private float gapFromIcon = 10f;
     [SerializeField] private float minHeight = 0f;    // 필요 시 최소 높이(옵션)
 
+    //[SerializeField] private PlayerStatsManager playerStats;
+
     private Transform originalParent;
     private ItemHoverTooltip currentOwner;
 
     void Awake()
     {
+        //if (playerStats == null)
+        //    playerStats = FindAnyObjectByType<PlayerStatsManager>();
+
         Instance = this;
         if (canvas == null) canvas = GetComponentInParent<Canvas>();
         if (root == null) root = transform as RectTransform;
@@ -49,16 +54,46 @@ public class ItemTooltipUI : MonoBehaviour
     }
 
     // 기존: 마우스 위치 기준
+    //public void Show(InventoryItem item, Vector2 screenPos)
+    //{
+    //    if (item == null || item.data == null) return;
+
+    //    nameText.text = item.data.name;
+    //    //levelText.text = $"요구 레벨: {Mathf.Max(1, item.data.level)}";
+    //    int required = Mathf.Max(1, item.data.level);
+    //    levelText.text = $"요구 레벨: {required}";
+    //    if (playerStats != null && playerStats.Data.Level < required)
+    //        levelText.color = Color.red;
+    //    else
+    //        levelText.color = Color.white;
+
+    //    if (typeText) typeText.text = $"분류: {item.data.type}";
+    //    statsText.text = BuildStats(item);
+
+    //    ForceResizeToContent();           // 동적 리사이즈
+    //    UpdatePosition(screenPos);
+
+    //    gameObject.SetActive(true);
+    //    transform.SetAsLastSibling();
+    //}
     public void Show(InventoryItem item, Vector2 screenPos)
     {
         if (item == null || item.data == null) return;
 
         nameText.text = item.data.name;
-        levelText.text = $"요구 레벨: {Mathf.Max(1, item.data.level)}";
+        int required = Mathf.Max(1, item.data.level);
+        levelText.text = $"요구 레벨: {required}";
+
+        var ps = PlayerStatsManager.Instance;
+        if (ps != null && ps.Data != null && ps.Data.Level < required)
+            levelText.color = Color.red;
+        else
+            levelText.color = Color.white;
+
         if (typeText) typeText.text = $"분류: {item.data.type}";
         statsText.text = BuildStats(item);
 
-        ForceResizeToContent();           // 동적 리사이즈
+        ForceResizeToContent();
         UpdatePosition(screenPos);
 
         gameObject.SetActive(true);
@@ -84,10 +119,38 @@ public class ItemTooltipUI : MonoBehaviour
     // 타겟 RectTransform(아이콘) 옆에 고정 (왼쪽 우선)
     public void ShowNextTo(InventoryItem item, RectTransform target, ItemHoverTooltip owner)
     {
+        //if (item == null || item.data == null || target == null) return;
+
+        //nameText.text = item.data.name;
+        ////levelText.text = $"요구 레벨: {Mathf.Max(1, item.data.level)}";
+        //int required = Mathf.Max(1, item.data.level);
+        //Debug.Log($"[Tooltip] Player Level = {playerStats.Data.Level}, Required = {required}");
+
+        //levelText.text = $"요구 레벨: {required}";
+
+        //// 색상 처리
+        //if (playerStats != null && playerStats.Data.Level < required)
+        //    levelText.color = Color.red;
+        //else
+        //    levelText.color = Color.white;
+        //if (typeText) typeText.text = $"부위: {GetTypeDisplayName(item.data.type)}";
+
+        //statsText.text = BuildStats(item);
         if (item == null || item.data == null || target == null) return;
 
         nameText.text = item.data.name;
-        levelText.text = $"요구 레벨: {Mathf.Max(1, item.data.level)}";
+        int required = Mathf.Max(1, item.data.level);
+        levelText.text = $"요구 레벨: {required}";
+
+        var ps = PlayerStatsManager.Instance;
+        if (ps != null && ps.Data != null)
+            Debug.Log($"[Tooltip] Player Level = {ps.Data.Level}, Required = {required}");
+
+        if (ps != null && ps.Data != null && ps.Data.Level < required)
+            levelText.color = Color.red;
+        else
+            levelText.color = Color.white;
+
         if (typeText) typeText.text = $"부위: {GetTypeDisplayName(item.data.type)}";
         statsText.text = BuildStats(item);
 

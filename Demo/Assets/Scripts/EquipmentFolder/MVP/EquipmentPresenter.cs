@@ -13,14 +13,14 @@ public class EquipmentPresenter : MonoBehaviour
 
     [SerializeField] private Camera uiCamera;           // 장비 UI 전용 카메라
     [SerializeField] private Transform targetCharacter; // 캐릭터 모델
-    [SerializeField] private PlayerStatsManager playerStats; // 캐릭터 스탯 계산용
+    //[SerializeField] private PlayerStatsManager playerStats; // 캐릭터 스탯 계산용
 
     void Start()
     {
         model = new EquipmentModel();
         view = FindAnyObjectByType<EquipmentView>();
         inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
-        playerStats = GetComponent<PlayerStatsManager>();
+        //playerStats = GetComponent<PlayerStatsManager>();
 
         // UI 초기화
         if (view != null)
@@ -93,9 +93,14 @@ public class EquipmentPresenter : MonoBehaviour
             RefreshEquipmentUI();
     }
 
+    //private int GetPlayerLevel()
+    //{
+    //    return playerStats != null ? playerStats.Data.Level : 1;
+    //}
     private int GetPlayerLevel()
     {
-        return playerStats != null ? playerStats.Data.Level : 1;
+        var ps = PlayerStatsManager.Instance;
+        return (ps != null && ps.Data != null) ? ps.Data.Level : 1;
     }
 
     /// <summary>아이템 장착 (uniqueId 기반)</summary>
@@ -169,13 +174,35 @@ public class EquipmentPresenter : MonoBehaviour
     }
 
     // 장비 변경 시 즉시 스탯 갱신 + 저장
+    //private void ApplyStatsAndSave()
+    //{
+    //    playerStats?.RecalculateStats(model.Slots);
+    //    SaveLoadManager.SavePlayerData(playerStats.Data);
+    //}
     private void ApplyStatsAndSave()
     {
-        playerStats?.RecalculateStats(model.Slots);
-        SaveLoadManager.SavePlayerData(playerStats.Data);
+        var ps = PlayerStatsManager.Instance;
+        if (ps != null)
+        {
+            ps.RecalculateStats(model.Slots);
+            SaveLoadManager.SavePlayerData(ps.Data);
+        }
     }
 
     /// <summary>JSON 저장된 장비 데이터 복원</summary>
+    //private void InitializeEquippedItemsFromJson()
+    //{
+    //    foreach (var slot in model.Slots)
+    //    {
+    //        if (slot.equipped != null && !string.IsNullOrEmpty(slot.equipped.prefabPath))
+    //        {
+    //            GameObject prefab = Resources.Load<GameObject>(slot.equipped.prefabPath);
+    //            if (prefab != null)
+    //                AttachPrefabToCharacter(prefab, slot.slotType);
+    //        }
+    //    }
+    //    playerStats?.RecalculateStats(model.Slots);
+    //}
     private void InitializeEquippedItemsFromJson()
     {
         foreach (var slot in model.Slots)
@@ -187,7 +214,8 @@ public class EquipmentPresenter : MonoBehaviour
                     AttachPrefabToCharacter(prefab, slot.slotType);
             }
         }
-        playerStats?.RecalculateStats(model.Slots);
+        var ps = PlayerStatsManager.Instance;
+        if (ps != null) ps.RecalculateStats(model.Slots);
     }
 
     /// <summary>장비 프리팹 캐릭터 본에 장착</summary>
@@ -197,12 +225,13 @@ public class EquipmentPresenter : MonoBehaviour
         if (bone == null) return;
 
         // 기존 오브젝트 제거
-        for (int i = bone.childCount - 1; i >= 0; i--)
-        {
-            Transform child = bone.GetChild(i);
-            if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
-                Destroy(child.gameObject);
-        }
+        //for (int i = bone.childCount - 1; i >= 0; i--)
+        //{
+        //    Transform child = bone.GetChild(i);
+        //    if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
+        //        Destroy(child.gameObject);
+        //}
+        //RemoveLastChild(bone);
 
         // 새 프리팹 장착
         GameObject instance = Instantiate(prefab, bone);
@@ -217,13 +246,24 @@ public class EquipmentPresenter : MonoBehaviour
         Transform bone = GetSlotTransform(slotType);
         if (bone == null) return;
 
-        for (int i = bone.childCount - 1; i >= 0; i--)
-        {
-            Transform child = bone.GetChild(i);
-            if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
-                Destroy(child.gameObject);
-        }
+        //for (int i = bone.childCount - 1; i >= 0; i--)
+        //{
+        //    Transform child = bone.GetChild(i);
+        //    if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
+        //        Destroy(child.gameObject);
+        //}
+        //RemoveLastChild(bone);
     }
+
+    //private void RemoveLastChild(Transform bone)
+    //{
+    //    int last = bone.childCount - 1;
+    //    if (last >= 0)
+    //    {
+    //        var lastChild = bone.GetChild(last);
+    //        Destroy(lastChild.gameObject);
+    //    }
+    //}
 
     /// <summary>슬롯 본 찾기</summary>
     private Transform GetSlotTransform(string slotType)

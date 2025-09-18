@@ -5,20 +5,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _speed = 10;
     [SerializeField] private float _rotate = 0.1f;
 
-    [SerializeField] private GameObject Tank;
     void Start()
     {
         Managers.Input.KeyAction -= OnKeyboard;
         Managers.Input.KeyAction += OnKeyboard;
-
-        GameObject go = Instantiate(Tank);
-        go.transform.SetParent(transform);
-        go.transform.parent = transform;
     }
+
 
     void Update()
     {
-        
+
     }
 
     void OnKeyboard()
@@ -29,11 +25,13 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), _rotate);
         }
 
+
         if (Input.GetKey(KeyCode.A))
         {
             transform.position += Vector3.left * Time.deltaTime * _speed;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), _rotate);
         }
+
 
         if (Input.GetKey(KeyCode.S))
         {

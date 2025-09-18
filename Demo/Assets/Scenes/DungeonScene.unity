@@ -636,6 +636,109 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 82501456}
   m_CullTransparentMesh: 1
+--- !u!1 &95178279
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 95178286}
+  - component: {fileID: 95178283}
+  - component: {fileID: 95178282}
+  - component: {fileID: 95178281}
+  - component: {fileID: 95178280}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &95178280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95178279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31fdbcb20622bd440aab4af17b8568a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tensPlace: {fileID: 1321070385}
+  onesPlace: {fileID: 1163211327}
+--- !u!114 &95178281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95178279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff115546b6706c046b7f323fb0e64d7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hpBar: {fileID: 57407508}
+  mpBar: {fileID: 1293829627}
+  expBar: {fileID: 1789484378}
+  statusUIRootName: StatusUI
+  hpIndex: 3
+  mpIndex: 4
+  expIndex: 5
+--- !u!114 &95178282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95178279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed2f2becb7e620c4fbdbdeba03450c87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryPanel: {fileID: 718330250}
+  buttonContainer: {fileID: 1542372488}
+  exitButton: {fileID: 2142963312}
+--- !u!114 &95178283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95178279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e143170ccae0ce74388f77629a12bb26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  equipmentUI: {fileID: 1916037017}
+  exitButton: {fileID: 181273562}
+  headSlot: {fileID: 0}
+  rShoulderSlot: {fileID: 0}
+  lShoulderSlot: {fileID: 0}
+  gemSlot: {fileID: 0}
+  weaponSlot: {fileID: 0}
+  shieldSlot: {fileID: 0}
+--- !u!4 &95178286
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95178279}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 565.2753, y: 0, z: 1493.4814}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &100010147
 GameObject:
   m_ObjectHideFlags: 0
@@ -5436,7 +5539,6 @@ GameObject:
   - component: {fileID: 718330253}
   - component: {fileID: 718330252}
   - component: {fileID: 718330251}
-  - component: {fileID: 718330254}
   m_Layer: 5
   m_Name: InventoryPanel
   m_TagString: Untagged
@@ -5503,21 +5605,6 @@ RectTransform:
   m_AnchoredPosition: {x: -250, y: 0}
   m_SizeDelta: {x: 350, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &718330254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 718330250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed2f2becb7e620c4fbdbdeba03450c87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventoryPanel: {fileID: 718330250}
-  buttonContainer: {fileID: 1542372488}
-  exitButton: {fileID: 2142963312}
 --- !u!1 &720877860
 GameObject:
   m_ObjectHideFlags: 0
@@ -8922,7 +9009,6 @@ GameObject:
   - component: {fileID: 1312282648}
   - component: {fileID: 1312282650}
   - component: {fileID: 1312282649}
-  - component: {fileID: 1312282651}
   m_Layer: 5
   m_Name: LevelUI
   m_TagString: Untagged
@@ -8989,18 +9075,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312282647}
   m_CullTransparentMesh: 1
---- !u!114 &1312282651
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312282647}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31fdbcb20622bd440aab4af17b8568a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1321070383
 GameObject:
   m_ObjectHideFlags: 0
@@ -12662,7 +12736,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1916037018}
-  - component: {fileID: 1916037019}
   - component: {fileID: 1916037021}
   m_Layer: 5
   m_Name: EquipmentUI
@@ -12700,26 +12773,6 @@ RectTransform:
   m_AnchoredPosition: {x: -650, y: 0}
   m_SizeDelta: {x: 500, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1916037019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1916037017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e143170ccae0ce74388f77629a12bb26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  equipmentUI: {fileID: 1916037017}
-  exitButton: {fileID: 181273562}
-  headSlot: {fileID: 0}
-  rShoulderSlot: {fileID: 0}
-  lShoulderSlot: {fileID: 0}
-  gemSlot: {fileID: 0}
-  weaponSlot: {fileID: 0}
-  shieldSlot: {fileID: 0}
 --- !u!222 &1916037021
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13881,3 +13934,4 @@ SceneRoots:
   - {fileID: 1492567329}
   - {fileID: 1993939235}
   - {fileID: 1802909688}
+  - {fileID: 95178286}

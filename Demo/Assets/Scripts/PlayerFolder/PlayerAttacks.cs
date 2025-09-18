@@ -120,7 +120,8 @@ public class PlayerAttacks : MonoBehaviour
     void Awake()
     {
         animationComponent = GetComponent<Animation>();
-        stats = GetComponent<PlayerStatsManager>();
+        //stats = GetComponent<PlayerStatsManager>();
+        stats = PlayerStatsManager.Instance; // ← 싱글톤
 
         if (animationComponent == null)
             Debug.LogError("Animation 컴포넌트가 Player 프리팹 또는 자식에 없습니다!");

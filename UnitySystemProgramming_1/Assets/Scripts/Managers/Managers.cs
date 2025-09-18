@@ -1,17 +1,17 @@
-using System;
-using UnityEditor.PackageManager;
+using System.Resources;
 using UnityEngine;
 
-// ΩÃ±€≈Ê ∆–≈œ
 public class Managers : MonoBehaviour
 {
-    static Managers s_instance; // ¿Ø¿œº∫¿Ã ∫∏¿Âµ 
-    static public Managers Instance { get { Init();  return s_instance; } }
+    private static Managers s_instance;
+    public static Managers Instance { get { Init(); return s_instance; } }
 
     private InputManager _input = new InputManager();
-    private ResourceManager _resource = new ResourceManager();
+    private ResouceManager _resouce = new ResouceManager();
     public static InputManager Input { get { return Instance._input; } }
-    public static ResourceManager Resource { get { return Instance._resource; } }
+    public static ResouceManager Resource { get { return Instance._resouce; } }
+
+
     void Start()
     {
         Init();
@@ -24,7 +24,7 @@ public class Managers : MonoBehaviour
 
     static void Init()
     {
-        if(s_instance == null)
+        if (s_instance == null)
         {
             GameObject go = GameObject.Find("@Managers");
             if (go == null)

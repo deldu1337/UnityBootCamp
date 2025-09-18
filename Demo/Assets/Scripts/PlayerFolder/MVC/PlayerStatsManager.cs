@@ -4,6 +4,28 @@ using UnityEngine;
 
 public class PlayerStatsManager : MonoBehaviour, IHealth
 {
+    //public PlayerData Data { get; private set; }
+    //private ILevelUpStrategy levelUpStrategy;
+
+    //public float CurrentHP => Data.CurrentHP;
+    //public float MaxHP => Data.MaxHP;
+
+    //public event Action<float, float> OnHPChanged;
+    //public event Action<float, float> OnMPChanged;
+    //public event Action<int, float> OnExpChanged;
+    //public event Action<int> OnLevelUp;
+
+
+    //void Awake()
+    //{
+    //    levelUpStrategy = new DefaultLevelUpStrategy();
+    //    // 씬 시작 시 바로 로드
+
+    //    PlayerData loaded = SaveLoadManager.LoadPlayerData();
+    //    LoadData(loaded);
+    //}
+    public static PlayerStatsManager Instance { get; private set; }   // ← 추가
+
     public PlayerData Data { get; private set; }
     private ILevelUpStrategy levelUpStrategy;
 
@@ -15,14 +37,25 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public event Action<int, float> OnExpChanged;
     public event Action<int> OnLevelUp;
 
-
     void Awake()
     {
-        levelUpStrategy = new DefaultLevelUpStrategy();
-        // 씬 시작 시 바로 로드
+        // --- 싱글톤 보장: 새로 스폰된 플레이어가 항상 최신 Instance가 되도록 ---
+        if (Instance != null && Instance != this)
+        {
+            Destroy(Instance.gameObject); // 이전 플레이어 제거
+        }
+        Instance = this;
 
+        levelUpStrategy = new DefaultLevelUpStrategy();
+
+        // 저장 로드
         PlayerData loaded = SaveLoadManager.LoadPlayerData();
         LoadData(loaded);
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     void Start()
