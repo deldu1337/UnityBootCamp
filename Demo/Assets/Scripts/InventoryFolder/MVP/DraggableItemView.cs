@@ -48,6 +48,13 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
         Action<string, ItemOrigin> unequipCallback = null
     )
     {
+        if (InventoryGuards.IsInvalid(item))
+        {
+            Debug.LogWarning("[DraggableItemView] 무효 아이템으로 초기화 시도 → 비활성화");
+            gameObject.SetActive(false);
+            return;
+        }
+
         Item = item;
         uniqueId = item.uniqueId;
         originType = origin;
@@ -104,7 +111,6 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
             onItemUnequipped?.Invoke(slotType, ItemOrigin.Equipment);
         }
     }
-
 
     public void OnBeginDrag(PointerEventData eventData)
     {

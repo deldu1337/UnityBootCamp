@@ -4,26 +4,6 @@ using UnityEngine;
 
 public class PlayerStatsManager : MonoBehaviour, IHealth
 {
-    //public PlayerData Data { get; private set; }
-    //private ILevelUpStrategy levelUpStrategy;
-
-    //public float CurrentHP => Data.CurrentHP;
-    //public float MaxHP => Data.MaxHP;
-
-    //public event Action<float, float> OnHPChanged;
-    //public event Action<float, float> OnMPChanged;
-    //public event Action<int, float> OnExpChanged;
-    //public event Action<int> OnLevelUp;
-
-
-    //void Awake()
-    //{
-    //    levelUpStrategy = new DefaultLevelUpStrategy();
-    //    // 씬 시작 시 바로 로드
-
-    //    PlayerData loaded = SaveLoadManager.LoadPlayerData();
-    //    LoadData(loaded);
-    //}
     public static PlayerStatsManager Instance { get; private set; }   // ← 추가
 
     public PlayerData Data { get; private set; }
@@ -49,7 +29,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         levelUpStrategy = new DefaultLevelUpStrategy();
 
         // 저장 로드
-        PlayerData loaded = SaveLoadManager.LoadPlayerData();
+        PlayerData loaded = SaveLoadService.LoadPlayerDataOrNull();
         LoadData(loaded);
     }
 
@@ -143,7 +123,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         Data.CritChance = baseCC + equipCC;
         Data.CritDamage = baseCD + equipCD;
 
-        SaveLoadManager.SavePlayerData(Data);
+        SaveLoadService.SavePlayerData(Data);
         UpdateUI();
     }
 
@@ -151,7 +131,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     {
         float finalDamage = Mathf.Max(damage - Data.Def, 1f);
         Data.CurrentHP = Mathf.Max(Data.CurrentHP - finalDamage, 0);
-        SaveLoadManager.SavePlayerData(Data);
+        SaveLoadService.SavePlayerData(Data);
         UpdateUI();
 
         if (Data.CurrentHP <= 0)
@@ -161,7 +141,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public void Heal(float amount)
     {
         Data.CurrentHP = Mathf.Min(Data.CurrentHP + amount, Data.MaxHP);
-        SaveLoadManager.SavePlayerData(Data);
+        SaveLoadService.SavePlayerData(Data);
         UpdateUI();
     }
 
@@ -169,7 +149,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     {
         if (Data.CurrentMP < amount) return false;
         Data.CurrentMP -= amount;
-        SaveLoadManager.SavePlayerData(Data);
+        SaveLoadService.SavePlayerData(Data);
         UpdateUI();
         return true;
     }
@@ -177,7 +157,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public void RestoreMana(float amount)
     {
         Data.CurrentMP = Mathf.Min(Data.CurrentMP + amount, Data.MaxMP);
-        SaveLoadManager.SavePlayerData(Data);
+        SaveLoadService.SavePlayerData(Data);
         UpdateUI();
     }
 
@@ -193,7 +173,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
             LevelUp();
         }
 
-        SaveLoadManager.SavePlayerData(Data);
+        SaveLoadService.SavePlayerData(Data);
         UpdateUI();
     }
 
@@ -216,10 +196,28 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     }
 
 
-    public float CalculateDamage()
+    //public float CalculateDamage()
+    //{
+    //    float damage = Data.Atk;
+    //    if (UnityEngine.Random.value <= Data.CritChance)
+    //    {
+    //        damage *= Data.CritDamage;
+    //        Debug.Log($"치명타! {damage} 데미지");
+    //    }
+    //    return damage;
+    //}
+    public float CalculateDamage() // 기존 그대로 유지 (호환용)
+    {
+        bool _;
+        return CalculateDamage(out _);
+    }
+
+    // 치명타 여부를 함께 반환하는 오버로드
+    public float CalculateDamage(out bool isCrit)
     {
         float damage = Data.Atk;
-        if (UnityEngine.Random.value <= Data.CritChance)
+        isCrit = UnityEngine.Random.value <= Data.CritChance;
+        if (isCrit)
         {
             damage *= Data.CritDamage;
             Debug.Log($"치명타! {damage} 데미지");

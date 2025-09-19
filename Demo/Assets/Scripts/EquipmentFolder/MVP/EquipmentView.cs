@@ -136,8 +136,6 @@ public class EquipmentView : MonoBehaviour
         }
     }
 
-
-
     private Button GetSlotButton(string slotType)
     {
         return slotType switch

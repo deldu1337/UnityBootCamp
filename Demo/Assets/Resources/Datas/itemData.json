@@ -104,6 +104,36 @@
       "cc": 0,
       "cd": 0,
       "type": "rshoulder"
+    },
+    {
+      "id": 8,
+      "name": "힐링 포션",
+      "uniqueName": "HPPotion",
+      "level": 1,
+      "hp": 50,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "dex": 0,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
+      "type": "potion"
+    },
+    {
+      "id": 9,
+      "name": "마나 포션",
+      "uniqueName": "MPPotion",
+      "level": 1,
+      "hp": 0,
+      "mp": 20,
+      "atk": 0,
+      "def": 0,
+      "dex": 0,
+      "As": 0,
+      "cc": 0,
+      "cd": 0,
+      "type": "potion"
     }
   ]
 }

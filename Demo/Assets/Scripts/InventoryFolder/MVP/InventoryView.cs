@@ -35,6 +35,9 @@ public class InventoryView : MonoBehaviour
         for (int i = 0; i < items.Count && i < inventoryButtons.Length; i++)
         {
             var item = items[i];
+            if (InventoryGuards.IsInvalid(item))
+                continue; // UI 슬롯 배정 안함
+
             var button = inventoryButtons[i];
             button.gameObject.SetActive(true);
 

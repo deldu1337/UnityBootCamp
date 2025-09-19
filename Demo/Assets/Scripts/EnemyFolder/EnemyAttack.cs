@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static DamageTextManager;
 
 [RequireComponent(typeof(EnemyMove))]
 [RequireComponent(typeof(EnemyStatsManager))]
@@ -107,7 +108,13 @@ public class EnemyAttack : MonoBehaviour
         {
             float damage = Mathf.Max(stats.Data.atk - targetPlayer.Data.Def, 1f);
             targetPlayer.TakeDamage(damage);
-            // Debug.Log($"{stats.Data.name}이 {targetPlayer.name}에게 {damage} 데미지!");
+
+            // 플레이어 피격 텍스트
+            DamageTextManager.Instance.ShowDamage(
+                targetPlayer.transform,
+                Mathf.RoundToInt(damage),
+                new Color(1f, 0.5f, 0f),
+                DamageTextManager.DamageTextTarget.Player);
         }
 
         // 남은 모션 동안도 이탈 즉시 중단

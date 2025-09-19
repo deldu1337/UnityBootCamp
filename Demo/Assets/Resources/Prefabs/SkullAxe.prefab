@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8184935619819796483, guid: f1b0a0f464a59aa4d844472cba0cd381, type: 3}
       propertyPath: m_Name
-      value: 2
+      value: SkullAxe
       objectReference: {fileID: 0}
     - target: {fileID: -8184935619819796483, guid: f1b0a0f464a59aa4d844472cba0cd381, type: 3}
       propertyPath: m_Layer
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 293373de664ca914eaedda7ab3fbcc56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemInfo: "\uB369\uCE58 \uB9DD\uCE58"
+  itemInfo: 
   id: 2
   icon: {fileID: 21300000, guid: 4663a67b0ee738c48b2e927d34dac2f9, type: 3}
   showDistance: 7

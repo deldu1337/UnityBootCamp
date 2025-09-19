@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static DamageTextManager;
 
 // 상태 인터페이스
 public interface IPlayerStates
@@ -170,6 +171,20 @@ public class PlayerAttacks : MonoBehaviour
         }
     }
 
+    public float DistanceTo(EnemyStatsManager enemy)
+    {
+        if (enemy == null) return float.MaxValue;
+        var col = enemy.GetComponent<Collider>();
+        Vector3 origin = transform.position + Vector3.up * raycastYOffset;
+        Vector3 closest = col != null ? col.ClosestPoint(origin) : enemy.transform.position;
+        return Vector3.Distance(origin, closest);
+    }
+
+    public bool IsInAttackRange(EnemyStatsManager enemy)
+    {
+        return DistanceTo(enemy) <= GetAttackRange();
+    }
+
     // 마우스 아래 적 선택 (근접 보정 포함)
     public bool TryPickEnemyUnderMouse(out EnemyStatsManager enemy)
     {
@@ -212,22 +227,22 @@ public class PlayerAttacks : MonoBehaviour
         }
 
         // 3) 최후 보정: 플레이어 주변에서 가장 가까운 Enemy
-        Collider[] near = Physics.OverlapSphere(transform.position, 1.5f, mask, QueryTriggerInteraction.Collide);
-        float best = float.MaxValue;
-        foreach (var c in near)
-        {
-            var esm = c.GetComponentInParent<EnemyStatsManager>();
-            if (esm == null || esm.CurrentHP <= 0) continue;
+        //Collider[] near = Physics.OverlapSphere(transform.position, 1.5f, mask, QueryTriggerInteraction.Collide);
+        //float best = float.MaxValue;
+        //foreach (var c in near)
+        //{
+        //    var esm = c.GetComponentInParent<EnemyStatsManager>();
+        //    if (esm == null || esm.CurrentHP <= 0) continue;
 
-            // 콜라이더까지의 최단거리 기준(겹침/초근접 보정)
-            Vector3 origin = transform.position + Vector3.up * 1f;
-            float d = Vector3.Distance(origin, c.ClosestPoint(origin));
-            if (d < best)
-            {
-                best = d;
-                enemy = esm;
-            }
-        }
+        //    // 콜라이더까지의 최단거리 기준(겹침/초근접 보정)
+        //    Vector3 origin = transform.position + Vector3.up * 1f;
+        //    float d = Vector3.Distance(origin, c.ClosestPoint(origin));
+        //    if (d < best)
+        //    {
+        //        best = d;
+        //        enemy = esm;
+        //    }
+        //}
         return enemy != null;
     }
 
@@ -269,13 +284,24 @@ public class PlayerAttacks : MonoBehaviour
     private IEnumerator DelayedDamage(float delay)
     {
         yield return new WaitForSeconds(delay);
-
         if (targetEnemy == null) yield break;
 
-        float damage = stats.CalculateDamage();
+        bool isCrit;
+        float damage = stats.CalculateDamage(out isCrit);
+
         Debug.Log($"Before Attack: {targetEnemy.name} HP={targetEnemy.CurrentHP}");
         targetEnemy.TakeDamage(damage);
         Debug.Log($"After Attack: {targetEnemy.name} HP={targetEnemy.CurrentHP}");
+
+        // 치명타면 빨간색, 평타면 흰색
+        var color = isCrit ? Color.red : Color.white;
+
+        DamageTextManager.Instance.ShowDamage(
+            targetEnemy.transform,
+            Mathf.RoundToInt(damage),
+            color,
+            DamageTextManager.DamageTextTarget.Enemy
+        );
 
         targetHealthBar?.CheckHp();
     }

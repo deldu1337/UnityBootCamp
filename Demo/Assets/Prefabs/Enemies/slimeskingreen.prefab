@@ -176,7 +176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -266,7 +266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1515,9 +1515,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4919699992168265997}
-    - targetCorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 6802318681074465013}
     - targetCorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
       insertIndex: -1
@@ -1534,35 +1531,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6328195307722416645}
+    - targetCorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2070944687941192414}
   m_SourcePrefab: {fileID: 6382970104451570410, guid: b3df990fe313328448650bc5dda610ca, type: 3}
 --- !u!1 &3684642728859710217 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
   m_PrefabInstance: {fileID: 8704473852688668040}
   m_PrefabAsset: {fileID: 0}
---- !u!136 &4919699992168265997
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3684642728859710217}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1.25
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.25, z: -0.25}
 --- !u!54 &6802318681074465013
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1674,6 +1651,14 @@ MonoBehaviour:
     dropChance: 10
     minAmount: 1
     maxAmount: 1
+  - itemPrefab: {fileID: 3085885664524991808, guid: 4da30eee1b22f214ba12c5ae9fa6fe14, type: 3}
+    dropChance: 100
+    minAmount: 1
+    maxAmount: 1
+  - itemPrefab: {fileID: 3085885664524991808, guid: bcb19e60da705f240a2c47c9b5a94dfe, type: 3}
+    dropChance: 100
+    minAmount: 1
+    maxAmount: 1
   dropPoint: {fileID: 4803082293499739681}
   dropRadius: 1
 --- !u!114 &6328195307722416645
@@ -1689,6 +1674,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyId: slime
+--- !u!136 &2070944687941192414
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3684642728859710217}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.5, z: -0.5}
 --- !u!4 &4803082293499739681 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5013780460985504855, guid: b3df990fe313328448650bc5dda610ca, type: 3}

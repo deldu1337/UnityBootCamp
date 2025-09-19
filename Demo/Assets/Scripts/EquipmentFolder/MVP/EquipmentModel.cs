@@ -93,23 +93,11 @@ public class EquipmentModel
     /// <summary>장비 데이터 불러오기</summary>
     public void Load()
     {
-        if (File.Exists(filePath))
-        {
-            string json = File.ReadAllText(filePath);
-            data = JsonUtility.FromJson<EquipmentData>(json);
-        }
-        else
-        {
-            data = new EquipmentData();
-            Save();
-        }
+        data = SaveLoadService.LoadEquipmentOrNew();
     }
 
-    /// <summary>장비 데이터 저장</summary>
     public void Save()
     {
-        string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(filePath, json);
-        Debug.Log($"장비 데이터 저장됨 → {filePath}");
+        SaveLoadService.SaveEquipment(data);
     }
 }

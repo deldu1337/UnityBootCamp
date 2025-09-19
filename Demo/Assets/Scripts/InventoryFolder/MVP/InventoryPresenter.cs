@@ -58,6 +58,13 @@ public class InventoryPresenter : MonoBehaviour
             prefabPath = prefabPath
         };
 
+        // 최후 방어
+        if (InventoryGuards.IsInvalid(item))
+        {
+            Debug.LogWarning("[InventoryPresenter] 생성된 아이템이 무효 → 추가 취소");
+            return;
+        }
+
         model.AddItem(item);
         Refresh();
     }
@@ -68,6 +75,22 @@ public class InventoryPresenter : MonoBehaviour
     {
         var item = model.GetItemById(uniqueId);
         if (item == null) return;
+
+        if (item.data != null && string.Equals(item.data.type, "potion", StringComparison.OrdinalIgnoreCase))
+        {
+            var stats = PlayerStatsManager.Instance; // 싱글톤
+            if (stats != null)
+            {
+                if (item.data.hp > 0) stats.Heal(item.data.hp);
+                if (item.data.mp > 0) stats.RestoreMana(item.data.mp);
+            }
+            // 인벤토리에서 해당 포션 1개 제거
+            model.RemoveById(uniqueId);
+
+            // UI 갱신
+            Refresh();
+            return; // 장비 장착 로직으로 가지 않도록 종료
+        }
 
         var equipPresenter = FindAnyObjectByType<EquipmentPresenter>();
         equipPresenter?.HandleEquipItem(item);

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,8 +30,8 @@ public class EquipmentPresenter : MonoBehaviour
         // UI 카메라 자동 세팅
         SetupUICamera();
 
-        // JSON에서 저장된 장비 불러와 캐릭터에 장착
-        InitializeEquippedItemsFromJson();
+        // 저장된 장비 불러와 캐릭터에 장착
+        InitializeEquippedItems();
 
         RefreshEquipmentUI();
     }
@@ -92,11 +93,6 @@ public class EquipmentPresenter : MonoBehaviour
         if (isOpen)
             RefreshEquipmentUI();
     }
-
-    //private int GetPlayerLevel()
-    //{
-    //    return playerStats != null ? playerStats.Data.Level : 1;
-    //}
     private int GetPlayerLevel()
     {
         var ps = PlayerStatsManager.Instance;
@@ -174,36 +170,18 @@ public class EquipmentPresenter : MonoBehaviour
     }
 
     // 장비 변경 시 즉시 스탯 갱신 + 저장
-    //private void ApplyStatsAndSave()
-    //{
-    //    playerStats?.RecalculateStats(model.Slots);
-    //    SaveLoadManager.SavePlayerData(playerStats.Data);
-    //}
     private void ApplyStatsAndSave()
     {
         var ps = PlayerStatsManager.Instance;
         if (ps != null)
         {
             ps.RecalculateStats(model.Slots);
-            SaveLoadManager.SavePlayerData(ps.Data);
+            SaveLoadService.SavePlayerData(ps.Data);
         }
     }
 
     /// <summary>JSON 저장된 장비 데이터 복원</summary>
-    //private void InitializeEquippedItemsFromJson()
-    //{
-    //    foreach (var slot in model.Slots)
-    //    {
-    //        if (slot.equipped != null && !string.IsNullOrEmpty(slot.equipped.prefabPath))
-    //        {
-    //            GameObject prefab = Resources.Load<GameObject>(slot.equipped.prefabPath);
-    //            if (prefab != null)
-    //                AttachPrefabToCharacter(prefab, slot.slotType);
-    //        }
-    //    }
-    //    playerStats?.RecalculateStats(model.Slots);
-    //}
-    private void InitializeEquippedItemsFromJson()
+    private void InitializeEquippedItems()
     {
         foreach (var slot in model.Slots)
         {
@@ -224,14 +202,11 @@ public class EquipmentPresenter : MonoBehaviour
         Transform bone = GetSlotTransform(slotType);
         if (bone == null) return;
 
-        // 기존 오브젝트 제거
-        //for (int i = bone.childCount - 1; i >= 0; i--)
-        //{
-        //    Transform child = bone.GetChild(i);
-        //    if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
-        //        Destroy(child.gameObject);
-        //}
-        //RemoveLastChild(bone);
+        if (bone.childCount > 0)
+        {
+            Transform lastChild = bone.GetChild(bone.childCount - 1);
+            Destroy(lastChild.gameObject);
+        }
 
         // 새 프리팹 장착
         GameObject instance = Instantiate(prefab, bone);
@@ -246,35 +221,23 @@ public class EquipmentPresenter : MonoBehaviour
         Transform bone = GetSlotTransform(slotType);
         if (bone == null) return;
 
-        //for (int i = bone.childCount - 1; i >= 0; i--)
-        //{
-        //    Transform child = bone.GetChild(i);
-        //    if (int.TryParse(child.name.Replace("(Clone)", ""), out _))
-        //        Destroy(child.gameObject);
-        //}
-        //RemoveLastChild(bone);
+        if (bone.childCount > 0)
+        {
+            Transform lastChild = bone.GetChild(bone.childCount - 1);
+            Destroy(lastChild.gameObject);
+        }
     }
-
-    //private void RemoveLastChild(Transform bone)
-    //{
-    //    int last = bone.childCount - 1;
-    //    if (last >= 0)
-    //    {
-    //        var lastChild = bone.GetChild(last);
-    //        Destroy(lastChild.gameObject);
-    //    }
-    //}
 
     /// <summary>슬롯 본 찾기</summary>
     private Transform GetSlotTransform(string slotType)
     {
         string boneName = slotType switch
         {
-            "weapon" => "bone_HandR",
-            "shield" => "bone_HandL",
-            "head" => "bone_Head",
-            "lshoulder" => "bone_ShoulderL",
-            "rshoulder" => "bone_ShoulderR",
+            "weapon" => "HandR",
+            "shield" => "HandL",
+            "head" => "Head",
+            "lshoulder" => "ShoulderL",
+            "rshoulder" => "ShoulderR",
             _ => null
         };
 

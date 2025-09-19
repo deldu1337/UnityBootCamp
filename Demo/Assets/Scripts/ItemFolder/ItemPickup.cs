@@ -54,6 +54,18 @@ public class ItemPickup : MonoBehaviour
             {
                 if (inventoryPresenter != null)
                 {
+                    // 좌클릭 줍기 직전
+                    if (!int.TryParse(id, out int parsedId))
+                    {
+                        Debug.LogError($"[ItemPickup] id 파싱 실패: '{id}'");
+                        return;
+                    }
+                    if (dataManager == null || dataManager.dicItemDatas == null || !dataManager.dicItemDatas.ContainsKey(parsedId))
+                    {
+                        Debug.LogError($"[ItemPickup] DataManager에 id={parsedId} 없음");
+                        return;
+                    }
+
                     string prefabPath = $"Prefabs/{dataManager.dicItemDatas[int.Parse(id)].uniqueName}"; // Resources 폴더 기준
                     inventoryPresenter.AddItem(int.Parse(id), icon, prefabPath);
                 }

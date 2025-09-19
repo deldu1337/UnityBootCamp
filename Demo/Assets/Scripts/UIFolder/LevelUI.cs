@@ -7,68 +7,47 @@ public class LevelUI : MonoBehaviour
     [Header("UI 참조")]
     [SerializeField] private Image tensPlace;   // 10의 자리
     [SerializeField] private Image onesPlace;   // 1의 자리
-    private PlayerStatsManager playerStats;
+
+    private PlayerStatsManager playerStats;     // 싱글톤 참조
     private Sprite[] numberSprites;
 
-    //private void Awake()
-    //{
-    //    // PlayerStatsManager 자동 연결
-    //    if (!playerStats)
-    //        playerStats = GetComponentInParent<PlayerStatsManager>();
-
-    //    // Resources 폴더에서 스프라이트 로드 (Assets/Resources/Prefabs/Levels/0~9)
-    //    numberSprites = Resources.LoadAll<Sprite>("Prefabs/Levels");
-    //    if (numberSprites == null || numberSprites.Length < 10)
-    //        Debug.LogError("[LevelUI] Prefabs/Levels 폴더에 0~9 스프라이트가 필요합니다!");
-
-    //    Transform statusUI = GameObject.Find("LevelUI").transform;
-    //    tensPlace = statusUI.GetChild(0).GetComponent<Image>();
-    //    onesPlace = statusUI.GetChild(1).GetComponent<Image>();
-    //}
     private void Awake()
     {
-        playerStats = PlayerStatsManager.Instance; // ← 싱글톤
-
+        // 숫자 스프라이트 로드 (Assets/Resources/Prefabs/Levels/0~9)
         numberSprites = Resources.LoadAll<Sprite>("Prefabs/Levels");
         if (numberSprites == null || numberSprites.Length < 10)
             Debug.LogError("[LevelUI] Prefabs/Levels 폴더에 0~9 스프라이트가 필요합니다!");
 
-        Transform statusUI = GameObject.Find("LevelUI").transform;
-        tensPlace = statusUI.GetChild(0).GetComponent<Image>();
-        onesPlace = statusUI.GetChild(1).GetComponent<Image>();
+        // 필요 시, 하이어라키에서 직접 찾아 연결 (직접 드래그 연결되어 있으면 생략 가능)
+        if (!tensPlace || !onesPlace)
+        {
+            Transform statusUI = GameObject.Find("LevelUI")?.transform;
+            if (statusUI != null)
+            {
+                tensPlace = tensPlace ? tensPlace : statusUI.GetChild(0).GetComponent<Image>();
+                onesPlace = onesPlace ? onesPlace : statusUI.GetChild(1).GetComponent<Image>();
+            }
+        }
     }
 
-    //private void OnEnable()
-    //{
-    //    if (playerStats)
-    //    {
-    //        // 이벤트 구독
-    //        playerStats.OnLevelUp += UpdateLevelUI;
-
-    //        // 시작 시 레벨 UI 강제 초기화
-    //        if (playerStats.Data != null)
-    //            UpdateLevelUI(playerStats.Data.Level);
-    //    }
-    //}
     private void OnEnable()
     {
-        // 싱글톤 준비될 때까지 기다렸다가 구독 + 초기 렌더
+        // 싱글톤/데이터 준비될 때까지 대기 → 구독 + 초기 1회 렌더
         StartCoroutine(BindWhenReady());
     }
 
     private IEnumerator BindWhenReady()
     {
-        // PlayerStatsManager 인스턴스와 Data가 준비될 때까지 대기
         while (PlayerStatsManager.Instance == null || PlayerStatsManager.Instance.Data == null)
             yield return null;
 
         playerStats = PlayerStatsManager.Instance;
 
-        // 중복 구독 방지 후 구독
+        // 중복 방지 후 구독
         playerStats.OnLevelUp -= UpdateLevelUI;
         playerStats.OnLevelUp += UpdateLevelUI;
 
-        // 첫 렌더
+        // 초기 1회 강제 렌더
         UpdateLevelUI(playerStats.Data.Level);
     }
 
@@ -78,8 +57,14 @@ public class LevelUI : MonoBehaviour
             playerStats.OnLevelUp -= UpdateLevelUI;
     }
 
+    private void OnDestroy()
+    {
+        if (playerStats != null)
+            playerStats.OnLevelUp -= UpdateLevelUI;
+    }
+
     /// <summary>
-    /// 레벨 값으로 UI 업데이트
+    /// 레벨 값으로 UI 업데이트 (이벤트 기반)
     /// </summary>
     private void UpdateLevelUI(int level)
     {
@@ -92,7 +77,7 @@ public class LevelUI : MonoBehaviour
         int tens = level / 10;  // 10의 자리
         int ones = level % 10;  // 1의 자리
 
-        // 10의 자리 설정
+        // 10의 자리
         if (tensPlace)
         {
             if (tens > 0)
@@ -106,13 +91,14 @@ public class LevelUI : MonoBehaviour
             }
         }
 
-        // 1의 자리 설정
+        // 1의 자리
         if (onesPlace)
         {
             onesPlace.sprite = numberSprites[ones];
             onesPlace.enabled = true;
         }
 
-        Debug.Log($"[LevelUI] UI 업데이트 완료 -> Level={level}");
+        // 디버그
+        // Debug.Log($"[LevelUI] 업데이트 -> Level={level}");
     }
 }

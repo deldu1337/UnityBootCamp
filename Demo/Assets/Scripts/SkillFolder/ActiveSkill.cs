@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static DamageTextManager;
 
 public class ActiveSkill : ISkill
 {
@@ -122,9 +123,22 @@ public class ActiveSkill : ISkill
             float dist = Vector3.Distance(userTf.position, target.transform.position);
             if (dist <= Range)
             {
-                float finalDamage = stats.CalculateDamage() * damage;
+                // 치명타 여부 포함 계산
+                bool isCrit;
+                float baseDmg = stats.CalculateDamage(out isCrit);
+                float finalDamage = baseDmg * damage;
+
                 target.TakeDamage(finalDamage);
-                Debug.Log($"{target.name}에게 {finalDamage} 피해! (ActiveSkill)");
+
+                // 적 Transform에 고정 + 색상(치명타=빨강, 평타=흰색)
+                DamageTextManager.Instance.ShowDamage(
+                    target.transform,
+                    Mathf.RoundToInt(finalDamage),
+                    isCrit ? Color.red : Color.white,
+                    DamageTextTarget.Enemy
+                );
+
+                Debug.Log($"{target.name}에게 {finalDamage} 피해! (ActiveSkill, Crit={isCrit})");
             }
         }
     }

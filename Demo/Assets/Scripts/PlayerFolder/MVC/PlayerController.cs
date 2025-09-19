@@ -52,6 +52,6 @@ public class PlayerController : MonoBehaviour
             stats.RecalculateStats(equipmentPresenter.GetEquipmentSlots());
 
         if (stats != null)
-            SaveLoadManager.SavePlayerData(stats.Data);
+            SaveLoadService.SavePlayerData(stats.Data);
     }
 }

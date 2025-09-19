@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using static DamageTextManager;
+using static UnityEngine.GraphicsBuffer;
 
 public class ProjectileSkill : ISkill
 {
@@ -81,9 +83,22 @@ public class ProjectileSkill : ISkill
             EnemyStatsManager enemy = hit.GetComponent<EnemyStatsManager>();
             if (enemy != null && enemy.CurrentHP > 0)
             {
-                float finalDamage = stats.CalculateDamage() * damage;
+                // 각 적마다 독립적으로 치명타 판정
+                bool isCrit;
+                float baseDmg = stats.CalculateDamage(out isCrit);
+                float finalDamage = baseDmg * damage;
+
                 enemy.TakeDamage(finalDamage);
-                Debug.Log($"{enemy.name}에게 {finalDamage} 피해! (광역)");
+
+                // 적 Transform에 고정 + 색상(치명타=빨강, 평타=흰색)
+                DamageTextManager.Instance.ShowDamage(
+                    enemy.transform,
+                    Mathf.RoundToInt(finalDamage),
+                    isCrit ? Color.red : Color.white,
+                    DamageTextTarget.Enemy
+                );
+
+                Debug.Log($"{enemy.name}에게 {finalDamage} 피해! (광역, Crit={isCrit})");
             }
         }
     }
