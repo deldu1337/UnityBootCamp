@@ -5,8 +5,9 @@ using UnityEngine.EventSystems;
 public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Refs")]
-    public Image icon;
-    public GameObject lockOverlay;    // 잠금일 때 보이게
+    public Image icon;                 // 자식 "Icon"
+    public GameObject lockOverlay;     // 자식 "LockOverlay"
+    [SerializeField] private Image bg; // 자식 "Bg" (선택)
 
     [Header("Runtime")]
     public string SkillId { get; private set; }
@@ -20,6 +21,21 @@ public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHan
     void Awake()
     {
         rootCanvas = GetComponentInParent<Canvas>();
+
+        if (bg) bg.raycastTarget = false;
+
+        if (icon)
+        {
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            // 여기서는 더 이상 꺼두지 않음
+            // icon.enabled = false;  ← 제거
+        }
+    }
+
+    void OnEnable()
+    {
+        EnsureIconVisibility();
     }
 
     public void Setup(string id, Sprite sp, int unlockLv, bool unlocked)
@@ -27,17 +43,32 @@ public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHan
         SkillId = id;
         UnlockLevel = unlockLv;
         IconSprite = sp;
-        if (icon) { icon.sprite = sp; icon.enabled = sp != null; }
-        SetUnlocked(unlocked);
+        Unlocked = unlocked;
+
+        if (icon) icon.sprite = sp;
+        if (lockOverlay) lockOverlay.SetActive(!unlocked);
+
+        EnsureIconVisibility();
     }
 
     public void SetUnlocked(bool unlocked)
     {
         Unlocked = unlocked;
         if (lockOverlay) lockOverlay.SetActive(!unlocked);
+        EnsureIconVisibility();
     }
 
-    // ============ Drag ============
+    private void EnsureIconVisibility()
+    {
+        // 아이콘 스프라이트가 있으면 항상 보이게
+        if (icon)
+            icon.enabled = (IconSprite != null || icon.sprite != null);
+
+        // 필요하면 색도 조절 가능(예: 잠금 시 반투명)
+        // if (icon) icon.color = Unlocked ? Color.white : new Color(1,1,1,0.7f);
+    }
+
+    // ===== Drag =====
     public void OnBeginDrag(PointerEventData e)
     {
         if (!Unlocked || icon == null || icon.sprite == null) return;
@@ -66,7 +97,11 @@ public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHan
     void UpdateGhost(PointerEventData e)
     {
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rootCanvas.transform as RectTransform, e.position, rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera, out var local);
+            rootCanvas.transform as RectTransform,
+            e.position,
+            rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera,
+            out var local
+        );
         ghost.rectTransform.anchoredPosition = local;
     }
 }

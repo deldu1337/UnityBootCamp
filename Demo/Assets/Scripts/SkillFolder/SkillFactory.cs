@@ -32,6 +32,7 @@ public static class SkillFactory
         {
             "ActiveSkill" => new ActiveSkill(data),
             "ProjectileSkill" => new ProjectileSkill(data),
+            "ChargeSkill" => new ChargeSkill(data),
             _ => new ActiveSkill(data)
         };
     }

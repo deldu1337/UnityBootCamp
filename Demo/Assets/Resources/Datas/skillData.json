@@ -3,7 +3,7 @@
     {
       "id": "slash",
       "name": "일격",
-      "cooldown": 3.0,
+      "cooldown": 2.0,
       "damage": 3,
       "mpCost": 5,
       "range": 4.5,
@@ -21,6 +21,17 @@
       "impactDelay": 0.6,
       "type": "ProjectileSkill",
       "animation": "Attack2HL (ID 19 variation 1)"
+    },
+    {
+      "id": "charge",
+      "name": "돌진",
+      "cooldown": 5.0,
+      "damage": 2,
+      "mpCost": 15,
+      "range": 15,
+      "impactDelay": 0.15,
+      "type": "ChargeSkill",
+      "animation": "AttackOffPierce (ID 88 variation 0)"
     }
   ]
 }

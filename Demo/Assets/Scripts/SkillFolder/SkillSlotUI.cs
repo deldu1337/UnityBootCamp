@@ -69,26 +69,25 @@ public class SkillSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         ghost.rectTransform.anchoredPosition = local;
     }
 
-    // ============ Drop ============
+    // SkillSlotUI.cs (OnDrop 부분만 수정)
     public void OnDrop(PointerEventData e)
     {
-        // 드래그 시작한 곳이 SkillSlotUI 또는 SkillBookItemDraggable 인지 검사
         if (e.pointerDrag == null) return;
 
+        var quickBar = GetComponentInParent<SkillQuickBar>(); // 저장 트리거 위해 경유
         var fromSlot = e.pointerDrag.GetComponent<SkillSlotUI>();
         if (fromSlot != null && fromSlot != this)
         {
-            // 슬롯 ↔ 슬롯 스왑
-            GetComponentInParent<SkillQuickBar>().Swap(fromSlot.index, index);
+            quickBar?.Swap(fromSlot.index, index);
             return;
         }
 
         var bookItem = e.pointerDrag.GetComponent<SkillBookItemDraggable>();
         if (bookItem != null && bookItem.Unlocked)
         {
-            // 스킬북 → 슬롯 할당
-            SetSkill(bookItem.SkillId, bookItem.IconSprite);
+            quickBar?.Assign(index, bookItem.SkillId, bookItem.IconSprite); // ← 직접 SetSkill 대신
             return;
         }
     }
+
 }

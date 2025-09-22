@@ -230,6 +230,6 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         OnHPChanged?.Invoke(Data.CurrentHP, Data.MaxHP);
         OnMPChanged?.Invoke(Data.CurrentMP, Data.MaxMP);
         OnExpChanged?.Invoke(Data.Level, Data.Exp);
-        OnLevelUp?.Invoke(Data.Level);
+        //OnLevelUp?.Invoke(Data.Level);
     }
 }
