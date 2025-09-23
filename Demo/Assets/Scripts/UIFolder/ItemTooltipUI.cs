@@ -41,9 +41,8 @@ public class ItemTooltipUI : MonoBehaviour
         // 텍스트 색상 전부 흰색
         if (nameText) nameText.color = Color.white;
         if (levelText) levelText.color = Color.white;
-        if (levelText) tierText.color = Color.white;
         if (typeText) typeText.color = Color.white;
-        if (statsText) statsText.color = Color.white;
+        if (statsText) statsText.color = new Color32(100, 96, 219, 255);
 
         gameObject.SetActive(false);
     }
@@ -61,6 +60,10 @@ public class ItemTooltipUI : MonoBehaviour
 
         nameText.text = item.data.name;
         nameText.color = GetTierColor(item.data.tier);
+
+        tierText.text = $"등급: {item.data.tier}";
+        tierText.color = GetTierColor(item.data.tier);
+
         int required = Mathf.Max(1, item.data.level);
         levelText.text = $"요구 레벨: {required}";
 
@@ -69,9 +72,6 @@ public class ItemTooltipUI : MonoBehaviour
             levelText.color = Color.red;
         else
             levelText.color = Color.white;
-
-        tierText.text = $"등급: {item.data.tier}";
-        tierText.color = GetTierColor(item.data.tier);
 
         if (typeText) typeText.text = $"분류: {item.data.type}";
         statsText.text = BuildStats(item);
@@ -93,6 +93,7 @@ public class ItemTooltipUI : MonoBehaviour
             case "weapon": return "무기";
             case "shield": return "방패";
             case "gem": return "젬";
+            case "potion": return "포션";
             // 필요한 타입들 계속 추가
             default: return type; // 매핑이 없으면 원래 값 그대로
         }
@@ -106,6 +107,10 @@ public class ItemTooltipUI : MonoBehaviour
 
         nameText.text = item.data.name;
         nameText.color = GetTierColor(item.data.tier);
+
+        tierText.text = $"등급: {item.data.tier}";
+        tierText.color = GetTierColor(item.data.tier);
+
         int required = Mathf.Max(1, item.data.level);
         levelText.text = $"요구 레벨: {required}";
 
@@ -117,9 +122,6 @@ public class ItemTooltipUI : MonoBehaviour
             levelText.color = Color.red;
         else
             levelText.color = Color.white;
-
-        tierText.text = $"등급: {item.data.tier}";
-        tierText.color = GetTierColor(item.data.tier);
 
         if (typeText) typeText.text = $"부위: {GetTypeDisplayName(item.data.type)}";
         statsText.text = BuildStats(item);
