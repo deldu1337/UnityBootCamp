@@ -41,11 +41,6 @@ public class InventoryModel
 
     public void AddItem(InventoryItem item)
     {
-        //if (!items.Exists(i => i.uniqueId == item.uniqueId))
-        //{
-        //    items.Add(item);
-        //    Save();
-        //}
         if (InventoryGuards.IsInvalid(item))
         {
             Debug.LogWarning("[InventoryModel] 무효 아이템 추가 시도 → 무시");

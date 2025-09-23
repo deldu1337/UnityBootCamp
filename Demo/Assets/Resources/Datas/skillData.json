@@ -4,7 +4,7 @@
       "id": "slash",
       "name": "일격",
       "cooldown": 2.0,
-      "damage": 3,
+      "damage": 4,
       "mpCost": 5,
       "range": 4.5,
       "impactDelay": 0.5,
@@ -28,7 +28,7 @@
       "cooldown": 5.0,
       "damage": 2,
       "mpCost": 15,
-      "range": 15,
+      "range": 20,
       "impactDelay": 0.15,
       "type": "ChargeSkill",
       "animation": "AttackOffPierce (ID 88 variation 0)"

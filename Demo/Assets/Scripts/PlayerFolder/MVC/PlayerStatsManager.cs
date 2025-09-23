@@ -195,17 +195,6 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         OnLevelUp?.Invoke(Data.Level);
     }
 
-
-    //public float CalculateDamage()
-    //{
-    //    float damage = Data.Atk;
-    //    if (UnityEngine.Random.value <= Data.CritChance)
-    //    {
-    //        damage *= Data.CritDamage;
-    //        Debug.Log($"치명타! {damage} 데미지");
-    //    }
-    //    return damage;
-    //}
     public float CalculateDamage() // 기존 그대로 유지 (호환용)
     {
         bool _;
@@ -230,6 +219,5 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         OnHPChanged?.Invoke(Data.CurrentHP, Data.MaxHP);
         OnMPChanged?.Invoke(Data.CurrentMP, Data.MaxMP);
         OnExpChanged?.Invoke(Data.Level, Data.Exp);
-        //OnLevelUp?.Invoke(Data.Level);
     }
 }

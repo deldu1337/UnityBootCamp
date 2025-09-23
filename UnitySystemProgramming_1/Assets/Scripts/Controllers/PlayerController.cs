@@ -1,87 +1,94 @@
-using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float _speed = 10;
-    [SerializeField] private float _rotate = 0.1f;
 
-    bool _moveToDest = false;
     Vector3 _destPos;
 
     void Start()
     {
-        Managers.Input.KeyAction -= OnKeyboard;
-        Managers.Input.KeyAction += OnKeyboard;
         Managers.Input.MouseAction -= OnMouseClicked;
         Managers.Input.MouseAction += OnMouseClicked;
+
+        // 임시
+        Managers.UI.ShowSceneUI<UI_Inven>();
     }
+
+    public enum PlayerState
+    {
+        Die,
+        Moving,
+        Idle,
+    }
+
+    PlayerState _state = PlayerState.Idle;
+
+    void UpdateDie()
+    {
+        // 아무것도 하지 않음
+    }
+
+    void UpdateMoving()
+    {
+        Vector3 dir = _destPos - transform.position;
+        if (dir.magnitude < 0.0001f)
+        {
+            _state = PlayerState.Idle;
+        }
+        else
+        {
+            float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+            transform.position += dir.normalized * moveDist;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+        }
+
+        // 애니메이션 - 이동
+        Animator anim = GetComponent<Animator>();
+        // 현재 게임 상태에 대한 정보를 넘겨준다
+        anim.SetFloat("speed", _speed);
+    }
+
+    void UpdateIdle()
+    {
+        // 애니메이션 - 멈춤
+        Animator anim = GetComponent<Animator>();
+        anim.SetFloat("speed", 0);
+
+    }
+
 
     void Update()
-    {
-        if(_moveToDest == true)
+    { 
+        switch (_state)
         {
-            Vector3 dir = _destPos - transform.position;
-            if(dir.magnitude < 0.0001f)
-            {
-                _moveToDest = false;
-            }
-            else
-            {
-                float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
-                transform.position = transform.position + _destPos;
-                transform.LookAt(_destPos);
-            }
+            case PlayerState.Die:
+                UpdateDie();
+                break;
+            case PlayerState.Moving:
+                UpdateMoving();
+                break;
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
+            default:
+                break;
         }
     }
 
-    void OnKeyboard()
+    void OnMouseClicked(Define.MouseEvent evt)
     {
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.position += Vector3.forward * Time.deltaTime * _speed;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), _rotate);
-        }
-
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.position += Vector3.left * Time.deltaTime * _speed;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), _rotate);
-        }
-
-
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.position += Vector3.back * Time.deltaTime * _speed;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), _rotate);
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.position += Vector3.right * Time.deltaTime * _speed;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), _rotate);
-        }
-
-        _moveToDest = true;
-    }
-
-    private void OnMouseClicked(Define.MouseEvent evt)
-    {
-        if (evt != Define.MouseEvent.Click)
+        if (_state == PlayerState.Die)
             return;
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
+       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
 
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall"))) ;
+        if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall")))
         {
             _destPos = hit.point;
-
-            _moveToDest = true;
-            //Debug.Log($"Raycast Camera: {hit.collider.gameObject.tag}");
+            _state = PlayerState.Moving;
         }
     }
 }

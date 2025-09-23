@@ -41,7 +41,8 @@ public class AttackingStates : IPlayerStates
     public void Enter(PlayerAttacks player)
     {
         //player.lastAttackTime = 0f; // 즉시 공격 가능
-        player.lastAttackTime = player.GetAttackCooldown(); // 즉시 공격 가능
+        //player.lastAttackTime = player.GetAttackCooldown(); // 즉시 공격 가능
+        player.lastAttackTime = Mathf.Max(player.lastAttackTime, Time.time);
     }
 
     public void Exit(PlayerAttacks player) { }
@@ -227,22 +228,22 @@ public class PlayerAttacks : MonoBehaviour
         }
 
         // 3) 최후 보정: 플레이어 주변에서 가장 가까운 Enemy
-        //Collider[] near = Physics.OverlapSphere(transform.position, 1.5f, mask, QueryTriggerInteraction.Collide);
-        //float best = float.MaxValue;
-        //foreach (var c in near)
-        //{
-        //    var esm = c.GetComponentInParent<EnemyStatsManager>();
-        //    if (esm == null || esm.CurrentHP <= 0) continue;
+        Collider[] near = Physics.OverlapSphere(transform.position, 1.5f, mask, QueryTriggerInteraction.Collide);
+        float best = float.MaxValue;
+        foreach (var c in near)
+        {
+            var esm = c.GetComponentInParent<EnemyStatsManager>();
+            if (esm == null || esm.CurrentHP <= 0) continue;
 
-        //    // 콜라이더까지의 최단거리 기준(겹침/초근접 보정)
-        //    Vector3 origin = transform.position + Vector3.up * 1f;
-        //    float d = Vector3.Distance(origin, c.ClosestPoint(origin));
-        //    if (d < best)
-        //    {
-        //        best = d;
-        //        enemy = esm;
-        //    }
-        //}
+            // 콜라이더까지의 최단거리 기준(겹침/초근접 보정)
+            Vector3 origin = transform.position + Vector3.up * 1f;
+            float d = Vector3.Distance(origin, c.ClosestPoint(origin));
+            if (d < best)
+            {
+                best = d;
+                enemy = esm;
+            }
+        }
         return enemy != null;
     }
 

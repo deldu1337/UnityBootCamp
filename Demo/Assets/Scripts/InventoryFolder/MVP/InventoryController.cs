@@ -69,7 +69,7 @@ public class InventoryController : MonoBehaviour
         // 해당 슬롯에 아이템 장착
         equipment.EquipItem(slotType, item);
         inventory.RemoveById(uniqueId);
-
+        
         Debug.Log($"장착: {item.data.name}");
         RefreshUI();
     }

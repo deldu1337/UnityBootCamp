@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ResouceManager
+public class ResourceManager
 {
     public T Load<T>(string path) where T : Object
     {
@@ -13,6 +13,13 @@ public class ResouceManager
         if (prefab == null)
         {
             Debug.LogError($"ÇÁ¸®ÆÕ ¾øÀ½ : {path}");
+        }
+
+        GameObject go = Object.Instantiate(prefab, parent);
+        int index = go.name.IndexOf("(Clone)");
+        if(index > 0)
+        {
+            go.name = go.name.Substring(0, index);
         }
 
         return Object.Instantiate(prefab, parent);

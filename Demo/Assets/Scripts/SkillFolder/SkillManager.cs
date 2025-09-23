@@ -286,9 +286,9 @@ public class SkillManager : MonoBehaviour
     // 레벨 해제 규칙 (원하면 더 추가)
     private readonly List<SkillUnlockDef> unlockDefs = new()
     {
-        new SkillUnlockDef("slash", 1),
+        new SkillUnlockDef("slash", 2),
         new SkillUnlockDef("smash", 3),
-        new SkillUnlockDef("charge", 5),
+        new SkillUnlockDef("charge", 4),
     };
 
     // 아이콘 로더 (Resources/SkillIcons/{id}.png)

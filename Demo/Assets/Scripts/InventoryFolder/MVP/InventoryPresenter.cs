@@ -69,6 +69,7 @@ public class InventoryPresenter : MonoBehaviour
         Refresh();
     }
 
+
     public void ForceRefresh() => view?.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
 
     private void OnItemEquipped(string uniqueId)
@@ -97,6 +98,7 @@ public class InventoryPresenter : MonoBehaviour
 
         Refresh();
     }
+
 
     private void OnItemRemoved(string uniqueId)
     {

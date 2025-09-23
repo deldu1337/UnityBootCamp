@@ -1,16 +1,16 @@
-using System.Resources;
 using UnityEngine;
 
 public class Managers : MonoBehaviour
 {
-    private static Managers s_instance;
-    public static Managers Instance { get { Init(); return s_instance; } }
+    private static Managers s_instance; // 유일성이 보장됨
+    public static Managers Instance { get { Init(); return s_instance; }  } // 유일한 매니저를 갖고옴
 
     private InputManager _input = new InputManager();
     private ResouceManager _resouce = new ResouceManager();
+    private UIManager _ui = new UIManager();
     public static InputManager Input { get { return Instance._input; } }
     public static ResouceManager Resource { get { return Instance._resouce; } }
-
+    public static UIManager UI { get { return Instance._ui; } }
 
     void Start()
     {
