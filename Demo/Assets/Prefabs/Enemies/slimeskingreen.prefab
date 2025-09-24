@@ -1623,40 +1623,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropTable:
-  - itemPrefab: {fileID: 584906182147590915, guid: f7128b2b33a81bc4f824c4f81712c9f6, type: 3}
-    dropChance: 100
-    minAmount: 1
-    maxAmount: 1
-  - itemPrefab: {fileID: 8624671125184764664, guid: 73d8eca41216b8345b2f597e8419ed18, type: 3}
-    dropChance: 10
-    minAmount: 1
-    maxAmount: 1
   - itemPrefab: {fileID: 4961705856022539819, guid: fa0a8eba4c4bff0459a26b44483abd0d, type: 3}
+    dropChance: 5
+    minAmount: 1
+    maxAmount: 1
+  - itemPrefab: {fileID: 3085885664524991808, guid: 4da30eee1b22f214ba12c5ae9fa6fe14, type: 3}
     dropChance: 10
     minAmount: 1
     maxAmount: 1
-  - itemPrefab: {fileID: 101002292291777123, guid: 043318942fc12a144a08aa022b16877b, type: 3}
+  - itemPrefab: {fileID: 3085885664524991808, guid: bcb19e60da705f240a2c47c9b5a94dfe, type: 3}
     dropChance: 10
     minAmount: 1
     maxAmount: 1
   - itemPrefab: {fileID: 6362805032887319301, guid: fdde87aa61257f448a2572816c5054a7, type: 3}
-    dropChance: 10
-    minAmount: 1
-    maxAmount: 1
-  - itemPrefab: {fileID: 8275680629370187925, guid: b62cb3807b2e1ac4884cd2ab02f4d460, type: 3}
-    dropChance: 10
-    minAmount: 1
-    maxAmount: 1
-  - itemPrefab: {fileID: 4358009217893259364, guid: 2ab0121f4526f30498cecf1edb7c40e6, type: 3}
-    dropChance: 10
-    minAmount: 1
-    maxAmount: 1
-  - itemPrefab: {fileID: 3085885664524991808, guid: 4da30eee1b22f214ba12c5ae9fa6fe14, type: 3}
-    dropChance: 100
-    minAmount: 1
-    maxAmount: 1
-  - itemPrefab: {fileID: 3085885664524991808, guid: bcb19e60da705f240a2c47c9b5a94dfe, type: 3}
-    dropChance: 100
+    dropChance: 3
     minAmount: 1
     maxAmount: 1
   dropPoint: {fileID: 4803082293499739681}
@@ -1673,7 +1653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4edcd7d6dbba1724fa0fd26f11f41734, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyId: slime
+  enemyId: infested slime
 --- !u!136 &2070944687941192414
 CapsuleCollider:
   m_ObjectHideFlags: 0

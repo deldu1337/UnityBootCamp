@@ -1747,6 +1747,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 924dbd15bad2e4b40971d21c0719eab4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseOffset: {x: -2, y: 17, z: -2}
+  useCurrentCameraOffsetOnStart: 1
+  zoomOutMultiplier: 1.7
+  bossTriggerRadius: 40
+  zoomLerpSpeed: 6
+  bossTag: Boss
+  lockRotation: 0
+  lockedEuler: {x: 55, y: 45, z: 0}
 --- !u!114 &-3634381296817825844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1846,3 +1854,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerClass: warrior
+  quickBar: {fileID: 0}
+  skillBook: {fileID: 0}

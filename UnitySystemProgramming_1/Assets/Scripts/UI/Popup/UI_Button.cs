@@ -36,7 +36,8 @@ public class UI_Button : UI_Popup
         Bind<Text>(typeof(Texts));
         Bind<Image>(typeof(Images));
 
-        GetButton((int)Buttons.PointButton).gameObject.AddUIEvent(OnButtonClicked);
+        GetButton((int)Buttons.PointButton).gameObject.BindEvent(OnButtonClicked);
+        //GetButton((int)Buttons.PointButton).onClick.AddListener(OnButtonClicked);
 
         GameObject go = GetImage((int)Images.ItemIcon).gameObject;
         BindEvent(go, (PointerEventData data) => { go.transform.position = data.position; }, Define.UIEvent.Drag);
@@ -44,7 +45,7 @@ public class UI_Button : UI_Popup
 
     private int _score = 0;
 
-    public void OnButtonClicked(PointerEventData data)
+    public void OnButtonClicked(PointerEventData data) 
     {
         GetText((int)Texts.ScoreText).text = $"Á¡¼ö : {++_score}Á¡";
     }

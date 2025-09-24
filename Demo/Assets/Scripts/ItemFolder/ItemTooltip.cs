@@ -1,55 +1,68 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 아이템 툴팁 관리 스크립트
 public class ItemTooltip : MonoBehaviour
 {
-    public static ItemTooltip Instance;           // 싱글톤 인스턴스
+    public static ItemTooltip Instance;
 
-    [SerializeField] private GameObject tooltipPanel; // 툴팁 전체 패널
-    [SerializeField] private Text tooltipText;        // 툴팁에 표시될 텍스트
+    [Header("UI")]
+    [SerializeField] private GameObject tooltipPanel;  // Panel (Image+Button 포함)
+    [SerializeField] private Text tooltipText;
 
-    private Vector2 padding = new Vector2(15f, 5f);   // 패널과 텍스트 사이 여백 (좌우, 상하)
+    [Header("Layout")]
+    [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.1f, 0f);
 
-    // Awake: 싱글톤 초기화 및 패널 숨김
+    // (선택) 초기 색 세팅을 여기서도 하고 싶다면 Color32 사용
+    [Header("Colors (optional init)")]
+    [SerializeField] private Color32 normalColor = new Color32(0, 0, 0, 225);
+    [SerializeField] private Color32 hoverColor = new Color32(3, 62, 113, 255);
+
+    private Transform followTarget;
+    private Action onClick;
+    private Button panelButton;
+    private UIHoverColor hover; // ← 패널에 붙어있는 컴포넌트
+
     void Awake()
     {
-        Instance = this;  // 싱글톤 인스턴스 설정
-        Hide();           // 시작 시 툴팁 숨김
+        Instance = this;
+
+        hover = tooltipPanel.GetComponent<UIHoverColor>();
+        if (hover == null) hover = tooltipPanel.AddComponent<UIHoverColor>();
+        hover.SetColors(normalColor, hoverColor); // 선택: 초기 색 지정
+
+        panelButton = tooltipPanel.GetComponent<Button>();
+        if (panelButton == null) panelButton = tooltipPanel.AddComponent<Button>();
+        panelButton.onClick.AddListener(() => onClick?.Invoke());
+
+        Hide();
     }
 
-    // 매 프레임 업데이트: 마우스 따라다니게
     void Update()
     {
-        if (tooltipPanel.activeSelf) // 툴팁이 활성화되어 있으면
-        {
-            Vector3 mousePos = Input.mousePosition;           // 현재 마우스 위치
-            tooltipPanel.transform.position = mousePos + new Vector3(0f, 5f, 0f); // 마우스 위치 기준 오프셋 적용
-        }
+        if (!tooltipPanel.activeSelf || followTarget == null) return;
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(followTarget.position + worldOffset);
+        tooltipPanel.transform.position = screenPos;
     }
 
-    // 툴팁 표시
-    public void Show(string info)
+    public void ShowFor(Transform target, string info, Action onClick)
     {
-        tooltipText.text = info;  // 툴팁 텍스트 설정
+        followTarget = target;
+        tooltipText.text = info;
+        this.onClick = onClick;
 
-        // 텍스트의 실제 크기 계산 (텍스트 내용에 맞춤)
-        Vector2 preferredSize = new Vector2(
-            tooltipText.preferredWidth,   // 텍스트 너비
-            tooltipText.preferredHeight   // 텍스트 높이
-        );
+        // 패널 배경을 기본색으로
+        var img = tooltipPanel.GetComponent<Image>();
+        if (img) img.color = normalColor;
 
-        // 패널 크기 = 텍스트 크기 + 여백
-        RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
-        panelRect.sizeDelta = preferredSize + padding;
-
-        tooltipPanel.SetActive(true);  // 툴팁 패널 활성화
+        tooltipPanel.SetActive(true);
     }
 
-  
-    // 툴팁 숨김
     public void Hide()
     {
         tooltipPanel.SetActive(false);
+        followTarget = null;
+        onClick = null;
     }
 }
+

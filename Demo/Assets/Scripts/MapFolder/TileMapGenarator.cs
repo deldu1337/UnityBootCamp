@@ -4,6 +4,8 @@ using System.Linq;
 
 public class TileMapGenerator : MonoBehaviour
 {
+    [SerializeField] private StageManager stageManager;
+
     public int width = 100; // 맵 가로 크기
     public int height = 100; // 맵 세로 크기
     public GameObject wallPrefab;  // 벽 프리팹
@@ -12,7 +14,33 @@ public class TileMapGenerator : MonoBehaviour
     public int maxRoomSize = 24;   // 방 최대 크기
     public int maxDepth = 20;      // BSP 분할 최대 깊이
     public int corridorWidth = 5;  // 통로 폭
+    public GameObject portalPrefab; // 포탈 프리팹
+    public float portalYOffset = 0f; // 필요 시 Y오프셋(바닥이 0이 아니면 조정)
+    public int bossRoomWidth = 28;
+    public int bossRoomHeight = 28;
 
+    [Header("Floor Animation")]
+    [Tooltip("floorPrefab에 FloorMaterialAnimator 자동 부착/설정")]
+    public bool enableFloorAnimation = true;
+
+    [Tooltip("애니메이션에 사용할 스프라이트들 (20장 등)")]
+    public Sprite[] floorFrames;
+
+    [Tooltip("초당 프레임 수")]
+    public float floorFps = 8f;
+
+    [Tooltip("각 바닥 타일이 랜덤 프레임에서 시작")]
+    public bool floorRandomStart = true;
+
+    [Tooltip("Resources에서 자동 로드할 경우 사용")]
+    public bool floorAutoLoadFromResources = false;
+    public string floorResourcesFolder = "Textures/Floor";
+    public string floorNamePrefix = "Floor_";
+
+    [Tooltip("URP/Lit이면 _BaseMap, Built-in Standard면 _MainTex")]
+    public string floorTexturePropertyName = "_BaseMap";
+
+    private RectInt bossRoom;  // 보스 전용 방
     private int[,] map; // 2D 맵 데이터: 0=바닥, 1=벽
     private List<RectInt> rooms; // 일반 방 리스트
     private RectInt playerRoom;  // 플레이어 전용 방
@@ -21,40 +49,157 @@ public class TileMapGenerator : MonoBehaviour
     public delegate void MapGeneratedHandler();
     public event MapGeneratedHandler OnMapGenerated;
 
+    private bool HasBossRoom => bossRoom.width > 0 && bossRoom.height > 0;
+
     void Start()
     {
         GenerateMap(); // 맵 데이터 생성
         RenderMap();   // 맵 오브젝트 생성
     }
 
+    //public void GenerateMap()
+    //{
+    //    map = new int[width, height];
+    //    rooms = new List<RectInt>();
+
+    //    // 전체 벽으로 초기화
+    //    for (int x = 0; x < width; x++)
+    //        for (int y = 0; y < height; y++)
+    //            map[x, y] = 1;
+
+    //    // BSP로 방 분할
+    //    RectInt root = new RectInt(1, 1, width - 2, height - 2);
+    //    SplitRoom(root, maxDepth, rooms);
+
+    //    // 플레이어 전용 방 생성 (10x10)
+    //    playerRoom = new RectInt(2, 2, 10, 10);
+
+    //    // 플레이어 방 벽 초기화
+    //    for (int x = playerRoom.xMin; x < playerRoom.xMax; x++)
+    //        for (int y = playerRoom.yMin; y < playerRoom.yMax; y++)
+    //            map[x, y] = 1;
+
+    //    // 플레이어 방 내부 바닥 생성 (가장자리 제외)
+    //    for (int x = playerRoom.xMin + 1; x < playerRoom.xMax - 1; x++)
+    //        for (int y = playerRoom.yMin + 1; y < playerRoom.yMax - 1; y++)
+    //            map[x, y] = 0;
+
+    //    // 일반 방 바닥 생성 (플레이어 방 제외)
+    //    foreach (var room in rooms)
+    //    {
+    //        if (!room.Overlaps(playerRoom))
+    //        {
+    //            for (int x = room.xMin; x < room.xMax; x++)
+    //                for (int y = room.yMin; y < room.yMax; y++)
+    //                    map[x, y] = 0;
+    //        }
+    //    }
+
+    //    // 방 중심 좌표 계산
+    //    List<Vector2Int> centers = rooms.Select(r =>
+    //        new Vector2Int(Mathf.RoundToInt(r.center.x), Mathf.RoundToInt(r.center.y))
+    //    ).ToList();
+
+    //    // MST 연결 (Prim 알고리즘) - 방들을 최소 연결 통로로 연결
+    //    List<Vector2Int> connected = new List<Vector2Int>();
+    //    List<Vector2Int> remaining = new List<Vector2Int>(centers);
+    //    if (remaining.Count > 0)
+    //    {
+    //        connected.Add(remaining[0]);
+    //        remaining.RemoveAt(0);
+    //    }
+
+    //    while (remaining.Count > 0)
+    //    {
+    //        float minDist = float.MaxValue;
+    //        Vector2Int a = Vector2Int.zero;
+    //        Vector2Int b = Vector2Int.zero;
+
+    //        // 연결된 방과 남은 방 사이의 최소 거리 방 선택
+    //        foreach (var c in connected)
+    //        {
+    //            foreach (var r in remaining)
+    //            {
+    //                float dist = Vector2Int.Distance(c, r);
+    //                if (dist < minDist)
+    //                {
+    //                    minDist = dist;
+    //                    a = c;
+    //                    b = r;
+    //                }
+    //            }
+    //        }
+
+    //        CreateCorridor(a, b); // 통로 생성
+    //        connected.Add(b);
+    //        remaining.Remove(b);
+    //    }
+
+    //    // 플레이어 방과 가장 가까운 방 연결 (항상 위쪽 방향 우선)
+    //    Vector2Int playerCenter = new Vector2Int(
+    //        Mathf.RoundToInt(playerRoom.center.x),
+    //        Mathf.RoundToInt(playerRoom.center.y)
+    //    );
+
+    //    if (centers.Count > 0)
+    //    {
+    //        Vector2Int nearestRoomCenter = centers
+    //            .OrderBy(c => Vector2Int.Distance(c, playerCenter))
+    //            .First();
+
+    //        // 통로 시작점: 플레이어 방 위쪽 중앙
+    //        Vector2Int corridorStart = new Vector2Int(
+    //            (playerRoom.xMin + playerRoom.xMax) / 2,
+    //            playerRoom.yMax
+    //        );
+
+    //        // 플레이어 방 벽 뚫기 (최소 corridorWidth 적용)
+    //        int offset = Mathf.Max(corridorWidth / 2, 1);
+    //        for (int w = -offset; w <= offset; w++)
+    //        {
+    //            int x = corridorStart.x + w;
+    //            int y = corridorStart.y;
+    //            if (x >= playerRoom.xMin && x < playerRoom.xMax && y < height)
+    //            {
+    //                map[x, y] = 0;
+    //                map[x, y - 1] = 0; // 입구 폭 확보
+    //            }
+    //        }
+
+    //        // 플레이어 방 → 가장 가까운 방 통로 생성
+    //        CreatePlayerCorridor(corridorStart, nearestRoomCenter);
+    //    }
+
+    //    PlacePortal();   // 가장 먼 방에 포탈 생성
+    //    // 맵 생성 완료 이벤트 호출
+    //    OnMapGenerated?.Invoke();
+    //}
     public void GenerateMap()
     {
         map = new int[width, height];
         rooms = new List<RectInt>();
+        bossRoom = new RectInt(0, 0, 0, 0);
 
-        // 전체 벽으로 초기화
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
                 map[x, y] = 1;
 
-        // BSP로 방 분할
+        // 1) playerRoom 먼저
+        playerRoom = new RectInt(2, 2, 10, 10);
+
+        // 2) BSP로 일반 방 생성
         RectInt root = new RectInt(1, 1, width - 2, height - 2);
         SplitRoom(root, maxDepth, rooms);
 
-        // 플레이어 전용 방 생성 (10x10)
-        playerRoom = new RectInt(2, 2, 10, 10);
-
-        // 플레이어 방 벽 초기화
+        // 3) 플레이어 방 carve
         for (int x = playerRoom.xMin; x < playerRoom.xMax; x++)
             for (int y = playerRoom.yMin; y < playerRoom.yMax; y++)
                 map[x, y] = 1;
-
-        // 플레이어 방 내부 바닥 생성 (가장자리 제외)
         for (int x = playerRoom.xMin + 1; x < playerRoom.xMax - 1; x++)
             for (int y = playerRoom.yMin + 1; y < playerRoom.yMax - 1; y++)
                 map[x, y] = 0;
 
-        // 일반 방 바닥 생성 (플레이어 방 제외)
+        // 4) 일반 방 carve (플레이어 방 제외)
         foreach (var room in rooms)
         {
             if (!room.Overlaps(playerRoom))
@@ -65,84 +210,176 @@ public class TileMapGenerator : MonoBehaviour
             }
         }
 
-        // 방 중심 좌표 계산
-        List<Vector2Int> centers = rooms.Select(r =>
-            new Vector2Int(Mathf.RoundToInt(r.center.x), Mathf.RoundToInt(r.center.y))
-        ).ToList();
+        // 보스 스테이지 여부
+        bool makeBossRoom = (stageManager != null && stageManager.IsBossStage());
 
-        // MST 연결 (Prim 알고리즘) - 방들을 최소 연결 통로로 연결
+        // 5) (보스 스테이지일 때만) 보스방 carve (정가운데 크게)
+        if (makeBossRoom)
+        {
+            int bw = Mathf.Clamp(bossRoomWidth, minRoomSize, width - 4);
+            int bh = Mathf.Clamp(bossRoomHeight, minRoomSize, height - 4);
+            int bx = (width - bw) / 2;
+            int by = (height - bh) / 2;
+            bossRoom = new RectInt(bx, by, bw, bh);
+
+            for (int x = bossRoom.xMin; x < bossRoom.xMax; x++)
+                for (int y = bossRoom.yMin; y < bossRoom.yMax; y++)
+                    map[x, y] = 0;
+        }
+
+        // 6) 방 중심 좌표(일반 방만)
+        List<Vector2Int> centers = rooms
+            .Where(r => !r.Overlaps(playerRoom) && !r.Overlaps(bossRoom))
+            .Select(r => new Vector2Int(Mathf.RoundToInt(r.center.x), Mathf.RoundToInt(r.center.y)))
+            .ToList();
+
+        // 7) MST로 일반 방 연결
         List<Vector2Int> connected = new List<Vector2Int>();
         List<Vector2Int> remaining = new List<Vector2Int>(centers);
-        if (remaining.Count > 0)
-        {
-            connected.Add(remaining[0]);
-            remaining.RemoveAt(0);
-        }
+        if (remaining.Count > 0) { connected.Add(remaining[0]); remaining.RemoveAt(0); }
 
         while (remaining.Count > 0)
         {
-            float minDist = float.MaxValue;
-            Vector2Int a = Vector2Int.zero;
-            Vector2Int b = Vector2Int.zero;
-
-            // 연결된 방과 남은 방 사이의 최소 거리 방 선택
+            float minDist = float.MaxValue; Vector2Int a = Vector2Int.zero, b = Vector2Int.zero;
             foreach (var c in connected)
-            {
                 foreach (var r in remaining)
                 {
                     float dist = Vector2Int.Distance(c, r);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        a = c;
-                        b = r;
-                    }
+                    if (dist < minDist) { minDist = dist; a = c; b = r; }
                 }
-            }
-
-            CreateCorridor(a, b); // 통로 생성
+            CreateCorridor(a, b);
             connected.Add(b);
             remaining.Remove(b);
         }
 
-        // 플레이어 방과 가장 가까운 방 연결 (항상 위쪽 방향 우선)
+        // 8) 플레이어 방 ↔ 가장 가까운 일반 방 연결
+        Vector2Int playerCenter = new Vector2Int(
+            Mathf.RoundToInt(playerRoom.center.x),
+            Mathf.RoundToInt(playerRoom.center.y)
+        );
+        if (centers.Count > 0)
+        {
+            Vector2Int nearestRoomCenter = centers.OrderBy(c => Vector2Int.Distance(c, playerCenter)).First();
+            Vector2Int corridorStart = new Vector2Int((playerRoom.xMin + playerRoom.xMax) / 2, playerRoom.yMax);
+
+            int offset = Mathf.Max(corridorWidth / 2, 1);
+            for (int w = -offset; w <= offset; w++)
+            {
+                int x = corridorStart.x + w, y = corridorStart.y;
+                if (x >= playerRoom.xMin && x < playerRoom.xMax && y < height)
+                {
+                    map[x, y] = 0; map[x, y - 1] = 0;
+                }
+            }
+            CreatePlayerCorridor(corridorStart, nearestRoomCenter);
+        }
+
+        // 9) (보스 스테이지일 때만) 보스방 ↔ 일반 방 연결(입구 최소 1개, 최대 4개)
+        if (makeBossRoom)
+            ConnectBossRoomEntrances(centers);
+
+        // 포탈은 기존 로직 유지(가장 먼 일반 방 중심)
+        PlacePortal();
+
+        OnMapGenerated?.Invoke();
+    }
+
+    void ConnectBossRoomEntrances(List<Vector2Int> normalCenters)
+    {
+        if (normalCenters == null || normalCenters.Count == 0) return;
+
+        // 보스방 네 변의 중간 지점(방 내부에서 바로 바깥으로 나가는 에지)
+        var edgePoints = new List<Vector2Int>
+    {
+        new Vector2Int(bossRoom.xMin, (bossRoom.yMin + bossRoom.yMax) / 2),          // Left
+        new Vector2Int(bossRoom.xMax - 1, (bossRoom.yMin + bossRoom.yMax) / 2),     // Right
+        new Vector2Int((bossRoom.xMin + bossRoom.xMax) / 2, bossRoom.yMin),         // Bottom
+        new Vector2Int((bossRoom.xMin + bossRoom.xMax) / 2, bossRoom.yMax - 1)      // Top
+    };
+
+        // 입구 최소 1개 보장, 가능하면 여러 개 연결
+        int made = 0;
+        foreach (var ep in edgePoints)
+        {
+            // 가장 가까운 일반 방 중심 찾기
+            var nearest = normalCenters.OrderBy(c => Vector2Int.Distance(c, ep)).FirstOrDefault();
+
+            // 에지에서 바깥으로 한 칸 나가며 문 틈(폭 corridorWidth) 확보
+            int offset = Mathf.Max(corridorWidth / 2, 1);
+            // 방향 판정(보스방 밖으로 나가는 방향)
+            Vector2Int dir = Vector2Int.zero;
+            if (ep.x == bossRoom.xMin) dir = Vector2Int.left;
+            else if (ep.x == bossRoom.xMax - 1) dir = Vector2Int.right;
+            else if (ep.y == bossRoom.yMin) dir = Vector2Int.down;
+            else if (ep.y == bossRoom.yMax - 1) dir = Vector2Int.up;
+
+            // 문 carving
+            for (int w = -offset; w <= offset; w++)
+            {
+                int x = ep.x + (dir.x == 0 ? w : 0);
+                int y = ep.y + (dir.y == 0 ? w : 0);
+                int dx = ep.x + dir.x;
+                int dy = ep.y + dir.y;
+
+                if (x >= 0 && x < width && y >= 0 && y < height) map[x, y] = 0;
+                if (dx >= 0 && dx < width && dy >= 0 && dy < height) map[dx, dy] = 0;
+            }
+
+            // 입구에서 일반 방 중심까지 복도 파기
+            CreatePlayerCorridor(ep, nearest);
+            made++;
+        }
+
+        // 혹시라도 네 변 모두 실패했다면(이론상 거의 없음) 중앙에서 한 번 더 시도
+        if (made == 0)
+        {
+            var bossC = new Vector2Int(Mathf.RoundToInt(bossRoom.center.x), Mathf.RoundToInt(bossRoom.center.y));
+            var nearest = normalCenters.OrderBy(c => Vector2Int.Distance(c, bossC)).First();
+            CreatePlayerCorridor(bossC, nearest);
+        }
+    }
+
+
+    void PlacePortal()
+    {
+        // 프리팹 없거나 방이 없으면 종료
+        if (portalPrefab == null || rooms == null || rooms.Count == 0) return;
+
+        // 플레이어 방 기준 중심
         Vector2Int playerCenter = new Vector2Int(
             Mathf.RoundToInt(playerRoom.center.x),
             Mathf.RoundToInt(playerRoom.center.y)
         );
 
-        if (centers.Count > 0)
-        {
-            Vector2Int nearestRoomCenter = centers
-                .OrderBy(c => Vector2Int.Distance(c, playerCenter))
-                .First();
-
-            // 통로 시작점: 플레이어 방 위쪽 중앙
-            Vector2Int corridorStart = new Vector2Int(
-                (playerRoom.xMin + playerRoom.xMax) / 2,
-                playerRoom.yMax
-            );
-
-            // 플레이어 방 벽 뚫기 (최소 corridorWidth 적용)
-            int offset = Mathf.Max(corridorWidth / 2, 1);
-            for (int w = -offset; w <= offset; w++)
+        // 플레이어 방과 겹치지 않는 방 중 가장 먼 방 고르기
+        RectInt farthestRoom = rooms
+            .Where(r => !r.Overlaps(playerRoom))
+            .OrderByDescending(r =>
             {
-                int x = corridorStart.x + w;
-                int y = corridorStart.y;
-                if (x >= playerRoom.xMin && x < playerRoom.xMax && y < height)
-                {
-                    map[x, y] = 0;
-                    map[x, y - 1] = 0; // 입구 폭 확보
-                }
-            }
+                var c = new Vector2Int(Mathf.RoundToInt(r.center.x), Mathf.RoundToInt(r.center.y));
+                return Vector2Int.Distance(playerCenter, c);
+            })
+            .FirstOrDefault();
 
-            // 플레이어 방 → 가장 가까운 방 통로 생성
-            CreatePlayerCorridor(corridorStart, nearestRoomCenter);
-        }
+        if (farthestRoom.width == 0 || farthestRoom.height == 0) return;
 
-        // 맵 생성 완료 이벤트 호출
-        OnMapGenerated?.Invoke();
+        // 포탈 위치 (방 중심)
+        Vector3 portalPos = new Vector3(farthestRoom.center.x, portalYOffset, farthestRoom.center.y);
+
+        // 생성 및 부모 설정(리로드 시 함께 정리되도록)
+        GameObject portal = Instantiate(portalPrefab, portalPos, Quaternion.identity, transform);
+
+        // 콜라이더 보장 + isTrigger 설정
+        Collider col = portal.GetComponent<Collider>();
+        if (col == null) col = portal.AddComponent<BoxCollider>();
+        col.isTrigger = true;
+
+        // 트리거 스크립트 보장 + 타겟 제너레이터 전달
+        PortalTrigger trigger = portal.GetComponent<PortalTrigger>();
+        if (trigger == null) trigger = portal.AddComponent<PortalTrigger>();
+        trigger.Setup(this); // 이 제너레이터의 ReloadMap을 사용
     }
+
 
     // BSP 분할 함수
     void SplitRoom(RectInt space, int depth, List<RectInt> rooms)
@@ -280,29 +517,68 @@ public class TileMapGenerator : MonoBehaviour
     // 맵 렌더링: 벽/바닥 프리팹 생성
     //void RenderMap()
     //{
+    //    float floorSize = 10f; // 바닥 프리팹 크기 (10×10)
+
     //    for (int x = 0; x < width; x++)
+    //    {
     //        for (int y = 0; y < height; y++)
     //        {
-    //            GameObject prefab = (map[x, y] == 1) ? wallPrefab : floorPrefab;
-    //            Instantiate(prefab, new Vector3(x, 0, y), Quaternion.identity, transform);
+    //            // === 바닥 생성 (10칸마다 한 번만) ===
+    //            if (x % (int)floorSize == 0 && y % (int)floorSize == 0)
+    //            {
+    //                Vector3 floorPos = new Vector3(x + 5, 0, y + 5);
+    //                Instantiate(floorPrefab, floorPos, Quaternion.identity, transform);
+    //            }
+
+    //            // === 벽 생성 (1×1 단위) ===
+    //            if (map[x, y] == 1)
+    //            {
+    //                float wallHeight = wallPrefab.transform.localScale.y;
+    //                Vector3 wallPos = new Vector3(x, wallHeight / 5f, y);
+    //                Instantiate(wallPrefab, wallPos, Quaternion.identity, transform);
+    //            }
     //        }
+    //    }
     //}
+
     void RenderMap()
     {
-        float floorSize = 10f; // 바닥 프리팹 크기 (10×10)
+        float floorSize = 10f;
 
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                // === 바닥 생성 (10칸마다 한 번만) ===
+                // 바닥(10×10) 타일 배치
                 if (x % (int)floorSize == 0 && y % (int)floorSize == 0)
                 {
                     Vector3 floorPos = new Vector3(x + 5, 0, y + 5);
-                    Instantiate(floorPrefab, floorPos, Quaternion.identity, transform);
+                    var floor = Instantiate(floorPrefab, floorPos, Quaternion.identity, transform);
+
+                    if (enableFloorAnimation)
+                    {
+                        var anim = floor.GetComponent<FloorMaterialAnimator>();
+                        if (anim == null) anim = floor.AddComponent<FloorMaterialAnimator>();
+
+                        // 인스펙터 세팅 반영
+                        anim.fps = floorFps;
+                        anim.randomStartFrame = floorRandomStart;
+                        anim.autoLoadFromResources = floorAutoLoadFromResources;
+                        anim.resourcesFolder = floorResourcesFolder;
+                        anim.namePrefix = floorNamePrefix;
+                        anim.texturePropertyName = floorTexturePropertyName;
+
+                        // 리소스 자동로드를 사용하지 않을 경우, 인스펙터 배열 사용
+                        if (!floorAutoLoadFromResources)
+                        {
+                            anim.sprites = floorFrames; // ★ 여기! frames → sprites 로 맞춤
+                            if ((anim.sprites == null || anim.sprites.Length == 0))
+                                Debug.LogWarning("[TileMapGenerator] enableFloorAnimation=true 인데 floorFrames가 비어있습니다.");
+                        }
+                    }
                 }
 
-                // === 벽 생성 (1×1 단위) ===
+                // 벽(1×1) 배치
                 if (map[x, y] == 1)
                 {
                     float wallHeight = wallPrefab.transform.localScale.y;
@@ -312,10 +588,6 @@ public class TileMapGenerator : MonoBehaviour
             }
         }
     }
-
-
-
-
 
     // 지정 좌표가 바닥인지 확인
     public bool IsFloor(int x, int y)
@@ -327,14 +599,18 @@ public class TileMapGenerator : MonoBehaviour
     // 일반 방 리스트 반환
     public List<RectInt> GetRooms()
     {
-        return rooms.Where(r => r != playerRoom).ToList();
+        // 보스방이 있을 때만 제외
+        if (HasBossRoom)
+            return rooms.Where(r => r != playerRoom && !r.Overlaps(bossRoom)).ToList();
+        else
+            return rooms.Where(r => r != playerRoom).ToList();
     }
 
+    public RectInt GetBossRoom() => bossRoom;
+
+
     // 플레이어 방 반환
-    public RectInt GetPlayerRoom()
-    {
-        return playerRoom;
-    }
+    public RectInt GetPlayerRoom() => playerRoom;
 
     // 맵 재생성
     public void ReloadMap()

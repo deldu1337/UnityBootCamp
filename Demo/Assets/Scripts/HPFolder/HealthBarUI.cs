@@ -31,4 +31,14 @@ public class HealthBarUI : MonoBehaviour
         float maxHp = hasHP.MaxHP > 0 ? hasHP.MaxHP : 1f;
         barImage.fillAmount = hasHP.CurrentHP / maxHp;
     }
+
+    public void SetTarget(MonoBehaviour newSource)
+    {
+        hpSource = newSource;
+        hasHP = hpSource as IHealth;
+    }
+    public void SetTargetIHealth(IHealth newTarget)
+    {
+        hasHP = newTarget;
+    }
 }

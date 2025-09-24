@@ -3,12 +3,54 @@
     {
       "id": "slime",
       "name": "슬라임",
-      "hp": 50,
+      "hp": 35,
       "atk": 5,
       "def": 0,
       "dex": 5,
       "As": 1,
-      "exp": 5
+      "exp": 5,
+      "unlockStage": 1,
+      "isBoss": false,
+      "weight": 1.0
+    },
+    {
+      "id": "infested slime",
+      "name": "감염된 슬라임",
+      "hp": 50,
+      "atk": 8,
+      "def": 0,
+      "dex": 5,
+      "As": 1,
+      "exp": 8,
+      "unlockStage": 2,
+      "isBoss": false,
+      "weight": 1.0
+    },
+    {
+      "id": "slime king",
+      "name": "킹 슬라임",
+      "hp": 75,
+      "atk": 12,
+      "def": 0,
+      "dex": 5,
+      "As": 1,
+      "exp": 15,
+      "unlockStage": 3,
+      "isBoss": false,
+      "weight": 1.0
+    },
+    {
+      "id": "infested slime king",
+      "name": "감염된 킹 슬라임",
+      "hp": 300,
+      "atk": 20,
+      "def": 0,
+      "dex": 5,
+      "As": 1,
+      "exp": 100,
+      "unlockStage": 5,
+      "isBoss": true,
+      "weight": 1.0
     }
   ]
 }

@@ -213,6 +213,29 @@ public class EquipmentPresenter : MonoBehaviour
         instance.transform.SetAsLastSibling();
         instance.transform.localPosition = GetSlotOffset(slotType);
         instance.transform.localRotation = Quaternion.identity;
+
+        // ── 여기부터 추가: 장비로 붙을 땐 줍기/툴팁/물리 비활성화 ──
+        // 1) 장착 마커 부착
+        if (instance.GetComponent<EquippedMarker>() == null)
+            instance.AddComponent<EquippedMarker>();
+
+        // 2) 근접 줍기/툴팁 스크립트 제거
+        foreach (var pickup in instance.GetComponentsInChildren<ItemPickup>(true))
+            Destroy(pickup);
+
+        // (혹시 붙어있을 수 있는) 월드 툴팁 트리거류도 제거하고 싶다면:
+        foreach (var hover in instance.GetComponentsInChildren<ItemHoverTooltip>(true))
+            Destroy(hover);
+
+        // 3) 물리 충돌/중력 제거 (캐릭터 본에 붙었을 땐 불필요)
+        foreach (var col in instance.GetComponentsInChildren<Collider>(true))
+            col.enabled = false;
+        foreach (var rb in instance.GetComponentsInChildren<Rigidbody>(true))
+            Destroy(rb);
+
+        // 4) (선택) 레이어 분리해서 다른 시스템에서 무시되게
+        // int equipLayer = LayerMask.NameToLayer("UICharacter");
+        // if (equipLayer != -1) SetLayerRecursively(instance, equipLayer);
     }
 
     /// <summary>장비 프리팹 캐릭터 본에서 제거</summary>

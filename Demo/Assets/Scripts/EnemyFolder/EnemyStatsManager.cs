@@ -2,6 +2,43 @@ using UnityEngine;
 
 public class EnemyStatsManager : MonoBehaviour, IHealth
 {
+    //[Header("적 ID (enemyData.json의 id와 일치)")]
+    //public string enemyId;
+
+    //public EnemyData Data { get; private set; }
+    //public float CurrentHP { get; private set; }
+    //public float MaxHP => Data.hp;
+
+    //private ItemDropManager dropManager;
+
+    //void Awake()
+    //{
+    //    dropManager = GetComponent<ItemDropManager>();
+    //    LoadEnemyData();
+    //}
+
+    //private void LoadEnemyData()
+    //{
+    //    TextAsset json = Resources.Load<TextAsset>("Datas/enemyData");
+    //    if (json == null)
+    //    {
+    //        Debug.LogError("Resources/Datas/enemyData.json 파일이 필요합니다!");
+    //        return;
+    //    }
+
+    //    EnemyDatabase db = JsonUtility.FromJson<EnemyDatabase>(json.text);
+    //    Data = System.Array.Find(db.enemies, e => e.id == enemyId);
+
+    //    if (Data == null)
+    //    {
+    //        Debug.LogError($"enemyId '{enemyId}' 데이터를 찾을 수 없습니다!");
+    //        return;
+    //    }
+
+    //    CurrentHP = Data.hp;
+    //    Debug.Log($"{Data.name} 데이터 로드 완료. HP: {CurrentHP}, ATK: {Data.atk}");
+    //}
+
     [Header("적 ID (enemyData.json의 id와 일치)")]
     public string enemyId;
 
@@ -20,23 +57,13 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
     private void LoadEnemyData()
     {
         TextAsset json = Resources.Load<TextAsset>("Datas/enemyData");
-        if (json == null)
-        {
-            Debug.LogError("Resources/Datas/enemyData.json 파일이 필요합니다!");
-            return;
-        }
+        if (json == null) { Debug.LogError("Resources/Datas/enemyData.json 필요!"); return; }
 
         EnemyDatabase db = JsonUtility.FromJson<EnemyDatabase>(json.text);
         Data = System.Array.Find(db.enemies, e => e.id == enemyId);
-
-        if (Data == null)
-        {
-            Debug.LogError($"enemyId '{enemyId}' 데이터를 찾을 수 없습니다!");
-            return;
-        }
+        if (Data == null) { Debug.LogError($"enemyId '{enemyId}' 데이터가 없습니다!"); return; }
 
         CurrentHP = Data.hp;
-        Debug.Log($"{Data.name} 데이터 로드 완료. HP: {CurrentHP}, ATK: {Data.atk}");
     }
 
     public void TakeDamage(float damage)
@@ -49,21 +76,6 @@ public class EnemyStatsManager : MonoBehaviour, IHealth
             Die();
     }
 
-    //private void Die()
-    //{
-    //    Debug.Log($"{Data.name} 사망!");
-
-    //    // EXP 지급
-    //    var player = FindAnyObjectByType<PlayerStatsManager>();
-    //    if (player != null)
-    //    {
-    //        player.GainExp(Data.exp);
-    //        Debug.Log($"플레이어가 {Data.exp} EXP를 획득!");
-    //    }
-
-    //    dropManager?.DropItems();
-    //    Destroy(gameObject);
-    //}
     private void Die()
     {
         Debug.Log($"{Data.name} 사망!");

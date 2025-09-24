@@ -161,7 +161,6 @@ public class ChargeSkill : ISkill
         // 목표 보정 관련 플래그/임계값
         bool lockFinalApproach = false;          // 마지막 구간에서는 desired 고정
         const float lockDistance = 0.35f;        // 이 거리 이내로 들어오면 desired 고정
-        const float arriveEpsilon = 0.08f;       // 도착 판단 임계값(조금 여유)
         const float snapEpsilon = 0.12f;       // 충분히 가깝다면 바로 스냅
 
         Face(self, target.transform.position);
