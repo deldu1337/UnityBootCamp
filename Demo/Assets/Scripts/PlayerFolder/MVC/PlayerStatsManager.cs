@@ -10,9 +10,14 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     // 전역 브로드캐스트 이벤트
     public static event Action OnPlayerDied;
     public static event Action OnPlayerDeathAnimFinished;
+    public static event Action OnPlayerRevived;              
+
+    [Header("Death/Revive Options")]
+    public bool pauseEditorOnDeath = false;
 
     // 죽음 1회 처리 가드
     private bool isDead = false;
+    public bool IsDead => isDead;
 
     public PlayerData Data { get; private set; }
     private ILevelUpStrategy levelUpStrategy;
@@ -154,7 +159,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     {
         isDead = true;
 
-        // ★ 전역 알림: 모든 적이 즉시 반응 가능
+        // 전역 알림: 모든 적이 즉시 반응 가능
         try { OnPlayerDied?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
 
         // 이동/공격 등 플레이어 컨트롤러가 있다면 비활성화(선택)
@@ -163,7 +168,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         var attacks = GetComponent<PlayerAttacks>();
         if (attacks) attacks.enabled = false;
 
-        // ★ 죽음 애니메이션 재생 후 에디터 일시정지
+        // 죽음 애니메이션 재생 후 에디터 일시정지
         StartCoroutine(PlayDeathAndPauseEditor());
     }
 
@@ -199,9 +204,39 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         try { OnPlayerDeathAnimFinished?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
 
         // 에디터에서만 일시정지
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPaused = true;
-#endif
+//#if UNITY_EDITOR
+//        UnityEditor.EditorApplication.isPaused = true;
+//#endif
+    }
+
+    /// <summary>사망 지점에서 부활: HP/MP 풀, EXP=0, 컨트롤 재활성</summary>
+    public void ReviveAt(Vector3 worldPos, Quaternion worldRot)
+    {
+        if (!isDead) return;
+
+        // 수치 회복
+        Data.CurrentHP = Data.MaxHP;
+        Data.CurrentMP = Data.MaxMP;
+        Data.Exp = 0f;                       // ★ EXP 초기화
+        SaveLoadService.SavePlayerData(Data);
+        UpdateUI();
+
+        // 위치/자세 복구
+        transform.SetPositionAndRotation(worldPos, worldRot);
+
+        // 컴포넌트 활성화
+        var move = GetComponent<PlayerMove>(); if (move) move.enabled = true;
+        var attacks = GetComponent<PlayerAttacks>(); if (attacks) attacks.enabled = true;
+
+        // 기본 대기 애니 재생(선택)
+        var anim = GetComponent<Animation>();
+        if (anim && anim.GetClip("Stand (ID 0 variation 0)"))
+            anim.CrossFade("Stand (ID 0 variation 0)", 0.15f);
+
+        isDead = false;
+
+        // 전역 알림
+        try { OnPlayerRevived?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
     }
 
     public void Heal(float amount)
