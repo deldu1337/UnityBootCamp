@@ -86,7 +86,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         float baseHP = 100f + (Data.Level - 1) * 10f; // 레벨당 10씩 증가 (레벨업 로직과 맞춤)
         float baseMP = 50f;                           // 레벨업으로 MP가 변하는 로직이 있으면 수정
         float baseAtk = 5f + (Data.Level - 1) * 2f;   // 레벨당 2씩 증가
-        float baseDef = 5f + (Data.Level - 1) * 0.5f;   // 레벨당 1씩 증가
+        float baseDef = 0f + (Data.Level - 1) * 0.5f;   // 레벨당 1씩 증가
         float baseDex = 10f;                          // 기본값 그대로
         float baseAS = 2f;                            // 기본값 그대로
         float baseCC = 0.1f;

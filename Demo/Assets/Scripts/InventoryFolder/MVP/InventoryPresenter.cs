@@ -69,6 +69,20 @@ public class InventoryPresenter : MonoBehaviour
         Refresh();
     }
 
+    // 반환값으로 '실제 제거 성공' 여부를 알 수 있게 변경
+    public bool RemoveItemFromInventory(string uniqueId)
+    {
+        if (model == null) model = new InventoryModel(); // 안전망
+
+        var before = model.GetItemById(uniqueId) != null;
+        model.RemoveById(uniqueId);
+        var after = model.GetItemById(uniqueId) != null;
+
+        // 인벤 UI는 닫혀 있어도 강제로 한번 갱신(보이는 상태라면 즉시 반영)
+        ForceRefresh();
+
+        return before && !after;
+    }
 
     public void ForceRefresh() => view?.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
 
@@ -118,7 +132,13 @@ public class InventoryPresenter : MonoBehaviour
         Refresh();
     }
 
-    public void RemoveItemFromInventory(string uniqueId) => model.RemoveById(uniqueId);
+    public InventoryItem GetItemByUniqueId(string uniqueId)
+    {
+        // model.GetItemById는 이미 있으니, 그대로 래핑해도 됩니다.
+        return model.GetItemById(uniqueId);
+    }
+
+    //public void RemoveItemFromInventory(string uniqueId) => model.RemoveById(uniqueId);
 
     public void Refresh()
     {

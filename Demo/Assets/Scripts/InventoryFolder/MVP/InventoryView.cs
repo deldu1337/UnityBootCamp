@@ -29,6 +29,13 @@ public class InventoryView : MonoBehaviour
         Action<string> onItemEquipped
     )
     {
+        // UpdateInventoryUI 시작 부분
+        foreach (Transform child in buttonContainer)
+        {
+            if (child && (child.name == "Placeholder"))
+                GameObject.Destroy(child.gameObject);
+        }
+
         foreach (var btn in inventoryButtons)
             btn.gameObject.SetActive(false);
 
