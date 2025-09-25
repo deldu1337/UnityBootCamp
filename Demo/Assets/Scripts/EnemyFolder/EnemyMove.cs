@@ -43,6 +43,25 @@ public class EnemyMove : MonoBehaviour
         playerLayerMask = 1 << LayerMask.NameToLayer("Player");
     }
 
+    private void OnEnable()
+    {
+        PlayerStatsManager.OnPlayerDied += HandlePlayerDied;
+    }
+
+    private void OnDisable()
+    {
+        PlayerStatsManager.OnPlayerDied -= HandlePlayerDied;
+    }
+
+    private void HandlePlayerDied()
+    {
+        // 플레이어가 죽는 즉시 타겟 해제 → 다음 FixedUpdate부터 스폰 복귀
+        TargetPlayer = null;
+
+        // 이동 애니/상태를 즉시 전환하고 싶다면(선택)
+        // Run/Stand는 MoveTowardsTarget가 처리하므로 여기서는 생략 가능
+    }
+
     /// <summary>적 스폰 위치 설정</summary>
     public void SetSpawnPosition(Vector3 position) => spawnPosition = position;
 
@@ -61,6 +80,12 @@ public class EnemyMove : MonoBehaviour
 
         foreach (var hit in hits)
         {
+            var pStats = hit.GetComponent<PlayerStatsManager>();
+            if (pStats == null) continue;
+
+            // 죽은 플레이어는 무시
+            if (pStats.CurrentHP <= 0f) continue;
+
             Vector3 playerPos = hit.transform.position;
 
             // 같은 방 플레이어 제외

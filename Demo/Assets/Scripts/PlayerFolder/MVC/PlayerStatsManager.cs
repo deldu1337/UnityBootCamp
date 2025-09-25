@@ -1,10 +1,18 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerStatsManager : MonoBehaviour, IHealth
 {
     public static PlayerStatsManager Instance { get; private set; }   // ← 추가
+
+    // 전역 브로드캐스트 이벤트
+    public static event Action OnPlayerDied;
+    public static event Action OnPlayerDeathAnimFinished;
+
+    // 죽음 1회 처리 가드
+    private bool isDead = false;
 
     public PlayerData Data { get; private set; }
     private ILevelUpStrategy levelUpStrategy;
@@ -86,7 +94,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         float baseHP = 100f + (Data.Level - 1) * 10f; // 레벨당 10씩 증가 (레벨업 로직과 맞춤)
         float baseMP = 50f;                           // 레벨업으로 MP가 변하는 로직이 있으면 수정
         float baseAtk = 5f + (Data.Level - 1) * 2f;   // 레벨당 2씩 증가
-        float baseDef = 0f + (Data.Level - 1) * 0.5f;   // 레벨당 1씩 증가
+        float baseDef = 2f + (Data.Level - 1) * 0.5f;   // 레벨당 1씩 증가
         float baseDex = 10f;                          // 기본값 그대로
         float baseAS = 2f;                            // 기본값 그대로
         float baseCC = 0.1f;
@@ -129,17 +137,76 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 
     public void TakeDamage(float damage)
     {
+        if (isDead) return; // 이미 죽은 뒤엔 무시
+
         float finalDamage = Mathf.Max(damage - Data.Def, 1f);
         Data.CurrentHP = Mathf.Max(Data.CurrentHP - finalDamage, 0);
         SaveLoadService.SavePlayerData(Data);
         UpdateUI();
 
-        if (Data.CurrentHP <= 0)
-            Debug.Log("Player Died!");
+        if (Data.CurrentHP <= 0 && !isDead)
+        {
+            HandleDeath();
+        }
+    }
+
+    private void HandleDeath()
+    {
+        isDead = true;
+
+        // ★ 전역 알림: 모든 적이 즉시 반응 가능
+        try { OnPlayerDied?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
+
+        // 이동/공격 등 플레이어 컨트롤러가 있다면 비활성화(선택)
+        var move = GetComponent<PlayerMove>();
+        if (move) move.enabled = false;
+        var attacks = GetComponent<PlayerAttacks>();
+        if (attacks) attacks.enabled = false;
+
+        // ★ 죽음 애니메이션 재생 후 에디터 일시정지
+        StartCoroutine(PlayDeathAndPauseEditor());
+    }
+
+    private IEnumerator PlayDeathAndPauseEditor()
+    {
+        string deathAnim = "Death (ID 1 variation 0)";
+        float duration = 0.7f; // 기본값(클립이 없을 때 대비)
+
+        var anim = GetComponent<Animation>();
+        if (anim && anim.GetClip(deathAnim))
+        {
+            var st = anim[deathAnim];
+            st.wrapMode = WrapMode.Once;
+            st.speed = 1f;
+            anim.Stop();
+            anim.Play(deathAnim);
+            duration = st.length;
+        }
+        else
+        {
+            Debug.LogWarning($"[PlayerStatsManager] Death clip '{deathAnim}'을 찾지 못했습니다. 기본 대기시간({duration}s) 후 일시정지합니다.");
+        }
+
+        // 애니메이션이 끝날 때까지 대기
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // 애니 끝난 뒤 알림
+        try { OnPlayerDeathAnimFinished?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
+
+        // 에디터에서만 일시정지
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPaused = true;
+#endif
     }
 
     public void Heal(float amount)
     {
+        if (isDead) return; // 죽은 뒤엔 힐 무시 (원한다면 부활 로직 따로)
         Data.CurrentHP = Mathf.Min(Data.CurrentHP + amount, Data.MaxHP);
         SaveLoadService.SavePlayerData(Data);
         UpdateUI();

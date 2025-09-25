@@ -29,6 +29,35 @@ public class EnemyAttack : MonoBehaviour
         if (!anim) Debug.LogWarning($"{name}: Animation 컴포넌트가 없습니다!");
     }
 
+    private void OnEnable()
+    {
+        PlayerStatsManager.OnPlayerDied += InterruptAttackOnPlayerDeath;
+    }
+
+    private void OnDisable()
+    {
+        PlayerStatsManager.OnPlayerDied -= InterruptAttackOnPlayerDeath;
+    }
+
+    private void InterruptAttackOnPlayerDeath()
+    {
+        // 공격 중이면 즉시 중단
+        if (attackRoutine != null)
+        {
+            StopCoroutine(attackRoutine);
+            attackRoutine = null;
+        }
+
+        // 공격 애니 중이면 멈춤
+        if (anim && anim.IsPlaying("AttackUnarmed (ID 16 variation 0)"))
+            anim.Stop();
+
+        isAttacking = false;
+
+        // 다음 공격 딜레이 초기화 (즉시 재개하지 않도록 약간의 쿨을 줄 수도 있음)
+        lastAttackTime = Time.time;
+    }
+
     private void Update()
     {
         UpdateTarget();

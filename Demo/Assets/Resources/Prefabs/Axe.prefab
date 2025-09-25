@@ -150,8 +150,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemInfo: 
   id: 1
-  icon: {fileID: 21300000, guid: db8062685f520604a8115d040c8080c0, type: 3}
+  icon: {fileID: 21300000, guid: e48c2841e8932c34f8919626d904a771, type: 3}
   showDistance: 7
+  hideWhenFar: 1
 --- !u!136 &1696571426411959195
 CapsuleCollider:
   m_ObjectHideFlags: 0
