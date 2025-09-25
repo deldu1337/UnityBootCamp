@@ -317,7 +317,7 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
                 // 퀵바로 이관(내부에서 인벤 제거 + 저장)
                 var qb = PotionQuickBar.Instance;
                 if (qb != null)
-                    qb.Assign(potionIndex, Item, s);
+                    qb.Assign(potionIndex-1, Item, s);
 
                 // 여기서 끝 (아래 공통 placeholder 파괴로 내려가지 않게)
                 return;

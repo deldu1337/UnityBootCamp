@@ -1827,6 +1827,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e764d79c47281e3458228d53283dde5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pauseEditorOnDeath: 0
+  poseRoot: {fileID: 2761100263615861165}
 --- !u!114 &6152161177944762235
 MonoBehaviour:
   m_ObjectHideFlags: 0

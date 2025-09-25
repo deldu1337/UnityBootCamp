@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class PlayerStatsManager : MonoBehaviour, IHealth
 {
-    public static PlayerStatsManager Instance { get; private set; }   // ¡ç Ãß°¡
+    public static PlayerStatsManager Instance { get; private set; }   // â† ì¶”ê°€
 
-    // Àü¿ª ºê·ÎµåÄ³½ºÆ® ÀÌº¥Æ®
+    // ì „ì—­ ë¸Œë¡œë“œìºìŠ¤íŠ¸ ì´ë²¤íŠ¸
     public static event Action OnPlayerDied;
     public static event Action OnPlayerDeathAnimFinished;
     public static event Action OnPlayerRevived;              
@@ -15,9 +15,15 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     [Header("Death/Revive Options")]
     public bool pauseEditorOnDeath = false;
 
-    // Á×À½ 1È¸ Ã³¸® °¡µå
+    [Header("Pose Root (ëª¨ë¸ ë£¨íŠ¸)")]
+    [Tooltip("í”Œë ˆì´ì–´ ë©”ì‹œì— í•´ë‹¹í•˜ëŠ” ëª¨ë¸ ë£¨íŠ¸ë¥¼ ì§€ì •(ë¹„ìš°ë©´ ì´ ì˜¤ë¸Œì íŠ¸ ìì²´ë¥¼ ì‚¬ìš©)")]
+    [SerializeField] private Transform poseRoot;
+
+    // ì£½ìŒ 1íšŒ ì²˜ë¦¬ ê°€ë“œ
     private bool isDead = false;
     public bool IsDead => isDead;
+
+    private PlayerSkeletonSnapshot lastAliveSnapshot;
 
     public PlayerData Data { get; private set; }
     private ILevelUpStrategy levelUpStrategy;
@@ -32,16 +38,16 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 
     void Awake()
     {
-        // --- ½Ì±ÛÅæ º¸Àå: »õ·Î ½ºÆùµÈ ÇÃ·¹ÀÌ¾î°¡ Ç×»ó ÃÖ½Å Instance°¡ µÇµµ·Ï ---
+        // --- ì‹±ê¸€í†¤ ë³´ì¥: ìƒˆë¡œ ìŠ¤í°ëœ í”Œë ˆì´ì–´ê°€ í•­ìƒ ìµœì‹  Instanceê°€ ë˜ë„ë¡ ---
         if (Instance != null && Instance != this)
         {
-            Destroy(Instance.gameObject); // ÀÌÀü ÇÃ·¹ÀÌ¾î Á¦°Å
+            Destroy(Instance.gameObject); // ì´ì „ í”Œë ˆì´ì–´ ì œê±°
         }
         Instance = this;
 
         levelUpStrategy = new DefaultLevelUpStrategy();
 
-        // ÀúÀå ·Îµå
+        // ì €ì¥ ë¡œë“œ
         PlayerData loaded = SaveLoadService.LoadPlayerDataOrNull();
         LoadData(loaded);
     }
@@ -56,16 +62,16 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         Debug.Log(Data.Level);
     }
 
-    /// <summary>ÀúÀåµÈ µ¥ÀÌÅÍ ºÒ·¯¿À±â</summary>
+    /// <summary>ì €ì¥ëœ ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸°</summary>
     public void LoadData(PlayerData loaded)
     {
         if (loaded != null)
         {
-            Data = loaded; // ÀúÀåµÈ µ¥ÀÌÅÍ »ç¿ë
+            Data = loaded; // ì €ì¥ëœ ë°ì´í„° ì‚¬ìš©
         }
         else
         {
-            // jsonÀÌ ¾øÀ¸¸é ±âº»°ª ¼¼ÆÃ
+            // jsonì´ ì—†ìœ¼ë©´ ê¸°ë³¸ê°’ ì„¸íŒ…
             Data = new PlayerData
             {
                 Level = 1,
@@ -87,25 +93,25 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         UpdateUI();
     }
 
-    /// <summary>Àåºñ ±â¹İÀ¸·Î MaxHP¸¸ °è»ê</summary>
+    /// <summary>ì¥ë¹„ ê¸°ë°˜ìœ¼ë¡œ MaxHPë§Œ ê³„ì‚°</summary>
     public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
     {
         float prevHP = Data.CurrentHP;
         float prevMP = Data.CurrentMP;
 
-        // ±âº»°ª(·¹º§¾÷ ¹İ¿µµÈ °ª)À¸·Î ÃÊ±âÈ­
-        // ÀúÀåµÈ JSON¿¡¼­ ºÒ·¯¿Â °ªÀÌ ÀÌ¹Ì ·¹º§¾÷±îÁö ¹İ¿µµÈ °ªÀÌ¹Ç·Î,
-        // "±âº»°ª"Àº PlayerDataÀÇ MaxHP, MaxMP, Atk, Def µîÀ» º¹»çÇØ¼­ »ç¿ë
-        float baseHP = 100f + (Data.Level - 1) * 10f; // ·¹º§´ç 10¾¿ Áõ°¡ (·¹º§¾÷ ·ÎÁ÷°ú ¸ÂÃã)
-        float baseMP = 50f;                           // ·¹º§¾÷À¸·Î MP°¡ º¯ÇÏ´Â ·ÎÁ÷ÀÌ ÀÖÀ¸¸é ¼öÁ¤
-        float baseAtk = 5f + (Data.Level - 1) * 2f;   // ·¹º§´ç 2¾¿ Áõ°¡
-        float baseDef = 2f + (Data.Level - 1) * 0.5f;   // ·¹º§´ç 1¾¿ Áõ°¡
-        float baseDex = 10f;                          // ±âº»°ª ±×´ë·Î
-        float baseAS = 2f;                            // ±âº»°ª ±×´ë·Î
+        // ê¸°ë³¸ê°’(ë ˆë²¨ì—… ë°˜ì˜ëœ ê°’)ìœ¼ë¡œ ì´ˆê¸°í™”
+        // ì €ì¥ëœ JSONì—ì„œ ë¶ˆëŸ¬ì˜¨ ê°’ì´ ì´ë¯¸ ë ˆë²¨ì—…ê¹Œì§€ ë°˜ì˜ëœ ê°’ì´ë¯€ë¡œ,
+        // "ê¸°ë³¸ê°’"ì€ PlayerDataì˜ MaxHP, MaxMP, Atk, Def ë“±ì„ ë³µì‚¬í•´ì„œ ì‚¬ìš©
+        float baseHP = 100f + (Data.Level - 1) * 10f; // ë ˆë²¨ë‹¹ 10ì”© ì¦ê°€ (ë ˆë²¨ì—… ë¡œì§ê³¼ ë§ì¶¤)
+        float baseMP = 50f;                           // ë ˆë²¨ì—…ìœ¼ë¡œ MPê°€ ë³€í•˜ëŠ” ë¡œì§ì´ ìˆìœ¼ë©´ ìˆ˜ì •
+        float baseAtk = 5f + (Data.Level - 1) * 2f;   // ë ˆë²¨ë‹¹ 2ì”© ì¦ê°€
+        float baseDef = 2f + (Data.Level - 1) * 0.5f;   // ë ˆë²¨ë‹¹ 1ì”© ì¦ê°€
+        float baseDex = 10f;                          // ê¸°ë³¸ê°’ ê·¸ëŒ€ë¡œ
+        float baseAS = 2f;                            // ê¸°ë³¸ê°’ ê·¸ëŒ€ë¡œ
         float baseCC = 0.1f;
         float baseCD = 1.5f;
 
-        // Àåºñ ½ºÅÈ ÇÕ»ê
+        // ì¥ë¹„ ìŠ¤íƒ¯ í•©ì‚°
         float equipHP = 0f, equipMP = 0f, equipAtk = 0f, equipDef = 0f, equipDex = 0f;
         float equipAS = 0f, equipCC = 0f, equipCD = 0f;
 
@@ -126,7 +132,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
             }
         }
 
-        // ÃÖÁ¾ ½ºÅÈ = ±âº»°ª + Àåºñ°ª
+        // ìµœì¢… ìŠ¤íƒ¯ = ê¸°ë³¸ê°’ + ì¥ë¹„ê°’
         Data.MaxHP = baseHP + equipHP;
         Data.MaxMP = baseMP + equipMP;
         Data.Atk = baseAtk + equipAtk;
@@ -142,7 +148,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 
     public void TakeDamage(float damage)
     {
-        if (isDead) return; // ÀÌ¹Ì Á×Àº µÚ¿£ ¹«½Ã
+        if (isDead) return; // ì´ë¯¸ ì£½ì€ ë’¤ì—” ë¬´ì‹œ
 
         float finalDamage = Mathf.Max(damage - Data.Def, 1f);
         Data.CurrentHP = Mathf.Max(Data.CurrentHP - finalDamage, 0);
@@ -151,6 +157,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 
         if (Data.CurrentHP <= 0 && !isDead)
         {
+            lastAliveSnapshot = PlayerSkeletonSnapshot.Capture(poseRoot, includeRootLocalTransform: false);
             HandleDeath();
         }
     }
@@ -159,23 +166,23 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     {
         isDead = true;
 
-        // Àü¿ª ¾Ë¸²: ¸ğµç ÀûÀÌ Áï½Ã ¹İÀÀ °¡´É
+        // ì „ì—­ ì•Œë¦¼: ëª¨ë“  ì ì´ ì¦‰ì‹œ ë°˜ì‘ ê°€ëŠ¥
         try { OnPlayerDied?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
 
-        // ÀÌµ¿/°ø°İ µî ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯°¡ ÀÖ´Ù¸é ºñÈ°¼ºÈ­(¼±ÅÃ)
+        // ì´ë™/ê³µê²© ë“± í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ëŸ¬ê°€ ìˆë‹¤ë©´ ë¹„í™œì„±í™”(ì„ íƒ)
         var move = GetComponent<PlayerMove>();
         if (move) move.enabled = false;
         var attacks = GetComponent<PlayerAttacks>();
         if (attacks) attacks.enabled = false;
 
-        // Á×À½ ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı ÈÄ ¿¡µğÅÍ ÀÏ½ÃÁ¤Áö
+        // ì£½ìŒ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ í›„ ì—ë””í„° ì¼ì‹œì •ì§€
         StartCoroutine(PlayDeathAndPauseEditor());
     }
 
     private IEnumerator PlayDeathAndPauseEditor()
     {
         string deathAnim = "Death (ID 1 variation 0)";
-        float duration = 0.7f; // ±âº»°ª(Å¬¸³ÀÌ ¾øÀ» ¶§ ´ëºñ)
+        float duration = 0.7f; // ê¸°ë³¸ê°’(í´ë¦½ì´ ì—†ì„ ë•Œ ëŒ€ë¹„)
 
         var anim = GetComponent<Animation>();
         if (anim && anim.GetClip(deathAnim))
@@ -189,10 +196,10 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         }
         else
         {
-            Debug.LogWarning($"[PlayerStatsManager] Death clip '{deathAnim}'À» Ã£Áö ¸øÇß½À´Ï´Ù. ±âº» ´ë±â½Ã°£({duration}s) ÈÄ ÀÏ½ÃÁ¤ÁöÇÕ´Ï´Ù.");
+            Debug.LogWarning($"[PlayerStatsManager] Death clip '{deathAnim}'ì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤. ê¸°ë³¸ ëŒ€ê¸°ì‹œê°„({duration}s) í›„ ì¼ì‹œì •ì§€í•©ë‹ˆë‹¤.");
         }
 
-        // ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ³¡³¯ ¶§±îÁö ´ë±â
+        // ì• ë‹ˆë©”ì´ì…˜ì´ ëë‚  ë•Œê¹Œì§€ ëŒ€ê¸°
         float t = 0f;
         while (t < duration)
         {
@@ -200,48 +207,103 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
             yield return null;
         }
 
-        // ¾Ö´Ï ³¡³­ µÚ ¾Ë¸²
+        // ì• ë‹ˆ ëë‚œ ë’¤ ì•Œë¦¼
         try { OnPlayerDeathAnimFinished?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
 
-        // ¿¡µğÅÍ¿¡¼­¸¸ ÀÏ½ÃÁ¤Áö
+        // ì—ë””í„°ì—ì„œë§Œ ì¼ì‹œì •ì§€
 //#if UNITY_EDITOR
 //        UnityEditor.EditorApplication.isPaused = true;
 //#endif
     }
 
-    /// <summary>»ç¸Á ÁöÁ¡¿¡¼­ ºÎÈ°: HP/MP Ç®, EXP=0, ÄÁÆ®·Ñ ÀçÈ°¼º</summary>
-    public void ReviveAt(Vector3 worldPos, Quaternion worldRot)
+    /// <summary>ì‚¬ë§ ì§€ì ì—ì„œ ë¶€í™œ: HP/MP í’€, EXP=0, ì»¨íŠ¸ë¡¤ ì¬í™œì„±</summary>
+    //public void ReviveAt(Vector3 worldPos, Quaternion worldRot)
+    //{
+    //    if (!isDead) return;
+
+    //    // ìˆ˜ì¹˜ íšŒë³µ
+    //    Data.CurrentHP = Data.MaxHP;
+    //    Data.CurrentMP = Data.MaxMP;
+    //    Data.Exp = 0f;                       // â˜… EXP ì´ˆê¸°í™”
+    //    SaveLoadService.SavePlayerData(Data);
+    //    UpdateUI();
+
+    //    // ìœ„ì¹˜/ìì„¸ ë³µêµ¬
+    //    transform.SetPositionAndRotation(worldPos, worldRot);
+
+    //    // ì»´í¬ë„ŒíŠ¸ í™œì„±í™”
+    //    var move = GetComponent<PlayerMove>(); if (move) move.enabled = true;
+    //    var attacks = GetComponent<PlayerAttacks>(); if (attacks) attacks.enabled = true;
+
+    //    // ê¸°ë³¸ ëŒ€ê¸° ì• ë‹ˆ ì¬ìƒ(ì„ íƒ)
+    //    var anim = GetComponent<Animation>();
+    //    if (anim && anim.GetClip("Stand (ID 0 variation 0)"))
+    //        anim.CrossFade("Stand (ID 0 variation 0)", 0.15f);
+
+    //    isDead = false;
+
+    //    // ì „ì—­ ì•Œë¦¼
+    //    try { OnPlayerRevived?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
+    //}
+    /// <summary>
+    /// ë¶€í™œ: revivePos/Rot ìœ„ì¹˜ì—ì„œ, ì£½ê¸° ì§ì „ ìŠ¤ëƒ…ìƒ· í¬ì¦ˆë¥¼ ë³µì›í•œ ë’¤ HP/MP í’€, EXP 0.
+    /// </summary>
+    public void ReviveAt(Vector3 reviveWorldPos, Quaternion reviveWorldRot)
     {
         if (!isDead) return;
 
-        // ¼öÄ¡ È¸º¹
+        // 0) ìœ„ì¹˜/ìì„¸ ë¨¼ì € ì„¤ì •
+        transform.SetPositionAndRotation(reviveWorldPos, reviveWorldRot);
+
+        // 1) ë¬¼ë¦¬ ì´ˆê¸°í™”
+        var rb = GetComponent<Rigidbody>();
+        if (rb) { rb.velocity = Vector3.zero; rb.angularVelocity = Vector3.zero; }
+
+        // 2) (ì¤‘ìš”) ì£½ê¸° ì§ì „ í¬ì¦ˆ ìŠ¤ëƒ…ìƒ·ì„ ë¡œì»¬ ë‹¨ìœ„ë¡œ ë³µì›
+        if (lastAliveSnapshot != null)
+        {
+            // í˜„ì¬ reviveWorldPos/Rot ì„ ìœ ì§€í•˜ë©´ì„œ, í¬ì¦ˆë§Œ ìŠ¤ëƒ…ìƒ·ìœ¼ë¡œ
+            lastAliveSnapshot.Apply(poseRoot, transform.position, transform.rotation);
+        }
+
+        // 3) ì• ë‹ˆë©”ì´ì…˜ ì´ˆê¸°í™” (ì”ìƒ ë°©ì§€)
+        var anim = GetComponent<Animation>();
+        if (anim)
+        {
+            anim.Stop();
+            string idle = "Stand (ID 0 variation 0)";
+            if (anim.GetClip(idle))
+            {
+                var st = anim[idle];
+                st.wrapMode = WrapMode.Loop;
+                st.time = 0f;
+                anim.Play(idle); // ìƒíƒœ ê°±ì‹ 
+                anim.Sample();   // ì¦‰ì‹œ 0í”„ë ˆì„ ì ìš©
+            }
+        }
+
+        // 4) ìˆ˜ì¹˜ íšŒë³µ
         Data.CurrentHP = Data.MaxHP;
         Data.CurrentMP = Data.MaxMP;
-        Data.Exp = 0f;                       // ¡Ú EXP ÃÊ±âÈ­
+        Data.Exp = 0f;
         SaveLoadService.SavePlayerData(Data);
         UpdateUI();
 
-        // À§Ä¡/ÀÚ¼¼ º¹±¸
-        transform.SetPositionAndRotation(worldPos, worldRot);
-
-        // ÄÄÆ÷³ÍÆ® È°¼ºÈ­
+        // 5) ì»¨íŠ¸ë¡¤ ì¬í™œì„±
         var move = GetComponent<PlayerMove>(); if (move) move.enabled = true;
         var attacks = GetComponent<PlayerAttacks>(); if (attacks) attacks.enabled = true;
 
-        // ±âº» ´ë±â ¾Ö´Ï Àç»ı(¼±ÅÃ)
-        var anim = GetComponent<Animation>();
-        if (anim && anim.GetClip("Stand (ID 0 variation 0)"))
-            anim.CrossFade("Stand (ID 0 variation 0)", 0.15f);
-
         isDead = false;
 
-        // Àü¿ª ¾Ë¸²
+        // 6) ìŠ¤ëƒ…ìƒ·ì€ 1íšŒì„±ìœ¼ë¡œ ì‚¬ìš©í–ˆìœ¼ë‹ˆ í•„ìš”í•˜ë©´ íŒŒê¸°(ì›í•œë‹¤ë©´ ìœ ì§€ ê°€ëŠ¥)
+        lastAliveSnapshot = null;
+
         try { OnPlayerRevived?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
     }
 
     public void Heal(float amount)
     {
-        if (isDead) return; // Á×Àº µÚ¿£ Èú ¹«½Ã (¿øÇÑ´Ù¸é ºÎÈ° ·ÎÁ÷ µû·Î)
+        if (isDead) return; // ì£½ì€ ë’¤ì—” í ë¬´ì‹œ (ì›í•œë‹¤ë©´ ë¶€í™œ ë¡œì§ ë”°ë¡œ)
         Data.CurrentHP = Mathf.Min(Data.CurrentHP + amount, Data.MaxHP);
         SaveLoadService.SavePlayerData(Data);
         UpdateUI();
@@ -266,12 +328,12 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public void GainExp(float amount)
     {
         Data.Exp += amount;
-        Debug.Log($"ÇöÀç EXP: {Data.Exp}/{Data.ExpToNextLevel}");
+        Debug.Log($"í˜„ì¬ EXP: {Data.Exp}/{Data.ExpToNextLevel}");
 
-        // ·¹º§¾÷ ·çÇÁ
+        // ë ˆë²¨ì—… ë£¨í”„
         while (Data.Exp >= Data.ExpToNextLevel)
         {
-            Data.Exp -= Data.ExpToNextLevel; // ¿©ºĞ EXP À¯Áö
+            Data.Exp -= Data.ExpToNextLevel; // ì—¬ë¶„ EXP ìœ ì§€
             LevelUp();
         }
 
@@ -282,28 +344,28 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     private void LevelUp()
     {
         Data.Level++;
-        // ·¹º§¾÷ ½Ã ÇÊ¿äÇÑ EXP Áõ°¡ (¿øÇÏ¸é °î¼± Áõ°¡ °¡´É)
+        // ë ˆë²¨ì—… ì‹œ í•„ìš”í•œ EXP ì¦ê°€ (ì›í•˜ë©´ ê³¡ì„  ì¦ê°€ ê°€ëŠ¥)
         Data.ExpToNextLevel = Mathf.Round(Data.ExpToNextLevel * 1.2f);
 
-        // ·¹º§¾÷ º¸³Ê½º (¿øÇÏ´Â´ë·Î Ä¿½ºÅÒ °¡´É)
+        // ë ˆë²¨ì—… ë³´ë„ˆìŠ¤ (ì›í•˜ëŠ”ëŒ€ë¡œ ì»¤ìŠ¤í…€ ê°€ëŠ¥)
         Data.MaxHP += 10f;
         Data.Atk += 2f;
         Data.Def += 1f;
 
-        Data.CurrentHP = Data.MaxHP; // ·¹º§¾÷ ½Ã Ç®ÇÇ È¸º¹
+        Data.CurrentHP = Data.MaxHP; // ë ˆë²¨ì—… ì‹œ í’€í”¼ íšŒë³µ
         Data.CurrentMP = Data.MaxMP;
-        Debug.Log($"·¹º§¾÷! ÇöÀç ·¹º§ {Data.Level}");
+        Debug.Log($"ë ˆë²¨ì—…! í˜„ì¬ ë ˆë²¨ {Data.Level}");
 
         OnLevelUp?.Invoke(Data.Level);
     }
 
-    public float CalculateDamage() // ±âÁ¸ ±×´ë·Î À¯Áö (È£È¯¿ë)
+    public float CalculateDamage() // ê¸°ì¡´ ê·¸ëŒ€ë¡œ ìœ ì§€ (í˜¸í™˜ìš©)
     {
         bool _;
         return CalculateDamage(out _);
     }
 
-    // Ä¡¸íÅ¸ ¿©ºÎ¸¦ ÇÔ²² ¹İÈ¯ÇÏ´Â ¿À¹ö·Îµå
+    // ì¹˜ëª…íƒ€ ì—¬ë¶€ë¥¼ í•¨ê»˜ ë°˜í™˜í•˜ëŠ” ì˜¤ë²„ë¡œë“œ
     public float CalculateDamage(out bool isCrit)
     {
         float damage = Data.Atk;
@@ -311,7 +373,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         if (isCrit)
         {
             damage *= Data.CritDamage;
-            Debug.Log($"Ä¡¸íÅ¸! {damage} µ¥¹ÌÁö");
+            Debug.Log($"ì¹˜ëª…íƒ€! {damage} ë°ë¯¸ì§€");
         }
         return damage;
     }
