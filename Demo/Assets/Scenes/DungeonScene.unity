@@ -8598,7 +8598,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1869150289}
         m_TargetAssemblyTypeName: TileMapGenerator, Assembly-CSharp
         m_MethodName: ReloadMap
         m_Mode: 1
@@ -15437,6 +15437,14 @@ MonoBehaviour:
     prefab: {fileID: 762957556684666954, guid: 1d7e3cf191650744a8ce2dae869e1ac8, type: 3}
   - id: infested slime king
     prefab: {fileID: 391828327219395841, guid: 9924bf8c38e4e2649bc3caec05f60359, type: 3}
+  - id: lava slime
+    prefab: {fileID: 5940300509202808884, guid: 194f254c597cb2f49af81b44b00e6230, type: 3}
+  - id: infested lava slime
+    prefab: {fileID: 5814643362935144547, guid: ad885003349db3f4ca4e1a9135dcb492, type: 3}
+  - id: lava mass
+    prefab: {fileID: 5076076510919583451, guid: d4de76df2ddd64d42a84ae1b9db51cf6, type: 3}
+  - id: lava worm
+    prefab: {fileID: 275276819645697641, guid: e986e67cb78ff1444935dcd595d74f6b, type: 3}
 --- !u!4 &1827502802
 Transform:
   m_ObjectHideFlags: 0
