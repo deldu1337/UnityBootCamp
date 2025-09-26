@@ -1089,7 +1089,7 @@ PrefabInstance:
       addedObject: {fileID: -6387573848703551399}
     - targetCorrespondingSourceObject: {fileID: 8137506101305030480, guid: ab2bbffba678e8b43be72e38cfd1deed, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7028148192864295461}
+      addedObject: {fileID: 5506486112660864904}
   m_SourcePrefab: {fileID: 2872628339351901350, guid: ab2bbffba678e8b43be72e38cfd1deed, type: 3}
 --- !u!4 &285790520996144283 stripped
 Transform:
@@ -1211,7 +1211,7 @@ MonoBehaviour:
     maxAmount: 1
   dropPoint: {fileID: 285790520996144283}
   dropRadius: 1
---- !u!136 &7028148192864295461
+--- !u!136 &5506486112660864904
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1230,7 +1230,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.5
+  m_Radius: 1
   m_Height: 1
   m_Direction: 1
-  m_Center: {x: 0, y: 1.5, z: -0.5}
+  m_Center: {x: 0, y: 1, z: -0.25}

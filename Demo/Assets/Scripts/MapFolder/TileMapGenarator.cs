@@ -1,9 +1,18 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
+using UnityEngine;
 
 public class TileMapGenerator : MonoBehaviour
 {
+    [System.Serializable]
+    public class StageTheme
+    {
+        public string name;
+        public Material wallMaterial;
+        public Material floorMaterial;
+    }
+
     [SerializeField] private StageManager stageManager;
 
     public int width = 100; // 맵 가로 크기
@@ -19,31 +28,31 @@ public class TileMapGenerator : MonoBehaviour
     public int bossRoomWidth = 28;
     public int bossRoomHeight = 28;
 
-    [Header("Floor Animation")]
-    [Tooltip("floorPrefab에 FloorMaterialAnimator 자동 부착/설정")]
-    public bool enableFloorAnimation = true;
-
-    [Tooltip("애니메이션에 사용할 스프라이트들 (20장 등)")]
-    public Sprite[] floorFrames;
-
-    [Tooltip("초당 프레임 수")]
-    public float floorFps = 8f;
-
-    [Tooltip("각 바닥 타일이 랜덤 프레임에서 시작")]
-    public bool floorRandomStart = true;
-
-    [Tooltip("Resources에서 자동 로드할 경우 사용")]
-    public bool floorAutoLoadFromResources = false;
-    public string floorResourcesFolder = "Textures/Floor";
-    public string floorNamePrefix = "Floor_";
-
-    [Tooltip("URP/Lit이면 _BaseMap, Built-in Standard면 _MainTex")]
-    public string floorTexturePropertyName = "_BaseMap";
-
     private RectInt bossRoom;  // 보스 전용 방
     private int[,] map; // 2D 맵 데이터: 0=바닥, 1=벽
     private List<RectInt> rooms; // 일반 방 리스트
     private RectInt playerRoom;  // 플레이어 전용 방
+
+    [Header("Stage Themes")]
+    public int stagesPerTheme = 5;      // 예: 1~5, 6~10 ...
+    public StageTheme[] themes;         // 인스펙터에서 a/b/c... 테마 등록
+    public bool useBossOverrideTheme = true;
+    public StageTheme bossOverrideTheme; // 보스 스테이지 테마(선택)
+
+    // 현재 테마 반환
+    private StageTheme GetActiveTheme()
+    {
+        // 보스 스테이지면 우선 보스 테마 사용(있으면)
+        if (useBossOverrideTheme && stageManager != null && stageManager.IsBossStage() && bossOverrideTheme != null)
+            return bossOverrideTheme;
+
+        if (themes == null || themes.Length == 0) return null;
+
+        int stage = (stageManager != null) ? stageManager.currentStage : 1;
+        int idx = Mathf.FloorToInt((stage - 1) / Mathf.Max(1, stagesPerTheme));
+        idx = Mathf.Clamp(idx, 0, themes.Length - 1);
+        return themes[idx];
+    }
 
     // 맵 생성 완료 이벤트
     public delegate void MapGeneratedHandler();
@@ -57,123 +66,6 @@ public class TileMapGenerator : MonoBehaviour
         RenderMap();   // 맵 오브젝트 생성
     }
 
-    //public void GenerateMap()
-    //{
-    //    map = new int[width, height];
-    //    rooms = new List<RectInt>();
-
-    //    // 전체 벽으로 초기화
-    //    for (int x = 0; x < width; x++)
-    //        for (int y = 0; y < height; y++)
-    //            map[x, y] = 1;
-
-    //    // BSP로 방 분할
-    //    RectInt root = new RectInt(1, 1, width - 2, height - 2);
-    //    SplitRoom(root, maxDepth, rooms);
-
-    //    // 플레이어 전용 방 생성 (10x10)
-    //    playerRoom = new RectInt(2, 2, 10, 10);
-
-    //    // 플레이어 방 벽 초기화
-    //    for (int x = playerRoom.xMin; x < playerRoom.xMax; x++)
-    //        for (int y = playerRoom.yMin; y < playerRoom.yMax; y++)
-    //            map[x, y] = 1;
-
-    //    // 플레이어 방 내부 바닥 생성 (가장자리 제외)
-    //    for (int x = playerRoom.xMin + 1; x < playerRoom.xMax - 1; x++)
-    //        for (int y = playerRoom.yMin + 1; y < playerRoom.yMax - 1; y++)
-    //            map[x, y] = 0;
-
-    //    // 일반 방 바닥 생성 (플레이어 방 제외)
-    //    foreach (var room in rooms)
-    //    {
-    //        if (!room.Overlaps(playerRoom))
-    //        {
-    //            for (int x = room.xMin; x < room.xMax; x++)
-    //                for (int y = room.yMin; y < room.yMax; y++)
-    //                    map[x, y] = 0;
-    //        }
-    //    }
-
-    //    // 방 중심 좌표 계산
-    //    List<Vector2Int> centers = rooms.Select(r =>
-    //        new Vector2Int(Mathf.RoundToInt(r.center.x), Mathf.RoundToInt(r.center.y))
-    //    ).ToList();
-
-    //    // MST 연결 (Prim 알고리즘) - 방들을 최소 연결 통로로 연결
-    //    List<Vector2Int> connected = new List<Vector2Int>();
-    //    List<Vector2Int> remaining = new List<Vector2Int>(centers);
-    //    if (remaining.Count > 0)
-    //    {
-    //        connected.Add(remaining[0]);
-    //        remaining.RemoveAt(0);
-    //    }
-
-    //    while (remaining.Count > 0)
-    //    {
-    //        float minDist = float.MaxValue;
-    //        Vector2Int a = Vector2Int.zero;
-    //        Vector2Int b = Vector2Int.zero;
-
-    //        // 연결된 방과 남은 방 사이의 최소 거리 방 선택
-    //        foreach (var c in connected)
-    //        {
-    //            foreach (var r in remaining)
-    //            {
-    //                float dist = Vector2Int.Distance(c, r);
-    //                if (dist < minDist)
-    //                {
-    //                    minDist = dist;
-    //                    a = c;
-    //                    b = r;
-    //                }
-    //            }
-    //        }
-
-    //        CreateCorridor(a, b); // 통로 생성
-    //        connected.Add(b);
-    //        remaining.Remove(b);
-    //    }
-
-    //    // 플레이어 방과 가장 가까운 방 연결 (항상 위쪽 방향 우선)
-    //    Vector2Int playerCenter = new Vector2Int(
-    //        Mathf.RoundToInt(playerRoom.center.x),
-    //        Mathf.RoundToInt(playerRoom.center.y)
-    //    );
-
-    //    if (centers.Count > 0)
-    //    {
-    //        Vector2Int nearestRoomCenter = centers
-    //            .OrderBy(c => Vector2Int.Distance(c, playerCenter))
-    //            .First();
-
-    //        // 통로 시작점: 플레이어 방 위쪽 중앙
-    //        Vector2Int corridorStart = new Vector2Int(
-    //            (playerRoom.xMin + playerRoom.xMax) / 2,
-    //            playerRoom.yMax
-    //        );
-
-    //        // 플레이어 방 벽 뚫기 (최소 corridorWidth 적용)
-    //        int offset = Mathf.Max(corridorWidth / 2, 1);
-    //        for (int w = -offset; w <= offset; w++)
-    //        {
-    //            int x = corridorStart.x + w;
-    //            int y = corridorStart.y;
-    //            if (x >= playerRoom.xMin && x < playerRoom.xMax && y < height)
-    //            {
-    //                map[x, y] = 0;
-    //                map[x, y - 1] = 0; // 입구 폭 확보
-    //            }
-    //        }
-
-    //        // 플레이어 방 → 가장 가까운 방 통로 생성
-    //        CreatePlayerCorridor(corridorStart, nearestRoomCenter);
-    //    }
-
-    //    PlacePortal();   // 가장 먼 방에 포탈 생성
-    //    // 맵 생성 완료 이벤트 호출
-    //    OnMapGenerated?.Invoke();
-    //}
     public void GenerateMap()
     {
         map = new int[width, height];
@@ -515,35 +407,10 @@ public class TileMapGenerator : MonoBehaviour
     }
 
     // 맵 렌더링: 벽/바닥 프리팹 생성
-    //void RenderMap()
-    //{
-    //    float floorSize = 10f; // 바닥 프리팹 크기 (10×10)
-
-    //    for (int x = 0; x < width; x++)
-    //    {
-    //        for (int y = 0; y < height; y++)
-    //        {
-    //            // === 바닥 생성 (10칸마다 한 번만) ===
-    //            if (x % (int)floorSize == 0 && y % (int)floorSize == 0)
-    //            {
-    //                Vector3 floorPos = new Vector3(x + 5, 0, y + 5);
-    //                Instantiate(floorPrefab, floorPos, Quaternion.identity, transform);
-    //            }
-
-    //            // === 벽 생성 (1×1 단위) ===
-    //            if (map[x, y] == 1)
-    //            {
-    //                float wallHeight = wallPrefab.transform.localScale.y;
-    //                Vector3 wallPos = new Vector3(x, wallHeight / 5f, y);
-    //                Instantiate(wallPrefab, wallPos, Quaternion.identity, transform);
-    //            }
-    //        }
-    //    }
-    //}
-
     void RenderMap()
     {
         float floorSize = 10f;
+        var theme = GetActiveTheme(); // 현재 테마
 
         for (int x = 0; x < width; x++)
         {
@@ -555,26 +422,11 @@ public class TileMapGenerator : MonoBehaviour
                     Vector3 floorPos = new Vector3(x + 5, 0, y + 5);
                     var floor = Instantiate(floorPrefab, floorPos, Quaternion.identity, transform);
 
-                    if (enableFloorAnimation)
+                    // 테마 바닥 머터리얼 적용
+                    if (theme != null && theme.floorMaterial != null)
                     {
-                        var anim = floor.GetComponent<FloorMaterialAnimator>();
-                        if (anim == null) anim = floor.AddComponent<FloorMaterialAnimator>();
-
-                        // 인스펙터 세팅 반영
-                        anim.fps = floorFps;
-                        anim.randomStartFrame = floorRandomStart;
-                        anim.autoLoadFromResources = floorAutoLoadFromResources;
-                        anim.resourcesFolder = floorResourcesFolder;
-                        anim.namePrefix = floorNamePrefix;
-                        anim.texturePropertyName = floorTexturePropertyName;
-
-                        // 리소스 자동로드를 사용하지 않을 경우, 인스펙터 배열 사용
-                        if (!floorAutoLoadFromResources)
-                        {
-                            anim.sprites = floorFrames; // ★ 여기! frames → sprites 로 맞춤
-                            if ((anim.sprites == null || anim.sprites.Length == 0))
-                                Debug.LogWarning("[TileMapGenerator] enableFloorAnimation=true 인데 floorFrames가 비어있습니다.");
-                        }
+                        var rend = floor.GetComponentInChildren<Renderer>();
+                        if (rend != null) rend.sharedMaterial = theme.floorMaterial;
                     }
                 }
 
@@ -583,7 +435,14 @@ public class TileMapGenerator : MonoBehaviour
                 {
                     float wallHeight = wallPrefab.transform.localScale.y;
                     Vector3 wallPos = new Vector3(x, wallHeight / 5f, y);
-                    Instantiate(wallPrefab, wallPos, Quaternion.identity, transform);
+                    var wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, transform);
+
+                    // 테마 벽 머터리얼 적용
+                    if (theme != null && theme.wallMaterial != null)
+                    {
+                        var rend = wall.GetComponentInChildren<Renderer>();
+                        if (rend != null) rend.sharedMaterial = theme.wallMaterial;
+                    }
                 }
             }
         }

@@ -1533,7 +1533,7 @@ PrefabInstance:
       addedObject: {fileID: 6328195307722416645}
     - targetCorrespondingSourceObject: {fileID: 5471587485182568065, guid: b3df990fe313328448650bc5dda610ca, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2070944687941192414}
+      addedObject: {fileID: 8974466605757631353}
   m_SourcePrefab: {fileID: 6382970104451570410, guid: b3df990fe313328448650bc5dda610ca, type: 3}
 --- !u!1 &3684642728859710217 stripped
 GameObject:
@@ -1654,7 +1654,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyId: infested slime
---- !u!136 &2070944687941192414
+--- !u!136 &8974466605757631353
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1673,10 +1673,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.5
+  m_Radius: 1
   m_Height: 1
   m_Direction: 1
-  m_Center: {x: 0, y: 1.5, z: -0.5}
+  m_Center: {x: 0, y: 1, z: -0.25}
 --- !u!4 &4803082293499739681 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5013780460985504855, guid: b3df990fe313328448650bc5dda610ca, type: 3}

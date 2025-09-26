@@ -2346,7 +2346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f30ad1ad05468f346916e698ef7bb53c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapGen: {fileID: 1080398098}
+  mapGen: {fileID: 1869150289}
   stageText: {fileID: 2023974196}
   currentStage: 1
   bossEvery: 5
@@ -8598,7 +8598,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1080398098}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TileMapGenerator, Assembly-CSharp
         m_MethodName: ReloadMap
         m_Mode: 1
@@ -9304,17 +9304,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079858624}
   m_CullTransparentMesh: 1
---- !u!114 &1080398098 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
-  m_PrefabInstance: {fileID: 6124660793284404608}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1869150285}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb11d08f9586ae478cbcd0971ee9d0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1098998927
 GameObject:
   m_ObjectHideFlags: 0
@@ -12964,7 +12953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 6914515128741021224, guid: 64ce4e95d3d6c2b46b21d429bfe33ec2, type: 3}
-  mapGenerator: {fileID: 1080398098}
+  mapGenerator: {fileID: 1869150289}
 --- !u!4 &1531966325
 Transform:
   m_ObjectHideFlags: 0
@@ -15430,7 +15419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bossWatcher: {fileID: 0}
-  mapGenerator: {fileID: 1080398098}
+  mapGenerator: {fileID: 1869150289}
   stageManager: {fileID: 241816476}
   spawnFactor: 70
   bossCount: 1
@@ -15710,6 +15699,17 @@ MonoBehaviour:
     m_Bits: 256
   transparency: 0.3
   checkRadius: 0.5
+--- !u!114 &1869150289 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+  m_PrefabInstance: {fileID: 6124660793284404608}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869150285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fb11d08f9586ae478cbcd0971ee9d0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1874267609
 GameObject:
   m_ObjectHideFlags: 0
@@ -17124,6 +17124,7 @@ GameObject:
   - component: {fileID: 2023974195}
   - component: {fileID: 2023974197}
   - component: {fileID: 2023974196}
+  - component: {fileID: 2023974198}
   m_Layer: 5
   m_Name: StageText
   m_TagString: Untagged
@@ -17192,6 +17193,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2023974194}
   m_CullTransparentMesh: 1
+--- !u!114 &2023974198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2023974194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &2024063043
 GameObject:
   m_ObjectHideFlags: 0
@@ -17828,16 +17844,52 @@ PrefabInstance:
       objectReference: {fileID: 241816476}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: floorNamePrefix
-      value: slime.
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: floorRandomStart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: useBossOverrideTheme
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: floorTexturePropertyName
       value: _MainTex
       objectReference: {fileID: 0}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.data[0].name
+      value: "\uC2AC\uB77C\uC784"
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.data[1].name
+      value: "\uC6A9\uC554"
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: floorAutoLoadFromResources
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.data[0].wallMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: d67448e918b222c4c88c780b40e465ff, type: 2}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.data[1].wallMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: f4377c386e5a5a74e8ce5f5d2c3444dc, type: 2}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.data[0].floorMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: b9f3aab38e451d64ca7a8f2fed7052b0, type: 2}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: themes.Array.data[1].floorMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: c72fa61dd6356c84098b3052d273c9e7, type: 2}
     - target: {fileID: 2835545463417149021, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

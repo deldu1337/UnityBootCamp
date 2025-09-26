@@ -1735,6 +1735,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseRotationSpeed: 10
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  clickRayDistance: 200
 --- !u!114 &1016322298301940480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1815,6 +1822,7 @@ MonoBehaviour:
   animationComponent: {fileID: 0}
   isAttacking: 0
   isCastingSkill: 0
+  mover: {fileID: 0}
 --- !u!114 &5760696339463234485
 MonoBehaviour:
   m_ObjectHideFlags: 0

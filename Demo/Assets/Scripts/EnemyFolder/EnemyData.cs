@@ -14,6 +14,8 @@ public class EnemyData
     public int unlockStage = 1;
     public bool isBoss = false;
     public float weight = 1f;
+    public int minStage;
+    public int maxStage;
 }
 
 [Serializable]

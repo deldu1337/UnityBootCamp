@@ -25,6 +25,16 @@ public class TitleManager : MonoBehaviour
 
     private void Start()
     {
+        // 유저 데이터 로드
+        UserDataManager.Instance.LoadUserData();
+
+        // 저장된 유저 데이터가 없으면 기본값으로 세팅 후 저장
+        if (UserDataManager.Instance.ExistsSaveData == false)
+        {
+            UserDataManager.Instance.SetDefaultUserData();
+            UserDataManager.Instance.SaveUserData();
+        }
+
         StartCoroutine(LoadGameCoroutine());
     }
 
@@ -48,14 +58,14 @@ public class TitleManager : MonoBehaviour
         _asyncOperation.allowSceneActivation = false; // 0.1~0.9 -> 씬이동을 자동으로 함, 그걸 막기 위한거
 
 
-        //_loadingSlider.value = 0.5f;
-        _loadingProgressText.text = ((int)(_loadingSlider.value * 100)).ToString();
+        _loadingSlider.value = 0.0f;
+        _loadingProgressText.text = $"{((int)(_loadingSlider.value * 100))}%";
         yield return new WaitForSeconds(0.5f);
 
         while (_asyncOperation.isDone == false)
         {
-            _loadingSlider.value = _asyncOperation.progress;
-            _loadingProgressText.text = ((int)(_loadingSlider.value * 100)).ToString();
+            _loadingSlider.value = _asyncOperation.progress; // 0.9 가 끝
+            _loadingProgressText.text = $"{((int)(_loadingSlider.value * 100))}%";
             
             // 씬 로딩이 완료 되었다면 코루틴 끄고 이동하기
             if (_asyncOperation.progress >= 0.9f)

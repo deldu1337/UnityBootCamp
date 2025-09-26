@@ -59,8 +59,8 @@ MonoBehaviour:
       - rid: 7418401125784879106
       - rid: 7418401125784879107
       - rid: 7418401125784879108
-      - rid: 7540247907117301760
-      - rid: 7540247907117301761
+      - rid: 7540247925446410240
+      - rid: 7540247925446410241
     m_RuntimeSettings:
       m_List: []
   m_AssetVersion: 8
@@ -352,12 +352,12 @@ MonoBehaviour:
       type: {class: UniversalRenderPipelineEditorAssets, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         m_DefaultSettingsVolumeProfile: {fileID: 11400000, guid: eda47df5b85f4f249abf7abd73db2cb2, type: 2}
-    - rid: 7540247907117301760
+    - rid: 7540247925446410240
       type: {class: LightmapSamplingSettings, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_Version: 1
         m_UseBicubicLightmapSampling: 0
-    - rid: 7540247907117301761
+    - rid: 7540247925446410241
       type: {class: VrsRenderPipelineRuntimeResources, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
       data:
         m_TextureComputeShader: {fileID: 7200000, guid: cacb30de6c40c7444bbc78cb0a81fd2a, type: 3}

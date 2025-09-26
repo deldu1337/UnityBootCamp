@@ -1057,7 +1057,7 @@ PrefabInstance:
       addedObject: {fileID: -6803410616345863862}
     - targetCorrespondingSourceObject: {fileID: 8648282591161290658, guid: 365367c79119f5e48b46d5baa904606a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5984494705609764356}
+      addedObject: {fileID: 8639948793358147906}
   m_SourcePrefab: {fileID: -5294974793089485462, guid: 365367c79119f5e48b46d5baa904606a, type: 3}
 --- !u!1 &762957556684666954 stripped
 GameObject:
@@ -1182,7 +1182,7 @@ MonoBehaviour:
     maxAmount: 1
   dropPoint: {fileID: 3078931525066992741}
   dropRadius: 1
---- !u!136 &5984494705609764356
+--- !u!136 &8639948793358147906
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1201,10 +1201,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.75
-  m_Height: 1
+  m_Radius: 1
+  m_Height: 1.5
   m_Direction: 1
-  m_Center: {x: 0, y: 1.75, z: -0.5}
+  m_Center: {x: 0, y: 1, z: -0.25}
 --- !u!4 &3078931525066992741 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6352539486808710029, guid: 365367c79119f5e48b46d5baa904606a, type: 3}

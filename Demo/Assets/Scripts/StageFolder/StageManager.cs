@@ -11,6 +11,8 @@ public class StageManager : MonoBehaviour
     public int currentStage = 1;
     public int bossEvery = 5;
 
+    private Color _defaultStageColor = Color.white;
+
     void Start()
     {
         UpdateStageUI();
@@ -27,6 +29,10 @@ public class StageManager : MonoBehaviour
 
     public void UpdateStageUI()
     {
-        if (stageText) stageText.text = $"Stage {currentStage}";
+        if (!stageText) return;
+
+        stageText.text = $"Stage {currentStage}";
+        // 보스면 빨간색, 아니면 기본색으로 복구
+        stageText.color = IsBossStage() ? Color.red : _defaultStageColor;
     }
 }

@@ -11,7 +11,9 @@
       "exp": 5,
       "unlockStage": 1,
       "isBoss": false,
-      "weight": 1.0
+      "weight": 1.0,
+      "minStage": 1,
+      "maxStage": 2
     },
     {
       "id": "infested slime",
@@ -24,7 +26,9 @@
       "exp": 8,
       "unlockStage": 2,
       "isBoss": false,
-      "weight": 1.0
+      "weight": 1.0,
+      "minStage": 2,
+      "maxStage": 4
     },
     {
       "id": "slime king",
@@ -37,7 +41,9 @@
       "exp": 15,
       "unlockStage": 3,
       "isBoss": false,
-      "weight": 1.0
+      "weight": 1.0,
+      "minStage": 3,
+      "maxStage": 4
     },
     {
       "id": "infested slime king",
@@ -50,7 +56,9 @@
       "exp": 100,
       "unlockStage": 5,
       "isBoss": true,
-      "weight": 1.0
+      "weight": 1.0,
+      "minStage": 5,
+      "maxStage": 5
     }
   ]
 }

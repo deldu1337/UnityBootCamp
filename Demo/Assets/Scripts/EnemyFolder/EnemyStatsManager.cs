@@ -2,43 +2,6 @@ using UnityEngine;
 
 public class EnemyStatsManager : MonoBehaviour, IHealth
 {
-    //[Header("적 ID (enemyData.json의 id와 일치)")]
-    //public string enemyId;
-
-    //public EnemyData Data { get; private set; }
-    //public float CurrentHP { get; private set; }
-    //public float MaxHP => Data.hp;
-
-    //private ItemDropManager dropManager;
-
-    //void Awake()
-    //{
-    //    dropManager = GetComponent<ItemDropManager>();
-    //    LoadEnemyData();
-    //}
-
-    //private void LoadEnemyData()
-    //{
-    //    TextAsset json = Resources.Load<TextAsset>("Datas/enemyData");
-    //    if (json == null)
-    //    {
-    //        Debug.LogError("Resources/Datas/enemyData.json 파일이 필요합니다!");
-    //        return;
-    //    }
-
-    //    EnemyDatabase db = JsonUtility.FromJson<EnemyDatabase>(json.text);
-    //    Data = System.Array.Find(db.enemies, e => e.id == enemyId);
-
-    //    if (Data == null)
-    //    {
-    //        Debug.LogError($"enemyId '{enemyId}' 데이터를 찾을 수 없습니다!");
-    //        return;
-    //    }
-
-    //    CurrentHP = Data.hp;
-    //    Debug.Log($"{Data.name} 데이터 로드 완료. HP: {CurrentHP}, ATK: {Data.atk}");
-    //}
-
     [Header("적 ID (enemyData.json의 id와 일치)")]
     public string enemyId;
 

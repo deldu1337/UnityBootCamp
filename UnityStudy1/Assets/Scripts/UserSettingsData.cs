@@ -2,13 +2,8 @@ using UnityEngine;
 
 public class UserSettingsData : MonoBehaviour
 {
-    void Start()
+    public bool LoadData()
     {
-        
-    }
 
-    void Update()
-    {
-        
     }
 }
