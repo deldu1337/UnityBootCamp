@@ -68,6 +68,9 @@ public class InventoryView : MonoBehaviour
             var hover = button.GetComponent<ItemHoverTooltip>();
             if (hover == null) hover = button.gameObject.AddComponent<ItemHoverTooltip>();
             hover.SetItem(item);
+
+            var CanvasGroup = button.GetComponent<CanvasGroup>();
+            CanvasGroup.blocksRaycasts = true;
         }
     }
 }

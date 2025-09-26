@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
 public enum ItemOrigin
 {
@@ -29,6 +28,7 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
     private CanvasGroup canvasGroup;
     private Transform originalParent;
     private int originalIndex;
+    private InventoryPresenter inventoryPresenter;
 
     private GameObject placeholder; // 맨 마지막에 둘 placeholder
 
@@ -37,6 +37,7 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = gameObject.AddComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
+        if (!inventoryPresenter) inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
     }
 
     public void Initialize(
@@ -317,7 +318,11 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
                 // 퀵바로 이관(내부에서 인벤 제거 + 저장)
                 var qb = PotionQuickBar.Instance;
                 if (qb != null)
-                    qb.Assign(potionIndex-1, Item, s);
+                {
+                    qb.Assign(potionIndex - 1, Item, s);
+                }
+
+                inventoryPresenter.Refresh();
 
                 // 여기서 끝 (아래 공통 placeholder 파괴로 내려가지 않게)
                 return;
@@ -365,7 +370,6 @@ public class DraggableItemView : MonoBehaviour, IPointerClickHandler, IBeginDrag
             Destroy(placeholder);
             placeholder = null;
         }
-
     }
 }
 

@@ -257,7 +257,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 
         // 1) 물리 초기화
         var rb = GetComponent<Rigidbody>();
-        if (rb) { rb.velocity = Vector3.zero; rb.angularVelocity = Vector3.zero; }
+        if (rb) { rb.linearVelocity = Vector3.zero; rb.angularVelocity = Vector3.zero; }
 
         // 2) (중요) 죽기 직전 포즈 스냅샷을 로컬 단위로 복원
         if (lastAliveSnapshot != null)

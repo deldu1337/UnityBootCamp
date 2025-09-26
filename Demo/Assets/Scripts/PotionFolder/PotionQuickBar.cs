@@ -16,6 +16,7 @@ public class PotionQuickBar : MonoBehaviour
 
     [SerializeField] private InventoryPresenter inventoryPresenter; // 인스펙터로 연결 권장
     private PlayerStatsManager stats;
+    private DraggableItemView draggableItemView;
 
     // 슬롯별 캐시
     private string[] slotUID = new string[4];
@@ -25,6 +26,8 @@ public class PotionQuickBar : MonoBehaviour
 
     private float[] cachedHP = new float[4];
     private float[] cachedMP = new float[4];
+
+    private static int checkCount = 1; // Assign 이중 호출 이슈 해결 변수
 
     // 이벤트(선택): 슬롯 구성 변경 때 바깥에서 후킹하고 싶으면
     public event System.Action OnChanged;
@@ -36,6 +39,7 @@ public class PotionQuickBar : MonoBehaviour
         AutoWireByHierarchy();
         if (!inventoryPresenter) inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
         stats = PlayerStatsManager.Instance ?? FindAnyObjectByType<PlayerStatsManager>();
+        draggableItemView = FindAnyObjectByType<DraggableItemView>();
 
         for (int i = 0; i < slots.Length; i++)
             slots[i]?.Clear();
@@ -55,6 +59,12 @@ public class PotionQuickBar : MonoBehaviour
 
     public void Assign(int index, InventoryItem item, Sprite icon)
     {
+        // 인벤토리 -> 퀵 슬롯 시 Assign 이중 호출 되는 이슈 해결
+        if (checkCount % 2 == 0)
+        {
+            checkCount++;
+            return;
+        }
         if (!ValidIndex(index) || item == null || item.data == null) return;
         if (!string.Equals(item.data.type, "potion", StringComparison.OrdinalIgnoreCase)) return;
 
@@ -78,9 +88,9 @@ public class PotionQuickBar : MonoBehaviour
 
         // 3) 저장
         PotionQuickBarPersistence.Save(ToSaveData());
+
+        checkCount++;
     }
-
-
 
     public void Move(int from, int to)
     {

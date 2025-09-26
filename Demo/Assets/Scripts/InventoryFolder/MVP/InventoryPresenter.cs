@@ -146,6 +146,3 @@ public class InventoryPresenter : MonoBehaviour
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
     }
 }
-
-
-
