@@ -9,7 +9,7 @@ public class StageManager : MonoBehaviour
 
     [Header("Stage")]
     public int currentStage = 1;
-    public int bossEvery = 5;
+    public int bossEvery = 3;
 
     private Color _defaultStageColor = Color.white;
 

@@ -216,35 +216,6 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 //#endif
     }
 
-    /// <summary>사망 지점에서 부활: HP/MP 풀, EXP=0, 컨트롤 재활성</summary>
-    //public void ReviveAt(Vector3 worldPos, Quaternion worldRot)
-    //{
-    //    if (!isDead) return;
-
-    //    // 수치 회복
-    //    Data.CurrentHP = Data.MaxHP;
-    //    Data.CurrentMP = Data.MaxMP;
-    //    Data.Exp = 0f;                       // ★ EXP 초기화
-    //    SaveLoadService.SavePlayerData(Data);
-    //    UpdateUI();
-
-    //    // 위치/자세 복구
-    //    transform.SetPositionAndRotation(worldPos, worldRot);
-
-    //    // 컴포넌트 활성화
-    //    var move = GetComponent<PlayerMove>(); if (move) move.enabled = true;
-    //    var attacks = GetComponent<PlayerAttacks>(); if (attacks) attacks.enabled = true;
-
-    //    // 기본 대기 애니 재생(선택)
-    //    var anim = GetComponent<Animation>();
-    //    if (anim && anim.GetClip("Stand (ID 0 variation 0)"))
-    //        anim.CrossFade("Stand (ID 0 variation 0)", 0.15f);
-
-    //    isDead = false;
-
-    //    // 전역 알림
-    //    try { OnPlayerRevived?.Invoke(); } catch (Exception e) { Debug.LogException(e); }
-    //}
     /// <summary>
     /// 부활: revivePos/Rot 위치에서, 죽기 직전 스냅샷 포즈를 복원한 뒤 HP/MP 풀, EXP 0.
     /// </summary>

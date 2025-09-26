@@ -2349,7 +2349,7 @@ MonoBehaviour:
   mapGen: {fileID: 1869150289}
   stageText: {fileID: 2023974196}
   currentStage: 1
-  bossEvery: 5
+  bossEvery: 3
 --- !u!4 &241816477
 Transform:
   m_ObjectHideFlags: 0
@@ -17850,6 +17850,10 @@ PrefabInstance:
       propertyPath: stageManager
       value: 
       objectReference: {fileID: 241816476}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: stagesPerTheme
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: floorNamePrefix
       value: 

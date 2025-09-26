@@ -462,10 +462,15 @@ public class EnemySpawn : MonoBehaviour
         if (mapGenerator.IsFloor(c.x, c.y)) pos = new Vector3(c.x, spawnY, c.y);
         else if (!TryPickPointInRoom(br, out pos)) pos = new Vector3(br.xMin + br.width / 2f, spawnY, br.yMin + br.height / 2f);
 
+        //var boss = bosses[UnityEngine.Random.Range(0, bosses.Count)];
         var boss = bosses[UnityEngine.Random.Range(0, bosses.Count)];
 
+        // Y축 180도 회전 후 스폰
+        Quaternion bossRot = Quaternion.Euler(0f, 180f, 0f);
+        GameObject go = SpawnById(boss.id, pos, markAsBoss: true, rotation: bossRot);
+
         // 보스 태그 부여
-        GameObject go = SpawnById(boss.id, pos, markAsBoss: true);
+        //GameObject go = SpawnById(boss.id, pos, markAsBoss: true);
         if (go == null) { Debug.LogError("[EnemySpawn] 보스 스폰 실패"); return; }
 
         var esm = go.GetComponent<EnemyStatsManager>();
@@ -476,7 +481,7 @@ public class EnemySpawn : MonoBehaviour
     }
 
     // 반환형 GameObject 권장
-    GameObject SpawnById(string enemyId, Vector3 position, bool markAsBoss = false)
+    GameObject SpawnById(string enemyId, Vector3 position, bool markAsBoss = false, Quaternion? rotation = null)
     {
         if (!prefabMap.TryGetValue(enemyId, out var prefab))
         {
@@ -484,7 +489,8 @@ public class EnemySpawn : MonoBehaviour
             return null;
         }
 
-        var go = Instantiate(prefab, position, Quaternion.identity, transform);
+        Quaternion rot = rotation ?? Quaternion.identity;   // 기본은 회전 없음
+        var go = Instantiate(prefab, position, rot, transform);
 
         var esm = go.GetComponent<EnemyStatsManager>();
         if (esm != null) esm.enemyId = enemyId;
@@ -496,6 +502,7 @@ public class EnemySpawn : MonoBehaviour
 
         return go;
     }
+
 
     bool TryPickPointInRoom(RectInt room, out Vector3 pos)
     {
