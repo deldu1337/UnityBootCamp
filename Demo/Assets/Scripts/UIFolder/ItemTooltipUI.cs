@@ -322,14 +322,24 @@ public class ItemTooltipUI : MonoBehaviour
             if (Mathf.Abs(val) > 0.0001f) sb.AppendLine($"{label}  +{val}");
         }
 
+        void AddCC(string label, float val)
+        {
+            if (Mathf.Abs(val) > 0.0001f) sb.AppendLine($"{label}  +{val*100}%");
+        }
+
+        void AddCD(string label, float val)
+        {
+            if (Mathf.Abs(val) > 0.0001f) sb.AppendLine($"{label}  x{val}");
+        }
+
         Add("HP", d.hp);
         Add("MP", d.mp);
         Add("데미지", d.atk);
         Add("방어력", d.def);
         Add("DEX", d.dex);
         Add("공격 속도", d.As);
-        Add("치명타 확률", d.cc);
-        Add("치명타 피해량", d.cd);
+        AddCC("치명타 확률", d.cc);
+        AddCD("치명타 피해량", d.cd);
 
         if (sb.Length == 0) sb.Append("추가 능력치 없음");
         return sb.ToString();

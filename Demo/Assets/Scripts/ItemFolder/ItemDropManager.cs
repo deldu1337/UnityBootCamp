@@ -51,7 +51,9 @@ public class ItemDropManager : MonoBehaviour
                 offset.y = 0;
                 Vector3 dropPos = basePos + offset;
 
-                GameObject instance = Instantiate(drop.itemPrefab, dropPos, Quaternion.identity, transform.parent);
+                // X축으로 90도 회전
+                Quaternion rot = Quaternion.Euler(90f, 0f, 0f);
+                GameObject instance = Instantiate(drop.itemPrefab, dropPos, rot, transform.parent);
                 Debug.Log($"[{drop.itemPrefab.name}] 생성 완료 at {dropPos}");
             }
         }

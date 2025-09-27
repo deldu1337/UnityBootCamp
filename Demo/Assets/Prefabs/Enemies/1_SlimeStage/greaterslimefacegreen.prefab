@@ -1180,6 +1180,10 @@ MonoBehaviour:
     dropChance: 20
     minAmount: 1
     maxAmount: 1
+  - itemPrefab: {fileID: 7305882949692592322, guid: 3dde4b746bf735746963ce74a299e4a5, type: 3}
+    dropChance: 1
+    minAmount: 1
+    maxAmount: 1
   dropPoint: {fileID: 3078931525066992741}
   dropRadius: 1
 --- !u!136 &8639948793358147906
@@ -1201,10 +1205,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 1.5
   m_Height: 1.5
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: -0.25}
+  m_Center: {x: 0, y: 1.5, z: -0.75}
 --- !u!4 &3078931525066992741 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6352539486808710029, guid: 365367c79119f5e48b46d5baa904606a, type: 3}

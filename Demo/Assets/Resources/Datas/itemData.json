@@ -143,6 +143,22 @@
       "cc": 0,
       "cd": 0,
       "type": "potion"
+    },
+    {
+      "id": 10,
+      "name": "크리 젬",
+      "uniqueName": "CriticalGem",
+      "tier": "Legendary",
+      "level": 1,
+      "hp": 0,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "dex": 0,
+      "As": 0,
+      "cc": 0.4,
+      "cd": 5,
+      "type": "gem"
     }
   ]
 }

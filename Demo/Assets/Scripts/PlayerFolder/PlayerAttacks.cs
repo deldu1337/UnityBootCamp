@@ -1,9 +1,9 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using static DamageTextManager;
 
-// »óÅÂ ÀÎÅÍÆäÀÌ½º
+// ìƒíƒœ ì¸í„°í˜ì´ìŠ¤
 public interface IPlayerStates
 {
     void Enter(PlayerAttacks player);
@@ -11,7 +11,7 @@ public interface IPlayerStates
     void Update(PlayerAttacks player);
 }
 
-// Idle »óÅÂ (´ë±â)
+// Idle ìƒíƒœ (ëŒ€ê¸°)
 public class IdleStates : IPlayerStates
 {
     public void Enter(PlayerAttacks player)
@@ -35,7 +35,7 @@ public class IdleStates : IPlayerStates
     }
 }
 
-// Attacking »óÅÂ
+// Attacking ìƒíƒœ
 public class AttackingStates : IPlayerStates
 {
     public void Enter(PlayerAttacks player)
@@ -47,7 +47,7 @@ public class AttackingStates : IPlayerStates
 
     public void Update(PlayerAttacks player)
     {
-        if (player.isCastingSkill) return; // ½ºÅ³ ½ÃÀü ÁßÀÌ¸é °ø°İ ·ÎÁ÷ Áß´Ü
+        if (player.isCastingSkill) return; // ìŠ¤í‚¬ ì‹œì „ ì¤‘ì´ë©´ ê³µê²© ë¡œì§ ì¤‘ë‹¨
 
         bool targetDead = player.targetEnemy == null || player.targetEnemy.CurrentHP <= 0;
 
@@ -70,18 +70,18 @@ public class AttackingStates : IPlayerStates
             }
         }
 
-        // ¿ìÅ¬¸¯: ´Ù¸¥ ÀûÀ¸·Î ÀüÈ¯ ¶Ç´Â ÇØÁ¦
+        // ìš°í´ë¦­: ë‹¤ë¥¸ ì ìœ¼ë¡œ ì „í™˜ ë˜ëŠ” í•´ì œ
         if (Input.GetMouseButtonDown(1))
         {
             if (player.TryPickEnemyUnderMouse(out var clickedEnemy))
             {
-                // ´Ù¸¥ ÀûÀ» ´­·¶À¸¸é Å¸°Ù ±³Ã¼
+                // ë‹¤ë¥¸ ì ì„ ëˆŒë €ìœ¼ë©´ íƒ€ê²Ÿ êµì²´
                 if (clickedEnemy != player.targetEnemy)
                     player.SetTarget(clickedEnemy);
             }
             else
             {
-                // ÀûÀÌ ¾Æ´Ñ °÷À» ´­·¶´Ù¸é Å¸°Ù ÇØÁ¦
+                // ì ì´ ì•„ë‹Œ ê³³ì„ ëˆŒë €ë‹¤ë©´ íƒ€ê²Ÿ í•´ì œ
                 player.ClearTarget();
                 player.ChangeState(new IdleStates());
             }
@@ -97,14 +97,14 @@ public class AttackingStates : IPlayerStates
 
 }
 
-// PlayerAttack Å¬·¡½º
+// PlayerAttack í´ë˜ìŠ¤
 public class PlayerAttacks : MonoBehaviour
 {
-    [Header("°ø°İ ¼³Á¤")]
+    [Header("ê³µê²© ì„¤ì •")]
     public float raycastYOffset = 1f;
     public LayerMask enemyLayer;
 
-    [Header("ÄğÅ¸ÀÓ")]
+    [Header("ì¿¨íƒ€ì„")]
     [HideInInspector] public float lastAttackTime;
 
     [HideInInspector] public EnemyStatsManager targetEnemy;
@@ -114,20 +114,20 @@ public class PlayerAttacks : MonoBehaviour
     private IPlayerStates currentState;
     private PlayerStatsManager stats;
 
-    [HideInInspector] public bool isAttacking = false; // °ø°İ Áß ¿©ºÎ
+    [HideInInspector] public bool isAttacking = false; // ê³µê²© ì¤‘ ì—¬ë¶€
     [HideInInspector] public bool isCastingSkill = false;
 
     void Awake()
     {
         animationComponent = GetComponent<Animation>();
         //stats = GetComponent<PlayerStatsManager>();
-        stats = PlayerStatsManager.Instance; // ¡ç ½Ì±ÛÅæ
+        stats = PlayerStatsManager.Instance; // â† ì‹±ê¸€í†¤
 
         if (animationComponent == null)
-            Debug.LogError("Animation ÄÄÆ÷³ÍÆ®°¡ Player ÇÁ¸®ÆÕ ¶Ç´Â ÀÚ½Ä¿¡ ¾ø½À´Ï´Ù!");
+            Debug.LogError("Animation ì»´í¬ë„ŒíŠ¸ê°€ Player í”„ë¦¬íŒ¹ ë˜ëŠ” ìì‹ì— ì—†ìŠµë‹ˆë‹¤!");
 
         if (stats == null)
-            Debug.LogError("PlayerCombatStats ÄÄÆ÷³ÍÆ®°¡ Player¿¡ ¾ø½À´Ï´Ù!");
+            Debug.LogError("PlayerCombatStats ì»´í¬ë„ŒíŠ¸ê°€ Playerì— ì—†ìŠµë‹ˆë‹¤!");
     }
 
     void Start()
@@ -184,20 +184,20 @@ public class PlayerAttacks : MonoBehaviour
         return DistanceTo(enemy) <= GetAttackRange();
     }
 
-    // ¸¶¿ì½º ¾Æ·¡ Àû ¼±ÅÃ (±ÙÁ¢ º¸Á¤ Æ÷ÇÔ)
+    // ë§ˆìš°ìŠ¤ ì•„ë˜ ì  ì„ íƒ (ê·¼ì ‘ ë³´ì • í¬í•¨)
     public bool TryPickEnemyUnderMouse(out EnemyStatsManager enemy)
     {
         enemy = null;
 
-        // UI À§¸é ¹«½Ã
+        // UI ìœ„ë©´ ë¬´ì‹œ
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return false;
 
         if (Camera.main == null) return false;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        int mask = enemyLayer; // Enemy ·¹ÀÌ¾î¸¸
+        int mask = enemyLayer; // Enemy ë ˆì´ì–´ë§Œ
 
-        // 1) RaycastAll: °¡Àå °¡±î¿î Enemy È÷Æ® ¼±ÅÃ
+        // 1) RaycastAll: ê°€ì¥ ê°€ê¹Œìš´ Enemy íˆíŠ¸ ì„ íƒ
         RaycastHit[] hits = Physics.RaycastAll(ray, 100f, mask, QueryTriggerInteraction.Collide);
         if (hits.Length > 0)
         {
@@ -213,7 +213,7 @@ public class PlayerAttacks : MonoBehaviour
             }
         }
 
-        // 2) ±ÙÁ¢ º¸Á¤: SphereCast
+        // 2) ê·¼ì ‘ ë³´ì •: SphereCast
         RaycastHit sh;
         if (Physics.SphereCast(ray, 0.3f, out sh, 100f, mask, QueryTriggerInteraction.Collide))
         {
@@ -225,7 +225,7 @@ public class PlayerAttacks : MonoBehaviour
             }
         }
 
-        // 3) ÃÖÈÄ º¸Á¤: ÇÃ·¹ÀÌ¾î ÁÖº¯¿¡¼­ °¡Àå °¡±î¿î Enemy
+        // 3) ìµœí›„ ë³´ì •: í”Œë ˆì´ì–´ ì£¼ë³€ì—ì„œ ê°€ì¥ ê°€ê¹Œìš´ Enemy
         //Collider[] near = Physics.OverlapSphere(transform.position, 1.5f, mask, QueryTriggerInteraction.Collide);
         //float best = float.MaxValue;
         //foreach (var c in near)
@@ -233,7 +233,7 @@ public class PlayerAttacks : MonoBehaviour
         //    var esm = c.GetComponentInParent<EnemyStatsManager>();
         //    if (esm == null || esm.CurrentHP <= 0) continue;
 
-        //    // Äİ¶óÀÌ´õ±îÁöÀÇ ÃÖ´Ü°Å¸® ±âÁØ(°ãÄ§/ÃÊ±ÙÁ¢ º¸Á¤)
+        //    // ì½œë¼ì´ë”ê¹Œì§€ì˜ ìµœë‹¨ê±°ë¦¬ ê¸°ì¤€(ê²¹ì¹¨/ì´ˆê·¼ì ‘ ë³´ì •)
         //    Vector3 origin = transform.position + Vector3.up * 1f;
         //    float d = Vector3.Distance(origin, c.ClosestPoint(origin));
         //    if (d < best)
@@ -245,14 +245,14 @@ public class PlayerAttacks : MonoBehaviour
         return enemy != null;
     }
 
-    // PlayerAttacks.cs ³»ºÎ ±³Ã¼
+    // PlayerAttacks.cs ë‚´ë¶€ êµì²´
     private static readonly Collider[] _overlapCache = new Collider[16];
 
     //public bool TryPickEnemyUnderMouse(out EnemyStatsManager enemy)
     //{
     //    enemy = null;
 
-    //    // 0) UI À§ Å¬¸¯ÀÌ¸é ¹«½Ã
+    //    // 0) UI ìœ„ í´ë¦­ì´ë©´ ë¬´ì‹œ
     //    if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
     //        return false;
 
@@ -262,17 +262,17 @@ public class PlayerAttacks : MonoBehaviour
     //    int mask = enemyLayer;
     //    Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
-    //    // === 1) 1Â÷: ÀÏ¹İ Raycast (°¡Àå ºü¸£°í Á¤È®)
+    //    // === 1) 1ì°¨: ì¼ë°˜ Raycast (ê°€ì¥ ë¹ ë¥´ê³  ì •í™•)
     //    if (Physics.Raycast(ray, out RaycastHit hit, 200f, mask, QueryTriggerInteraction.Collide))
     //    {
     //        var esm = hit.collider.GetComponentInParent<EnemyStatsManager>();
     //        if (esm != null && esm.CurrentHP > 0) { enemy = esm; return true; }
     //    }
 
-    //    // === 2) 2Â÷: ÀûÀÀÇü SphereCast (±ÙÁ¢ÀÏ¼ö·Ï ¹İ°æ Å©°Ô)
+    //    // === 2) 2ì°¨: ì ì‘í˜• SphereCast (ê·¼ì ‘ì¼ìˆ˜ë¡ ë°˜ê²½ í¬ê²Œ)
     //    float distCamToPlayer = Vector3.Distance(cam.transform.position, transform.position);
-    //    float nearFactor = Mathf.Clamp01(1f - (distCamToPlayer - 2f) / 6f); // Ä«¸Ş¶ó-ÇÃ·¹ÀÌ¾î 2~8m »çÀÌ °¡Áß
-    //    float sphereRadius = Mathf.Lerp(0.25f, 0.6f, nearFactor);           // 0.25~0.6 °¡º¯
+    //    float nearFactor = Mathf.Clamp01(1f - (distCamToPlayer - 2f) / 6f); // ì¹´ë©”ë¼-í”Œë ˆì´ì–´ 2~8m ì‚¬ì´ ê°€ì¤‘
+    //    float sphereRadius = Mathf.Lerp(0.25f, 0.6f, nearFactor);           // 0.25~0.6 ê°€ë³€
 
     //    if (Physics.SphereCast(ray, sphereRadius, out hit, 200f, mask, QueryTriggerInteraction.Collide))
     //    {
@@ -280,7 +280,7 @@ public class PlayerAttacks : MonoBehaviour
     //        if (esm != null && esm.CurrentHP > 0) { enemy = esm; return true; }
     //    }
 
-    //    // === 3) 3Â÷: ÇÃ·¹ÀÌ¾î ±âÁ¡ÀÇ Àü¹æ º¸Á¤ Ä³½ºÆ® (ÃÊ±ÙÁ¢ °ãÄ§ ´ëºñ)
+    //    // === 3) 3ì°¨: í”Œë ˆì´ì–´ ê¸°ì ì˜ ì „ë°© ë³´ì • ìºìŠ¤íŠ¸ (ì´ˆê·¼ì ‘ ê²¹ì¹¨ ëŒ€ë¹„)
     //    Vector3 playerOrigin = transform.position + Vector3.up * raycastYOffset;
     //    Vector3 toRay = ray.origin - playerOrigin;
     //    Vector3 dirFromPlayerToRay = Vector3.Project(toRay, ray.direction).normalized;
@@ -293,8 +293,8 @@ public class PlayerAttacks : MonoBehaviour
     //        if (esm != null && esm.CurrentHP > 0) { enemy = esm; return true; }
     //    }
 
-    //    // === 4) 4Â÷: È­¸é»ó Ä¿¼­ ºÎ±ÙÀÇ °ø°£À» ³Ğ°Ô ±Ü±â (¸¶¿ì½º Æ÷ÀÎÅÍ°¡ Àû ±ÙÃ³ÀÎµ¥ Äİ¶óÀÌ´õ ¸ğ¼­¸®ÀÏ ¶§)
-    //    // ·¹ÀÌ¸¦ µû¶ó 1.5m ÁöÁ¡ ±Ù¹æÀ» Áß½ÉÀ¸·Î OverlapSphere
+    //    // === 4) 4ì°¨: í™”ë©´ìƒ ì»¤ì„œ ë¶€ê·¼ì˜ ê³µê°„ì„ ë„“ê²Œ ê¸ê¸° (ë§ˆìš°ìŠ¤ í¬ì¸í„°ê°€ ì  ê·¼ì²˜ì¸ë° ì½œë¼ì´ë” ëª¨ì„œë¦¬ì¼ ë•Œ)
+    //    // ë ˆì´ë¥¼ ë”°ë¼ 1.5m ì§€ì  ê·¼ë°©ì„ ì¤‘ì‹¬ìœ¼ë¡œ OverlapSphere
     //    Vector3 probe = ray.GetPoint(1.5f);
     //    int count = Physics.OverlapSphereNonAlloc(probe, 0.9f, _overlapCache, mask, QueryTriggerInteraction.Collide);
     //    if (count > 0)
@@ -308,7 +308,7 @@ public class PlayerAttacks : MonoBehaviour
     //            var esm = col.GetComponentInParent<EnemyStatsManager>();
     //            if (esm == null || esm.CurrentHP <= 0) continue;
 
-    //            // È­¸é¿¡¼­ Ä¿¼­¿ÍÀÇ °Å¸®·Î °¡Àå "°¡±õ°Ô ´À²¸Áö´Â" Å¸°Ù ¼±ÅÃ
+    //            // í™”ë©´ì—ì„œ ì»¤ì„œì™€ì˜ ê±°ë¦¬ë¡œ ê°€ì¥ "ê°€ê¹ê²Œ ëŠê»´ì§€ëŠ”" íƒ€ê²Ÿ ì„ íƒ
     //            Vector3 screen = cam.WorldToScreenPoint(esm.transform.position);
     //            float screenDist = (new Vector2(screen.x, screen.y) - (Vector2)Input.mousePosition).sqrMagnitude;
     //            if (screenDist < best) { best = screenDist; bestEsm = esm; }
@@ -316,7 +316,7 @@ public class PlayerAttacks : MonoBehaviour
     //        if (bestEsm != null) { enemy = bestEsm; return true; }
     //    }
 
-    //    // === 5) 5Â÷: ÇÃ·¹ÀÌ¾î ÁÖº¯ ÃÖ±ÙÁ¢ (ÃÊ±ÙÁ¢ ¿ÏÀü °ãÄ§ ÃÖÈÄ º¸Á¤)
+    //    // === 5) 5ì°¨: í”Œë ˆì´ì–´ ì£¼ë³€ ìµœê·¼ì ‘ (ì´ˆê·¼ì ‘ ì™„ì „ ê²¹ì¹¨ ìµœí›„ ë³´ì •)
     //    count = Physics.OverlapSphereNonAlloc(transform.position, 1.8f, _overlapCache, mask, QueryTriggerInteraction.Collide);
     //    if (count > 0)
     //    {
@@ -347,34 +347,34 @@ public class PlayerAttacks : MonoBehaviour
         string animName = "Attack1H (ID 17 variation 0)";
         if (animationComponent.GetClip(animName) != null)
         {
-            // °ø°İ ½ÃÀÛ
+            // ê³µê²© ì‹œì‘
             isAttacking = true;
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç ¼Óµµ Àû¿ë
+            // ì• ë‹ˆë©”ì´ì…˜ ì†ë„ ì ìš©
             animationComponent[animName].speed = stats.Data.AttackSpeed;
             animationComponent.Play(animName);
 
-            // °ø°İ ÄğÅ¸ÀÓ
+            // ê³µê²© ì¿¨íƒ€ì„
             lastAttackTime = Time.time + GetAttackCooldown();
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç ÀÓÆÑÆ® ½ÃÁ¡¿¡ µ¥¹ÌÁö Àû¿ë
+            // ì• ë‹ˆë©”ì´ì…˜ ì„íŒ©íŠ¸ ì‹œì ì— ë°ë¯¸ì§€ ì ìš©
             float impactTime = 0.2f;
             StartCoroutine(DelayedDamage(impactTime));
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç ³¡³¯ ¶§ Idle·Î ÀüÈ¯
+            // ì• ë‹ˆë©”ì´ì…˜ ëë‚  ë•Œ Idleë¡œ ì „í™˜
             float animDuration = animationComponent[animName].length / animationComponent[animName].speed;
             StartCoroutine(AttackAnimationEnd(animDuration));
         }
     }
 
-    // ¾Ö´Ï¸ŞÀÌ¼Ç Á¾·á ÈÄ Ã³¸®
+    // ì• ë‹ˆë©”ì´ì…˜ ì¢…ë£Œ í›„ ì²˜ë¦¬
     private IEnumerator AttackAnimationEnd(float duration)
     {
         yield return new WaitForSeconds(duration);
         isAttacking = false;
     }
 
-    // µô·¹ÀÌ ÈÄ µ¥¹ÌÁö Àû¿ë
+    // ë”œë ˆì´ í›„ ë°ë¯¸ì§€ ì ìš©
     private IEnumerator DelayedDamage(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -387,7 +387,7 @@ public class PlayerAttacks : MonoBehaviour
         targetEnemy.TakeDamage(damage);
         Debug.Log($"After Attack: {targetEnemy.name} HP={targetEnemy.CurrentHP}");
 
-        // Ä¡¸íÅ¸¸é »¡°£»ö, ÆòÅ¸¸é Èò»ö
+        // ì¹˜ëª…íƒ€ë©´ ë¹¨ê°„ìƒ‰, í‰íƒ€ë©´ í°ìƒ‰
         var color = isCrit ? Color.red : Color.white;
 
         DamageTextManager.Instance.ShowDamage(
@@ -403,14 +403,14 @@ public class PlayerAttacks : MonoBehaviour
     // PlayerAttacks.cs
     public void ForceStopAttack()
     {
-        StopAllCoroutines();        // °ø°İ °ü·Ã ÄÚ·çÆ¾ Áß´Ü
+        StopAllCoroutines();        // ê³µê²© ê´€ë ¨ ì½”ë£¨í‹´ ì¤‘ë‹¨
         isAttacking = false;
         if (animationComponent != null)
-            animationComponent.Stop(); // ÇöÀç °ø°İ ¸ğ¼Ç Áß´Ü
+            animationComponent.Stop(); // í˜„ì¬ ê³µê²© ëª¨ì…˜ ì¤‘ë‹¨
     }
 
 
-    // === PlayerCombatStats¿¡¼­ °¡Á®¿À´Â ÇïÆÛ ===
+    // === PlayerCombatStatsì—ì„œ ê°€ì ¸ì˜¤ëŠ” í—¬í¼ ===
     public float GetAttackRange()
     {
         return 1f;
@@ -418,6 +418,6 @@ public class PlayerAttacks : MonoBehaviour
 
     public float GetAttackCooldown()
     {
-        return 1f / stats.Data.AttackSpeed; // °ø°İ ¼Óµµ°¡ ³ôÀ¸¸é ÄğÅ¸ÀÓ Âª¾ÆÁü
+        return 1f / stats.Data.AttackSpeed; // ê³µê²© ì†ë„ê°€ ë†’ìœ¼ë©´ ì¿¨íƒ€ì„ ì§§ì•„ì§
     }
 }
