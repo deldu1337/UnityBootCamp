@@ -14,7 +14,7 @@ public class ChargeSkill : ISkill
     private string animationName;
 
     // 튜닝 파라미터
-    private const float DashSpeed = 60f;             // 돌진 속도(유닛/초)
+    private const float DashSpeed = 70f;             // 돌진 속도(유닛/초)
     private const float MinStopPadding = 0.25f;      // 적 앞에 멈출 여유 거리
     private const float MaxDashTimePerMeter = 0.12f; // 안전 타임아웃(장애물 등)
     private const float fallbackHitWindup = 0.1f;   // 애니 길이를 알 수 없을 때 대기
