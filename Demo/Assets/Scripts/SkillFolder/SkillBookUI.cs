@@ -34,6 +34,8 @@ public class SkillBookUI : MonoBehaviour
     public void Show(bool visible) => panel.SetActive(visible);
     public void Toggle() => Show(!panel.activeSelf);
 
+    public bool IsOpen => panel != null && panel.activeSelf;
+
     public void Build(List<SkillUnlockDef> defs, System.Func<string, Sprite> iconResolver)
     {
         foreach (Transform t in contentParent) Destroy(t.gameObject);

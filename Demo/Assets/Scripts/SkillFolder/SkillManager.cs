@@ -376,6 +376,9 @@ public class SkillManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K) && skillBook != null)
             skillBook.Toggle();
 
+        if (Input.GetKeyDown(KeyCode.Escape) && skillBook != null && skillBook.IsOpen)
+            skillBook.Show(false);
+
         // 단축키 입력 → 슬롯 인덱스 실행
         if (Input.GetKeyDown(KeyCode.A)) UseSlot(0);
         if (Input.GetKeyDown(KeyCode.S)) UseSlot(1);

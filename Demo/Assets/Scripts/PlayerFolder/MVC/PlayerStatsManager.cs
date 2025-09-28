@@ -119,8 +119,8 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         {
             foreach (var slot in equippedSlots)
             {
-                if (slot.equipped == null || slot.equipped.data == null) continue;
-                var eq = slot.equipped.data;
+                if (slot.equipped == null || slot.equipped.data == null || slot.equipped.rolled == null) continue;
+                var eq = slot.equipped.rolled;
                 equipHP += eq.hp;
                 equipMP += eq.mp;
                 equipAtk += eq.atk;

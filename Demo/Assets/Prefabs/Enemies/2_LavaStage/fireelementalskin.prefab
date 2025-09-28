@@ -1414,7 +1414,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dropTable:
   - itemPrefab: {fileID: 7305882949692592322, guid: 3dde4b746bf735746963ce74a299e4a5, type: 3}
-    dropChance: 1
+    dropChance: 10
+    minAmount: 1
+    maxAmount: 1
+  - itemPrefab: {fileID: 2226707775509299374, guid: 94aa60af6595123488a1db5e26fe9439, type: 3}
+    dropChance: 10
+    minAmount: 1
+    maxAmount: 1
+  - itemPrefab: {fileID: 7905017886141185771, guid: d614621e9a663bf49939b485acf18d7c, type: 3}
+    dropChance: 10
+    minAmount: 1
+    maxAmount: 1
+  - itemPrefab: {fileID: 2251877542627138000, guid: b6a3d22af2dbf88489d7aca10ec3defa, type: 3}
+    dropChance: 10
     minAmount: 1
     maxAmount: 1
   dropPoint: {fileID: 872604229897539416}
