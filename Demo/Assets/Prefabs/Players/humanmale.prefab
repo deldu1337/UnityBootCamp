@@ -1747,8 +1747,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 924dbd15bad2e4b40971d21c0719eab4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseOffset: {x: -2, y: 17, z: -2}
-  useCurrentCameraOffsetOnStart: 1
+  baseOffset: {x: -9, y: 16.5, z: -9}
+  useCurrentCameraOffsetOnStart: 0
   zoomOutMultiplier: 1.7
   bossTriggerRadius: 40
   zoomLerpSpeed: 6

@@ -28,7 +28,7 @@ public class PlayerCamera : MonoBehaviour
 {
     [Header("Offsets")]
     [Tooltip("기본 카메라 오프셋(플레이어 기준). 시작 시 현재 카메라 오프셋 사용 옵션이 켜져있으면 무시됩니다.")]
-    public Vector3 baseOffset = new Vector3(-2f, 17f, -2f);
+    public Vector3 baseOffset = new Vector3(-2f, 16.5f, -2f);
 
     [Tooltip("게임 시작 시 (현재 카메라 위치 - 플레이어 위치)로 오프셋 자동 설정")]
     public bool useCurrentCameraOffsetOnStart = true;
