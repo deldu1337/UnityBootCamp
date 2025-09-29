@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 133927765}
   - component: {fileID: 133927764}
+  - component: {fileID: 133927766}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -168,6 +169,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &133927766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133927763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f891166fb9639124e8677c8666a83289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 75
+  height: 75
+  wallPrefab: {fileID: 247903902691160932, guid: 5afe76360cec64543bb6d8f8df20b868, type: 3}
+  Trans: {fileID: 1102280627}
+  maxDepth: 12
+  minimumDevideRate: 0.45
+  maximumDivideRate: 0.55
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,8 +274,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.24184473, y: -0.66446304, z: 0.24184473, w: 0.66446304}
-  m_LocalPosition: {x: 22, y: 22, z: 0}
+  m_LocalRotation: {x: -0.6862377, y: 0.0026165843, z: -0.002469033, w: -0.7273685}
+  m_LocalPosition: {x: 34.390263, y: 82.26291, z: 31.199566}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -588,9 +608,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 133927764}
-        m_TargetAssemblyTypeName: RandomMap, Assembly-CSharp
-        m_MethodName: ChangeRoom
+      - m_Target: {fileID: 133927766}
+        m_TargetAssemblyTypeName: BSP, Assembly-CSharp
+        m_MethodName: ReloadMap
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

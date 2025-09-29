@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class UserGoodsData : IUserData
 {
-    // 유저의 재화
-    // Gem : 보석
+    // 보석 재화
     public long Gem { get; set; }
-    // Gold : 돈
+
+    // 골드 재화
     public long Gold { get; set; }
+
 
     public void SetDefaultData()
     {
@@ -26,13 +27,14 @@ public class UserGoodsData : IUserData
         {
             Gem = long.Parse(PlayerPrefs.GetString("Gem"));
             Gold = long.Parse(PlayerPrefs.GetString("Gold"));
+
             result = true;
 
-            Logger.Log($"Gem : {Gem}, Gold : {Gold}");
+            Logger.Log($"Gem:{Gem}, Gold:{Gold}");
         }
         catch (System.Exception e)
         {
-            Logger.LogError($"Load failed ({e.Message})");
+            Logger.LogError($"Load failed (" + e.Message + ")");
         }
 
         return result;
@@ -51,11 +53,11 @@ public class UserGoodsData : IUserData
             PlayerPrefs.Save();
             result = true;
 
-            Logger.Log($"Gem : {Gem}, Gold : {Gold}");
+            Logger.Log($"Gem:{Gem}, Gold:{Gold}");
         }
         catch (System.Exception e)
         {
-            Logger.LogError($"Save failed ({e.Message})");
+            Logger.LogError($"Save failed (" + e.Message + ")");
         }
 
         return result;

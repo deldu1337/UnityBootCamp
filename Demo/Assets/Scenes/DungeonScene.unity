@@ -17843,6 +17843,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 632719224615532045, guid: 25273d137697f5f4cabe917fda52637c, type: 3}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: maxRoomSize
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: minRoomSize
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: portalPrefab
       value: 
       objectReference: {fileID: 6383152539548311014, guid: 09c500c683476f747a574c71d95a781c, type: 3}

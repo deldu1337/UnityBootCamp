@@ -3,53 +3,49 @@ using UnityEngine;
 
 public class UserDataManager : SingletonBehaviour<UserDataManager>
 {
-    // 저장된 유저 데이터 존재 여부
-    public bool ExistsSaveData { get; private set; }
+    // 저장된 유저 데이터 존재 여부 확인 변수
+    public bool ExistsSaveData {  get; private set; }
 
     // 모든 유저 데이터 인스턴스를 저장하는 컨테이너
     public List<IUserData> UserDataList { get; private set; } = new List<IUserData>();
 
     protected override void Init()
     {
-        // 싱글턴 객체는 만들어 줘야 하니까
         base.Init();
 
-        // 모든 유저 데이터를 UserDataList에 추가
+        // 모든 유저 데이터를 UserDataList 에 인스턴스 추가
         UserDataList.Add(new UserSettingsData());
         UserDataList.Add(new UserGoodsData());
     }
 
-    // 모든 유저 데이터를 초기화
     public void SetDefaultUserData()
     {
-        for (int i = 0; i < UserDataList.Count; i++)
+        foreach (var UserData in UserDataList)
         {
-            UserDataList[i].SetDefaultData();
+            UserData.SetDefaultData();
         }
     }
 
-    // 모든 유저 데이터를 로드
     public void LoadUserData()
     {
         ExistsSaveData = PlayerPrefs.GetInt("ExistsSaveData") == 1 ? true : false;
 
-        if (ExistsSaveData == true)
+        if (ExistsSaveData)
         {
-            for (int i = 0; i < UserDataList.Count; i++)
+            foreach (var UserData in UserDataList)
             {
-                UserDataList[i].LoadData();
+                UserData.LoadData();
             }
         }
     }
 
-    // 모든 유저 데이터를 저장
     public void SaveUserData()
     {
         bool hasSaveError = false;
 
-        for (int i = 0; i < UserDataList.Count; i++)
+        foreach (var UserData in UserDataList)
         {
-            bool isSaveSuccess = UserDataList[i].SaveData();
+            bool isSaveSuccess = UserData.SaveData();
             if (isSaveSuccess == false)
             {
                 hasSaveError = true;
