@@ -4,10 +4,10 @@ public class PlayerCamera : MonoBehaviour
 {
     [Header("Offsets")]
     [Tooltip("기본 카메라 오프셋(플레이어 기준). 시작 시 현재 카메라 오프셋 사용 옵션이 켜져있으면 무시됩니다.")]
-    public Vector3 baseOffset = new Vector3(-2f, 16.5f, -2f);
+    public Vector3 baseOffset = new Vector3(-9f, 16.5f, -9f);
 
     [Tooltip("게임 시작 시 (현재 카메라 위치 - 플레이어 위치)로 오프셋 자동 설정")]
-    public bool useCurrentCameraOffsetOnStart = true;
+    public bool useCurrentCameraOffsetOnStart = false;
 
     [Tooltip("보스 근접시 확대될(멀어질) 오프셋 배수")]
     public float zoomOutMultiplier = 1.7f;
@@ -17,7 +17,7 @@ public class PlayerCamera : MonoBehaviour
     public float bossTriggerRadius = 40f;
 
     [Tooltip("오프셋 전환 속도(초당). 값이 클수록 빠르게 전환")]
-    public float zoomLerpSpeed = 7f;
+    public float zoomLerpSpeed = 6f;
 
     [Tooltip("보스 탐색에 사용할 태그")]
     public string bossTag = "Boss";

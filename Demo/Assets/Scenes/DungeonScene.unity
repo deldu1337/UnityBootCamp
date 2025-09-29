@@ -12952,7 +12952,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c8b7b8fde13544b9dc64edf661e61c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 6914515128741021224, guid: 64ce4e95d3d6c2b46b21d429bfe33ec2, type: 3}
+  player: {fileID: 4600577724167717737, guid: e4ebe52c997d1a74ea6f2fa31557fd55, type: 3}
   mapGenerator: {fileID: 1869150289}
 --- !u!4 &1531966325
 Transform:
@@ -17839,6 +17839,10 @@ PrefabInstance:
       value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
+      propertyPath: maxDepth
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: wallPrefab
       value: 
       objectReference: {fileID: 632719224615532045, guid: 25273d137697f5f4cabe917fda52637c, type: 3}
@@ -17897,7 +17901,7 @@ PrefabInstance:
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: themes.Array.data[0].wallMaterial
       value: 
-      objectReference: {fileID: 2100000, guid: d67448e918b222c4c88c780b40e465ff, type: 2}
+      objectReference: {fileID: 2100000, guid: 27ea841fc4b43424b85ec2e95693a03e, type: 2}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: themes.Array.data[1].wallMaterial
       value: 
@@ -17905,7 +17909,7 @@ PrefabInstance:
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: themes.Array.data[0].floorMaterial
       value: 
-      objectReference: {fileID: 2100000, guid: b9f3aab38e451d64ca7a8f2fed7052b0, type: 2}
+      objectReference: {fileID: 2100000, guid: a46f5a6ca2560794a9c36ef296417a83, type: 2}
     - target: {fileID: 221320398945906193, guid: bbc77620113e4a845823dd6f3b9d26c6, type: 3}
       propertyPath: themes.Array.data[1].floorMaterial
       value: 
