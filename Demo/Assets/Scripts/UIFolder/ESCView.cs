@@ -4,14 +4,16 @@ using UnityEngine.UI;
 
 public class ESCView : MonoBehaviour
 {
-    [SerializeField] private GameObject escUI;       // esc UI 전체
+    [SerializeField] private GameObject escUI;
     private Button LogoutButton;
     private Button ExitGameButton;
-    private Button ExitButton;      // esc창 닫기 버튼
+    private Button ExitButton;
     private bool show = false;
 
     void Start()
     {
+        UIEscapeStack.GetOrCreate(); // 스택 보장
+
         if (escUI == null)
             escUI = GameObject.Find("escUI");
 
@@ -26,29 +28,27 @@ public class ESCView : MonoBehaviour
             ExitButton.onClick.AddListener(ToggleESC);
         }
 
-        escUI.SetActive(show);
+        if (escUI) escUI.SetActive(show);
     }
 
     private void Update()
     {
         if (Input.GetKeyUp(KeyCode.Escape))
         {
+            // 1) 최근 열린 UI부터 닫기 (있으면 여기서 끝)
+            if (UIEscapeStack.Instance != null && UIEscapeStack.Instance.PopTop())
+                return;
+
+            // 2) 닫을 UI가 없다면 ESC 메뉴 토글
             ToggleESC();
         }
     }
 
     public void ToggleESC()
     {
-        if(!show)
-        {
-            show = true;
-            escUI.SetActive(show);
-        }
-        else
-        {
-            show = false;
-            escUI.SetActive(show);
-        }
+        if (!escUI) return;
+        show = !show;
+        escUI.SetActive(show);
     }
 
     public void Logout()

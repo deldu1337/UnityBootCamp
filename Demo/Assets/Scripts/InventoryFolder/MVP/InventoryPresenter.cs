@@ -1,4 +1,4 @@
-//using System;
+ï»¿//using System;
 //using UnityEngine;
 
 //public class InventoryPresenter : MonoBehaviour
@@ -45,7 +45,7 @@
 //        var dataManager = DataManager.Instance;
 //        if (!dataManager.dicItemDatas.ContainsKey(id))
 //        {
-//            Debug.LogWarning($"¾ÆÀÌÅÛ ID {id}°¡ DataManager¿¡ ¾øÀ½!");
+//            Debug.LogWarning($"ì•„ì´í…œ ID {id}ê°€ DataManagerì— ì—†ìŒ!");
 //            return;
 //        }
 
@@ -58,10 +58,10 @@
 //            prefabPath = prefabPath
 //        };
 
-//        // ÃÖÈÄ ¹æ¾î
+//        // ìµœí›„ ë°©ì–´
 //        if (InventoryGuards.IsInvalid(item))
 //        {
-//            Debug.LogWarning("[InventoryPresenter] »ı¼ºµÈ ¾ÆÀÌÅÛÀÌ ¹«È¿ ¡æ Ãß°¡ Ãë¼Ò");
+//            Debug.LogWarning("[InventoryPresenter] ìƒì„±ëœ ì•„ì´í…œì´ ë¬´íš¨ â†’ ì¶”ê°€ ì·¨ì†Œ");
 //            return;
 //        }
 
@@ -69,16 +69,16 @@
 //        Refresh();
 //    }
 
-//    // ¹İÈ¯°ªÀ¸·Î '½ÇÁ¦ Á¦°Å ¼º°ø' ¿©ºÎ¸¦ ¾Ë ¼ö ÀÖ°Ô º¯°æ
+//    // ë°˜í™˜ê°’ìœ¼ë¡œ 'ì‹¤ì œ ì œê±° ì„±ê³µ' ì—¬ë¶€ë¥¼ ì•Œ ìˆ˜ ìˆê²Œ ë³€ê²½
 //    public bool RemoveItemFromInventory(string uniqueId)
 //    {
-//        if (model == null) model = new InventoryModel(); // ¾ÈÀü¸Á
+//        if (model == null) model = new InventoryModel(); // ì•ˆì „ë§
 
 //        var before = model.GetItemById(uniqueId) != null;
 //        model.RemoveById(uniqueId);
 //        var after = model.GetItemById(uniqueId) != null;
 
-//        // ÀÎº¥ UI´Â ´İÇô ÀÖ¾îµµ °­Á¦·Î ÇÑ¹ø °»½Å(º¸ÀÌ´Â »óÅÂ¶ó¸é Áï½Ã ¹İ¿µ)
+//        // ì¸ë²¤ UIëŠ” ë‹«í˜€ ìˆì–´ë„ ê°•ì œë¡œ í•œë²ˆ ê°±ì‹ (ë³´ì´ëŠ” ìƒíƒœë¼ë©´ ì¦‰ì‹œ ë°˜ì˜)
 //        ForceRefresh();
 
 //        return before && !after;
@@ -93,18 +93,18 @@
 
 //        if (item.data != null && string.Equals(item.data.type, "potion", StringComparison.OrdinalIgnoreCase))
 //        {
-//            var stats = PlayerStatsManager.Instance; // ½Ì±ÛÅæ
+//            var stats = PlayerStatsManager.Instance; // ì‹±ê¸€í†¤
 //            if (stats != null)
 //            {
 //                if (item.data.hp > 0) stats.Heal(item.data.hp);
 //                if (item.data.mp > 0) stats.RestoreMana(item.data.mp);
 //            }
-//            // ÀÎº¥Åä¸®¿¡¼­ ÇØ´ç Æ÷¼Ç 1°³ Á¦°Å
+//            // ì¸ë²¤í† ë¦¬ì—ì„œ í•´ë‹¹ í¬ì…˜ 1ê°œ ì œê±°
 //            model.RemoveById(uniqueId);
 
-//            // UI °»½Å
+//            // UI ê°±ì‹ 
 //            Refresh();
-//            return; // Àåºñ ÀåÂø ·ÎÁ÷À¸·Î °¡Áö ¾Êµµ·Ï Á¾·á
+//            return; // ì¥ë¹„ ì¥ì°© ë¡œì§ìœ¼ë¡œ ê°€ì§€ ì•Šë„ë¡ ì¢…ë£Œ
 //        }
 
 //        var equipPresenter = FindAnyObjectByType<EquipmentPresenter>();
@@ -134,7 +134,7 @@
 
 //    public InventoryItem GetItemByUniqueId(string uniqueId)
 //    {
-//        // model.GetItemById´Â ÀÌ¹Ì ÀÖÀ¸´Ï, ±×´ë·Î ·¡ÇÎÇØµµ µË´Ï´Ù.
+//        // model.GetItemByIdëŠ” ì´ë¯¸ ìˆìœ¼ë‹ˆ, ê·¸ëŒ€ë¡œ ë˜í•‘í•´ë„ ë©ë‹ˆë‹¤.
 //        return model.GetItemById(uniqueId);
 //    }
 
@@ -158,6 +158,7 @@ public class InventoryPresenter : MonoBehaviour
 
     void Start()
     {
+        UIEscapeStack.GetOrCreate(); // ìŠ¤íƒ ë³´ì¥
         view = FindAnyObjectByType<InventoryView>();
         if (view == null) return;
 
@@ -170,8 +171,9 @@ public class InventoryPresenter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
             ToggleInventory();
-        if (Input.GetKeyDown(KeyCode.Escape))
-            CloseInventory();
+
+        // ì—¬ê¸°ì„œ ESCë¡œ ë‹«ì§€ ì•ŠëŠ”ë‹¤ (ì¤‘ì•™ ESC ìŠ¤íƒì—ì„œ ì²˜ë¦¬)
+        // if (Input.GetKeyDown(KeyCode.Escape)) CloseInventory();
     }
 
     private void ToggleInventory()
@@ -179,25 +181,39 @@ public class InventoryPresenter : MonoBehaviour
         if (view == null) return;
         isOpen = !isOpen;
         view.Show(isOpen);
+
         if (isOpen)
+        {
             view.UpdateInventoryUI(model.Items, OnItemDropped, OnItemRemoved, OnItemEquipped);
+            UIEscapeStack.Instance.Push(
+                key: "inventory",
+                close: CloseInventory,
+                isOpen: () => isOpen
+            );
+        }
+        else
+        {
+            UIEscapeStack.Instance.Remove("inventory");
+        }
     }
 
     private void CloseInventory()
     {
+        if (!isOpen) return;
         isOpen = false;
         view.Show(false);
+        UIEscapeStack.Instance.Remove("inventory");
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛ ¡°È¹µæ¡± ½ÃÁ¡¿¡ ·Ñ¸µÀ» È®Á¤ÇØ¼­ ÀÎº¥Åä¸®¿¡ ÀúÀå.
+    /// ì•„ì´í…œ â€œíšë“â€ ì‹œì ì— ë¡¤ë§ì„ í™•ì •í•´ì„œ ì¸ë²¤í† ë¦¬ì— ì €ì¥.
     /// </summary>
     public void AddItem(int id, Sprite icon, string prefabPath)
     {
         var dataManager = DataManager.Instance;
         if (dataManager == null || !dataManager.dicItemDatas.ContainsKey(id))
         {
-            Debug.LogWarning($"¾ÆÀÌÅÛ ID {id}°¡ DataManager¿¡ ¾øÀ½!");
+            Debug.LogWarning($"ì•„ì´í…œ ID {id}ê°€ DataManagerì— ì—†ìŒ!");
             return;
         }
 
@@ -208,16 +224,16 @@ public class InventoryPresenter : MonoBehaviour
             uniqueId = Guid.NewGuid().ToString(),
             id = id,
             data = baseData,
-            // ¾ÆÀÌÄÜ/ÇÁ¸®ÆÕ °æ·Î Ä³½Ì
+            // ì•„ì´ì½˜/í”„ë¦¬íŒ¹ ê²½ë¡œ ìºì‹±
             iconPath = icon ? "Icons/" + icon.name : null,
             prefabPath = prefabPath,
-            // (Áß¿ä) È¹µæ ½ÃÁ¡ ·Ñ¸µ È®Á¤
+            // (ì¤‘ìš”) íšë“ ì‹œì  ë¡¤ë§ í™•ì •
             rolled = ItemRoller.CreateRolledStats(id)
         };
 
         if (InventoryGuards.IsInvalid(item))
         {
-            Debug.LogWarning("[InventoryPresenter] »ı¼ºµÈ ¾ÆÀÌÅÛÀÌ ¹«È¿ ¡æ Ãß°¡ Ãë¼Ò");
+            Debug.LogWarning("[InventoryPresenter] ìƒì„±ëœ ì•„ì´í…œì´ ë¬´íš¨ â†’ ì¶”ê°€ ì·¨ì†Œ");
             return;
         }
 
@@ -225,16 +241,16 @@ public class InventoryPresenter : MonoBehaviour
         Refresh();
     }
 
-    // ¹İÈ¯°ªÀ¸·Î '½ÇÁ¦ Á¦°Å ¼º°ø' ¿©ºÎ¸¦ ¾Ë ¼ö ÀÖ°Ô º¯°æ
+    // ë°˜í™˜ê°’ìœ¼ë¡œ 'ì‹¤ì œ ì œê±° ì„±ê³µ' ì—¬ë¶€ë¥¼ ì•Œ ìˆ˜ ìˆê²Œ ë³€ê²½
     public bool RemoveItemFromInventory(string uniqueId)
     {
-        if (model == null) model = new InventoryModel(); // ¾ÈÀü¸Á
+        if (model == null) model = new InventoryModel(); // ì•ˆì „ë§
 
         var before = model.GetItemById(uniqueId) != null;
         model.RemoveById(uniqueId);
         var after = model.GetItemById(uniqueId) != null;
 
-        // ÀÎº¥ UI´Â ´İÇô ÀÖ¾îµµ °­Á¦·Î ÇÑ¹ø °»½Å(º¸ÀÌ´Â »óÅÂ¶ó¸é Áï½Ã ¹İ¿µ)
+        // ì¸ë²¤ UIëŠ” ë‹«í˜€ ìˆì–´ë„ ê°•ì œë¡œ í•œë²ˆ ê°±ì‹ (ë³´ì´ëŠ” ìƒíƒœë¼ë©´ ì¦‰ì‹œ ë°˜ì˜)
         ForceRefresh();
 
         return before && !after;
@@ -248,7 +264,7 @@ public class InventoryPresenter : MonoBehaviour
         var item = model.GetItemById(uniqueId);
         if (item == null) return;
 
-        // Æ÷¼ÇÀº Áï½Ã »ç¿ë
+        // í¬ì…˜ì€ ì¦‰ì‹œ ì‚¬ìš©
         if (item.data != null && string.Equals(item.data.type, "potion", StringComparison.OrdinalIgnoreCase))
         {
             var stats = PlayerStatsManager.Instance;
@@ -264,7 +280,7 @@ public class InventoryPresenter : MonoBehaviour
             return;
         }
 
-        // Àåºñ ÀåÂøÀº ¿ÜºÎ ÇÁ·¹Á¨ÅÍ·Î
+        // ì¥ë¹„ ì¥ì°©ì€ ì™¸ë¶€ í”„ë ˆì  í„°ë¡œ
         var equipPresenter = FindAnyObjectByType<EquipmentPresenter>();
         equipPresenter?.HandleEquipItem(item);
 

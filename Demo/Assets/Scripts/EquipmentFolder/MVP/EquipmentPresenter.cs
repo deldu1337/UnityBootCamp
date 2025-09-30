@@ -18,21 +18,17 @@ public class EquipmentPresenter : MonoBehaviour
 
     void Start()
     {
+        UIEscapeStack.GetOrCreate(); // 스택 보장
+
         model = new EquipmentModel();
         view = FindAnyObjectByType<EquipmentView>();
         inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
-        //playerStats = GetComponent<PlayerStatsManager>();
 
-        // UI 초기화
         if (view != null)
             view.Initialize(CloseEquipment, HandleEquipFromInventory);
 
-        // UI 카메라 자동 세팅
         SetupUICamera();
-
-        // 저장된 장비 불러와 캐릭터에 장착
         InitializeEquippedItems();
-
         RefreshEquipmentUI();
     }
 
@@ -45,8 +41,9 @@ public class EquipmentPresenter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
             ToggleEquipment();
-        if(Input.GetKeyDown(KeyCode.Escape))
-            CloseEquipment();
+
+        // 여기서 ESC로 닫지 않는다 (중앙 ESC 스택에서 처리)
+        // if (Input.GetKeyDown(KeyCode.Escape)) CloseEquipment();
     }
 
     void LateUpdate()
@@ -87,12 +84,32 @@ public class EquipmentPresenter : MonoBehaviour
         if (view == null) return;
         isOpen = !isOpen;
         view.Show(isOpen);
-        if (uiCamera != null)
-            uiCamera.gameObject.SetActive(isOpen);
+        if (uiCamera != null) uiCamera.gameObject.SetActive(isOpen);
 
         if (isOpen)
+        {
             RefreshEquipmentUI();
+            UIEscapeStack.Instance.Push(
+                key: "equipment",
+                close: CloseEquipment,
+                isOpen: () => isOpen
+            );
+        }
+        else
+        {
+            UIEscapeStack.Instance.Remove("equipment");
+        }
     }
+
+    private void CloseEquipment()
+    {
+        if (!isOpen) return;
+        view.Show(false);
+        if (uiCamera != null) uiCamera.gameObject.SetActive(false);
+        isOpen = false;
+        UIEscapeStack.Instance.Remove("equipment");
+    }
+
     private int GetPlayerLevel()
     {
         var ps = PlayerStatsManager.Instance;
@@ -292,12 +309,5 @@ public class EquipmentPresenter : MonoBehaviour
     {
         if (view != null && model != null)
             view.UpdateEquipmentUI(model.Slots, HandleUnequipItem);
-    }
-
-    /// <summary>장비창 닫기</summary>
-    private void CloseEquipment()
-    {
-        view.Show(false);
-        isOpen = false;
     }
 }
