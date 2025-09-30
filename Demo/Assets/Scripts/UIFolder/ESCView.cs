@@ -6,7 +6,9 @@ public class ESCView : MonoBehaviour
 {
     [SerializeField] private GameObject escUI;
     private Button LogoutButton;
+    private Button SelectCharacterButton;
     private Button ExitGameButton;
+    private Button ReturnToGameButton;
     private Button ExitButton;
     private bool show = false;
 
@@ -20,11 +22,15 @@ public class ESCView : MonoBehaviour
         if (escUI != null)
         {
             LogoutButton = escUI.transform.GetChild(2).GetComponent<Button>();
-            ExitGameButton = escUI.transform.GetChild(3).GetComponent<Button>();
-            ExitButton = escUI.transform.GetChild(4).GetComponent<Button>();
+            SelectCharacterButton = escUI.transform.GetChild(3).GetComponent<Button>();
+            ExitGameButton = escUI.transform.GetChild(4).GetComponent<Button>();
+            ReturnToGameButton = escUI.transform.GetChild(5).GetComponent<Button>();
+            ExitButton = escUI.transform.GetChild(6).GetComponent<Button>();
 
             LogoutButton.onClick.AddListener(Logout);
+            SelectCharacterButton.onClick.AddListener(SelectCharacter);
             ExitGameButton.onClick.AddListener(ExitGame);
+            ReturnToGameButton.onClick.AddListener(ToggleESC);
             ExitButton.onClick.AddListener(ToggleESC);
         }
 
@@ -54,6 +60,11 @@ public class ESCView : MonoBehaviour
     public void Logout()
     {
         SceneManager.LoadScene("LoginScene");
+    }
+
+    public void SelectCharacter()
+    {
+        SceneManager.LoadScene("CharacterScene");
     }
 
     private void ExitGame()

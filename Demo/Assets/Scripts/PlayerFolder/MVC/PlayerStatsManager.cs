@@ -222,7 +222,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
                 {
                     Race = raceName,
 
-                    // ★ Base를 종족 기본값으로
+                    // Base를 종족 기본값으로
                     BaseMaxHP = e.MaxHP,
                     BaseMaxMP = e.MaxMP,
                     BaseAtk = e.Atk,
