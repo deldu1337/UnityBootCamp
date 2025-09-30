@@ -49,6 +49,8 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public event Action<int, float> OnExpChanged;
     public event Action<int> OnLevelUp;
 
+    private float eqHP, eqMP, eqAtk, eqDef, eqDex, eqAS, eqCC, eqCD;
+
     //void Awake()
     //{
     //    // --- 싱글톤 보장: 새로 스폰된 플레이어가 항상 최신 Instance가 되도록 ---
@@ -177,33 +179,28 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     /// <summary>저장된 데이터 불러오기</summary>
     public void LoadData(PlayerData loaded)
     {
-        if (loaded != null)
-        {
-            Data = loaded; // 저장된 데이터 사용
-        }
+        if (loaded != null) Data = loaded;
         else
         {
-            // json이 없으면 기본값 세팅
-            Data = new PlayerData
-            {
-                Level = 1,
-                Exp = 0,
-                ExpToNextLevel = 50f,
-                MaxHP = 100f,
-                MaxMP = 50f,
-                Atk = 5f,
-                Def = 0f,
-                Dex = 10f,
-                AttackSpeed = 2f,
-                CritChance = 0.1f,
-                CritDamage = 1.5f,
-                CurrentHP = 100f,
-                CurrentMP = 50f
-            };
+            Data = new PlayerData { /* 네가 쓰던 디폴트 값들 */ };
+        }
+
+        // ★ Base 미존재(=0)일 때 Final에서 한 번 복사하여 초기화
+        if (Data.BaseMaxHP <= 0f && Data.MaxHP > 0f)
+        {
+            Data.BaseMaxHP = Data.MaxHP;
+            Data.BaseMaxMP = Data.MaxMP;
+            Data.BaseAtk = Data.Atk;
+            Data.BaseDef = Data.Def;
+            Data.BaseDex = Data.Dex;
+            Data.BaseAttackSpeed = Data.AttackSpeed;
+            Data.BaseCritChance = Data.CritChance;
+            Data.BaseCritDamage = Data.CritDamage;
         }
 
         UpdateUI();
     }
+
 
     /// <summary>
     /// 하나의 JSON 파일(Entries 배열)에서 선택 종족 기본값 로드
@@ -212,20 +209,10 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     public void LoadRaceData_FromSingleFile(string raceName)
     {
         TextAsset json = Resources.Load<TextAsset>("PlayerData/PlayerDataAll");
-        if (json == null)
-        {
-            Debug.LogError("Resources/PlayerData/PlayerDataAll.json 을 찾지 못했습니다.");
-            LoadData(null); // 안전 fallback
-            return;
-        }
+        if (json == null) { Debug.LogError("..."); LoadData(null); return; }
 
         var col = JsonUtility.FromJson<PlayerDataCollection>(json.text);
-        if (col?.entries == null || col.entries.Length == 0)
-        {
-            Debug.LogError("PlayerDataAll.json: entries가 비어 있습니다.");
-            LoadData(null);
-            return;
-        }
+        if (col?.entries == null || col.entries.Length == 0) { Debug.LogError("..."); LoadData(null); return; }
 
         foreach (var e in col.entries)
         {
@@ -234,6 +221,22 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
                 Data = new PlayerData
                 {
                     Race = raceName,
+
+                    // ★ Base를 종족 기본값으로
+                    BaseMaxHP = e.MaxHP,
+                    BaseMaxMP = e.MaxMP,
+                    BaseAtk = e.Atk,
+                    BaseDef = e.Def,
+                    BaseDex = e.Dex,
+                    BaseAttackSpeed = e.AttackSpeed,
+                    BaseCritChance = e.CritChance,
+                    BaseCritDamage = e.CritDamage,
+
+                    Level = e.Level,
+                    Exp = e.Exp,
+                    ExpToNextLevel = e.ExpToNextLevel,
+
+                    // ★ Final = Base (장비 없음 기준)
                     MaxHP = e.MaxHP,
                     MaxMP = e.MaxMP,
                     Atk = e.Atk,
@@ -242,14 +245,13 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
                     AttackSpeed = e.AttackSpeed,
                     CritChance = e.CritChance,
                     CritDamage = e.CritDamage,
+
                     CurrentHP = e.CurrentHP,
-                    CurrentMP = e.CurrentMP,
-                    Level = e.Level,
-                    Exp = e.Exp,
-                    ExpToNextLevel = e.ExpToNextLevel
+                    CurrentMP = e.CurrentMP
                 };
+
                 UpdateUI();
-                Debug.Log($"{raceName} 기본 스탯 로드 완료 (단일 파일).");
+                Debug.Log($"{raceName} 기본 스탯 로드 완료 (Base/Final 분리).");
                 return;
             }
         }
@@ -257,6 +259,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
         Debug.LogError($"PlayerDataAll.json에 '{raceName}' 항목이 없습니다.");
         LoadData(null);
     }
+
 
     /// <summary>장비 기반으로 MaxHP만 계산</summary>
     //public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
@@ -312,44 +315,33 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     //}
     public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
     {
-        // 1) 베이스를 '현재 Data 값'에서 시작 (종족/레벨업 반영치)
-        float baseHP = Data.MaxHP;
-        float baseMP = Data.MaxMP;
-        float baseAtk = Data.Atk;
-        float baseDef = Data.Def;
-        float baseDex = Data.Dex;
-        float baseAS = Data.AttackSpeed;
-        float baseCC = Data.CritChance;   // ★ 0.1f 고정 → Data.CritChance 로
-        float baseCD = Data.CritDamage;
+        // 1) 장비 보너스 합산
+        eqHP = eqMP = eqAtk = eqDef = eqDex = eqAS = eqCC = eqCD = 0f;
 
-        // 2) 장비 보너스 합산
-        float equipHP = 0, equipMP = 0, equipAtk = 0, equipDef = 0, equipDex = 0, equipAS = 0, equipCC = 0, equipCD = 0;
         if (equippedSlots != null)
         {
             foreach (var slot in equippedSlots)
             {
                 if (slot.equipped == null || slot.equipped.data == null || slot.equipped.rolled == null) continue;
                 var eq = slot.equipped.rolled;
-                equipHP += eq.hp;
-                equipMP += eq.mp;
-                equipAtk += eq.atk;
-                equipDef += eq.def;
-                equipDex += eq.dex;
-                equipAS += eq.As;
-                equipCC += eq.cc;
-                equipCD += eq.cd;
+                eqHP += eq.hp; eqMP += eq.mp; eqAtk += eq.atk; eqDef += eq.def;
+                eqDex += eq.dex; eqAS += eq.As; eqCC += eq.cc; eqCD += eq.cd;
             }
         }
 
-        // 3) 최종치 = 베이스 + 장비
-        Data.MaxHP = baseHP + equipHP;
-        Data.MaxMP = baseMP + equipMP;
-        Data.Atk = baseAtk + equipAtk;
-        Data.Def = baseDef + equipDef;
-        Data.Dex = baseDex + equipDex;
-        Data.AttackSpeed = baseAS + equipAS;
-        Data.CritChance = baseCC + equipCC;   // ★ 이제 0.2도 보존됨
-        Data.CritDamage = baseCD + equipCD;
+        // 2) ★ Final = Base + Equip
+        Data.MaxHP = Data.BaseMaxHP + eqHP;
+        Data.MaxMP = Data.BaseMaxMP + eqMP;
+        Data.Atk = Data.BaseAtk + eqAtk;
+        Data.Def = Data.BaseDef + eqDef;
+        Data.Dex = Data.BaseDex + eqDex;
+        Data.AttackSpeed = Data.BaseAttackSpeed + eqAS;
+        Data.CritChance = Data.BaseCritChance + eqCC;
+        Data.CritDamage = Data.BaseCritDamage + eqCD;
+
+        // 현재 HP/MP가 최대치를 넘지 않게 클램프 (옵션)
+        Data.CurrentHP = Mathf.Min(Data.CurrentHP, Data.MaxHP);
+        Data.CurrentMP = Mathf.Min(Data.CurrentMP, Data.MaxMP);
 
         SaveLoadService.SavePlayerDataForRace(Data.Race, Data);
         UpdateUI();
@@ -525,20 +517,36 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
     private void LevelUp()
     {
         Data.Level++;
-        // 레벨업 시 필요한 EXP 증가 (원하면 곡선 증가 가능)
         Data.ExpToNextLevel = Mathf.Round(Data.ExpToNextLevel * 1.2f);
 
-        // 레벨업 보너스 (원하는대로 커스텀 가능)
-        Data.MaxHP += 10f;
-        Data.Atk += 2f;
-        Data.Def += 1f;
+        // 레벨업 보너스: Base에만 적용
+        Data.BaseMaxHP += 10f;
+        Data.BaseMaxMP += 5f;
+        Data.BaseAtk += 2f;
+        Data.BaseDef += 0.5f;
 
-        Data.CurrentHP = Data.MaxHP; // 레벨업 시 풀피 회복
+        // Dex / AS / CritChance / CritDamage 는 그대로 (Base 변경 X)
+
+        // Final = Base + (마지막 장비 보너스 캐시)
+        Data.MaxHP = Data.BaseMaxHP + eqHP;
+        Data.MaxMP = Data.BaseMaxMP + eqMP;
+        Data.Atk = Data.BaseAtk + eqAtk;
+        Data.Def = Data.BaseDef + eqDef;
+        Data.Dex = Data.BaseDex + eqDex;           // 변화 없음
+        Data.AttackSpeed = Data.BaseAttackSpeed + eqAS;            // 변화 없음
+        Data.CritChance = Data.BaseCritChance + eqCC;            // 변화 없음
+        Data.CritDamage = Data.BaseCritDamage + eqCD;            // 변화 없음
+
+        // 레벨업 시 풀 회복
+        Data.CurrentHP = Data.MaxHP;
         Data.CurrentMP = Data.MaxMP;
-        Debug.Log($"레벨업! 현재 레벨 {Data.Level}");
+
+        SaveLoadService.SavePlayerDataForRace(Data.Race, Data);
+        UpdateUI();
 
         OnLevelUp?.Invoke(Data.Level);
     }
+
 
     public float CalculateDamage() // 기존 그대로 유지 (호환용)
     {
