@@ -176,7 +176,7 @@ public class EquipmentPresenter : MonoBehaviour
         if (ps != null)
         {
             ps.RecalculateStats(model.Slots);
-            SaveLoadService.SavePlayerData(ps.Data);
+            SaveLoadService.SavePlayerDataForRace(ps.Data.Race, ps.Data);
         }
     }
 

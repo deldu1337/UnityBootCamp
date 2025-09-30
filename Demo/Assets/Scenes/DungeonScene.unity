@@ -12952,7 +12952,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58c8b7b8fde13544b9dc64edf661e61c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 4600577724167717737, guid: e4ebe52c997d1a74ea6f2fa31557fd55, type: 3}
   mapGenerator: {fileID: 1869150289}
 --- !u!4 &1531966325
 Transform:

@@ -75,12 +75,28 @@ public class CharacterManager : MonoBehaviour
         Debug.Log($"선택된 종족: {GameContext.SelectedRace}");
     }
 
+    //private void GameStart()
+    //{
+    //    if (string.IsNullOrEmpty(GameContext.SelectedRace))
+    //        GameContext.SelectedRace = CharacterObject.transform.GetChild(0).gameObject.name;
+
+    //    GameContext.IsNewGame = true;                     // 새 게임 시작
+    //    SceneManager.LoadScene("DungeonScene");
+    //}
     private void GameStart()
     {
-        if (string.IsNullOrEmpty(GameContext.SelectedRace))
-            GameContext.SelectedRace = CharacterObject.transform.GetChild(0).gameObject.name;
+        var race = string.IsNullOrEmpty(GameContext.SelectedRace)
+            ? CharacterObject.transform.GetChild(0).gameObject.name
+            : GameContext.SelectedRace;
 
-        GameContext.IsNewGame = true;                     // 새 게임 시작
+        // 해당 종족 저장 존재 여부 확인
+        var existing = SaveLoadService.LoadPlayerDataForRaceOrNull(race);
+        GameContext.IsNewGame = (existing == null);  // 있으면 false(이어하기), 없으면 true(새 게임)
+
+        // (선택) ‘새로 시작(덮어쓰기)’ 버튼을 따로 둘 경우:
+        // GameContext.ForceReset = true; // 사용자가 진짜 덮어쓰기를 원할 때만!
+
         SceneManager.LoadScene("DungeonScene");
     }
+
 }

@@ -3,6 +3,8 @@ using System;
 [Serializable]
 public class PlayerData
 {
+    public string Race; // 추가: 저장/비교용
+
     // 최종 스탯
     public float MaxHP;
     public float MaxMP;
