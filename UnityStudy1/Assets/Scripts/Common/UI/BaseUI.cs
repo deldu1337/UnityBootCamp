@@ -2,12 +2,13 @@ using System;
 using System.Threading;
 using UnityEngine;
 
-public class BaseUIData
+public class BaseUIData // UI의 데이터의 처리부분, 즉 데이터를 담는 일종의 모델
 {
     public Action OnShow;
     public Action OnClose;
 }
-public class BaseUI : MonoBehaviour
+
+public class BaseUI : MonoBehaviour // UI의 게임오브젝트들을 관리
 {
     public Animation m_UIOpenAnim;
 
@@ -24,6 +25,7 @@ public class BaseUI : MonoBehaviour
         transform.SetParent(anchor);
 
         RectTransform rectTransform = GetComponent<RectTransform>();
+
         rectTransform.localPosition = Vector3.zero;
         rectTransform.localScale = Vector3.one;
         rectTransform.offsetMin = Vector3.zero;

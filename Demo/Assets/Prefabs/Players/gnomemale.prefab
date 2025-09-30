@@ -48,12 +48,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 556954839425914694, guid: d635d10ea19911743bfb320283a49974, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7368319782209691362, guid: d635d10ea19911743bfb320283a49974, type: 3}
       propertyPath: m_Name
       value: gnomemale
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 556954839425914694, guid: d635d10ea19911743bfb320283a49974, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -6665183574130533599, guid: d635d10ea19911743bfb320283a49974, type: 3}

@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -4707254985435574583, guid: 6559af976ccae0147a70a3e25c9e5e36, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -125946576971884882, guid: 6559af976ccae0147a70a3e25c9e5e36, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1060.289
@@ -53,7 +57,8 @@ PrefabInstance:
       value: nightelfmale
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6584537400678746178, guid: 6559af976ccae0147a70a3e25c9e5e36, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3945828642686631459, guid: 6559af976ccae0147a70a3e25c9e5e36, type: 3}

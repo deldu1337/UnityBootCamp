@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UserDataManager : SingletonBehaviour<UserDataManager>
@@ -16,6 +17,7 @@ public class UserDataManager : SingletonBehaviour<UserDataManager>
         // 모든 유저 데이터를 UserDataList 에 인스턴스 추가
         UserDataList.Add(new UserSettingsData());
         UserDataList.Add(new UserGoodsData());
+        UserDataList.Add(new UserInventoryData());
     }
 
     public void SetDefaultUserData()
@@ -58,5 +60,10 @@ public class UserDataManager : SingletonBehaviour<UserDataManager>
             PlayerPrefs.SetInt("ExistsSaveData", 1);
             PlayerPrefs.Save();
         }
+    }
+
+    public T GetUserData<T>() where T : class, IUserData
+    {
+        return UserDataList.OfType<T>().FirstOrDefault();
     }
 }

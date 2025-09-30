@@ -52,8 +52,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: dwarfmale
       objectReference: {fileID: 0}
+    - target: {fileID: 335502611780771802, guid: badf0efd73bc51949a67bc64948a88e5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 586663321722421346, guid: badf0efd73bc51949a67bc64948a88e5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 586663321722421346, guid: badf0efd73bc51949a67bc64948a88e5, type: 3}
+    - {fileID: 335502611780771802, guid: badf0efd73bc51949a67bc64948a88e5, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -1579000971845509462, guid: badf0efd73bc51949a67bc64948a88e5, type: 3}

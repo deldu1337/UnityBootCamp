@@ -17,7 +17,7 @@ public class SceneUI : MonoBehaviour
 
     private void GameStart()
     {
-        SceneManager.LoadScene("DungeonScene");
+        SceneManager.LoadScene("CharacterScene");
     }
 
     // 게임 종료 함수는 전처리 사용(#if, #else, #endif)
