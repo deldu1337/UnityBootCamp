@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2794002554586196107}
   - component: {fileID: 2794002554586196106}
   m_Layer: 5
-  m_Name: GradeBg
+  m_Name: ItemGradeBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 2794002554853775527}
   - component: {fileID: 2794002554853775526}
   - component: {fileID: 737839204852525428}
+  - component: {fileID: 3363776254313982882}
   m_Layer: 5
   m_Name: InventoryItemSlot
   m_TagString: Untagged
@@ -197,6 +198,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3363776254313982882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2794002554853775520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f49da8251a91e44b4ad40eea84a1dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoApplySize: 1
+  _itemGradeBg: {fileID: 2794002554586196106}
+  _itemIcon: {fileID: 2794002555972019349}
 --- !u!1 &2794002555972019351
 GameObject:
   m_ObjectHideFlags: 0

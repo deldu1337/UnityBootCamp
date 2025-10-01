@@ -14,7 +14,8 @@ namespace Gpm.Ui
                 this.data = data;
             }
 
-            internal InfiniteScrollData data;
+            public InfiniteScrollData data { get; private set; }
+
             internal int index = -1;
 
             internal int itemIndex = -1;
@@ -314,6 +315,14 @@ namespace Gpm.Ui
                     selectCallback(data);
                 }
             }
+        }
+
+        public void SortDataList(Comparison<DataContext> comparison)
+        {
+            dataList.Sort(comparison);
+
+            needUpdateItemList = true;
+            UpdateShowItem();
         }
     }
 }

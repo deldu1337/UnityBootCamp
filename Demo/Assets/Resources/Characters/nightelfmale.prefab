@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 26533071135936788}
   - component: {fileID: 1175118142121921414}
   - component: {fileID: 1511739686781106054}
-  m_Layer: 6
+  m_Layer: 5
   m_Name: BG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 4909770277677937700}
   - component: {fileID: 8979617058956512421}
   - component: {fileID: 5065219747965413631}
-  m_Layer: 6
+  m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 6281872362668945989}
   - component: {fileID: 2114646797295785093}
   - component: {fileID: 5810084262716177233}
-  m_Layer: 6
+  m_Layer: 5
   m_Name: ArrowImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +378,7 @@ GameObject:
   - component: {fileID: 2730947321774949304}
   - component: {fileID: 6518778506417151101}
   - component: {fileID: 7724644623900033798}
-  m_Layer: 6
+  m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}

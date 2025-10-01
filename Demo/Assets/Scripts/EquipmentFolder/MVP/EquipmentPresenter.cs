@@ -1,26 +1,35 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Àåºñ UI¿Í Ä³¸¯ÅÍ ¸ğµ¨À» ¿¬°áÇÏ°í ÀåÂø/ÇØÁ¦ ¹× ½ºÅÈ °è»êÀ» ´ã´çÇÏ´Â Presenter
+/// ì¥ë¹„ UIì™€ ìºë¦­í„° ëª¨ë¸ì„ ì—°ê²°í•˜ê³  ì¥ì°©/í•´ì œ ë° ìŠ¤íƒ¯ ê³„ì‚°ì„ ë‹´ë‹¹í•˜ëŠ” Presenter
 /// </summary>
 public class EquipmentPresenter : MonoBehaviour
 {
-    private EquipmentModel model;                // Àåºñ µ¥ÀÌÅÍ ¸ğµ¨
-    private EquipmentView view;                  // Àåºñ UI
-    private InventoryPresenter inventoryPresenter; // ÀÎº¥Åä¸® Presenter
-    private bool isOpen = false;                 // ÀåºñÃ¢ ¿­¸² »óÅÂ
+    private EquipmentModel model;                // ì¥ë¹„ ë°ì´í„° ëª¨ë¸
+    private EquipmentView view;                  // ì¥ë¹„ UI
+    private InventoryPresenter inventoryPresenter; // ì¸ë²¤í† ë¦¬ Presenter
+    private bool isOpen = false;                 // ì¥ë¹„ì°½ ì—´ë¦¼ ìƒíƒœ
 
-    [SerializeField] private Camera uiCamera;           // Àåºñ UI Àü¿ë Ä«¸Ş¶ó
-    [SerializeField] private Transform targetCharacter; // Ä³¸¯ÅÍ ¸ğµ¨
-    //[SerializeField] private PlayerStatsManager playerStats; // Ä³¸¯ÅÍ ½ºÅÈ °è»ê¿ë
+    [SerializeField] private Camera uiCamera;           // ì¥ë¹„ UI ì „ìš© ì¹´ë©”ë¼
+    [SerializeField] private Transform targetCharacter; // ìºë¦­í„° ëª¨ë¸
+
+    // í˜„ì¬ í”Œë ˆì´ì–´ ì¢…ì¡±(ì¹´ë©”ë¼ ê°„ê²© ìŠ¤ìœ„ì¹˜ì— ì‚¬ìš©)
+    private string currentRace = "humanmale";
 
     void Start()
     {
-        UIEscapeStack.GetOrCreate(); // ½ºÅÃ º¸Àå
+        UIEscapeStack.GetOrCreate();
 
-        model = new EquipmentModel();
+        // ì¢…ì¡± êµ¬í•´ì„œ ëª¨ë¸ ìƒì„± + currentRace ì €ì¥
+        var ps = PlayerStatsManager.Instance;
+        currentRace = (ps != null && ps.Data != null && !string.IsNullOrEmpty(ps.Data.Race))
+                        ? ps.Data.Race
+                        : "humanmale";
+
+        model = new EquipmentModel(currentRace);
+
         view = FindAnyObjectByType<EquipmentView>();
         inventoryPresenter = FindAnyObjectByType<InventoryPresenter>();
 
@@ -34,7 +43,7 @@ public class EquipmentPresenter : MonoBehaviour
 
     public IReadOnlyList<EquipmentSlot> GetEquipmentSlots()
     {
-        return model?.Slots; // EquipmentModel¿¡¼­ ½½·Ô ¸®½ºÆ® °¡Á®¿À±â
+        return model?.Slots; // EquipmentModelì—ì„œ ìŠ¬ë¡¯ ë¦¬ìŠ¤íŠ¸ ê°€ì ¸ì˜¤ê¸°
     }
 
     void Update()
@@ -42,22 +51,84 @@ public class EquipmentPresenter : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
             ToggleEquipment();
 
-        // ¿©±â¼­ ESC·Î ´İÁö ¾Ê´Â´Ù (Áß¾Ó ESC ½ºÅÃ¿¡¼­ Ã³¸®)
+        // ì—¬ê¸°ì„œ ESCë¡œ ë‹«ì§€ ì•ŠëŠ”ë‹¤ (ì¤‘ì•™ ESC ìŠ¤íƒì—ì„œ ì²˜ë¦¬)
         // if (Input.GetKeyDown(KeyCode.Escape)) CloseEquipment();
     }
 
     void LateUpdate()
     {
-        // UI Ä«¸Ş¶ó°¡ Ä³¸¯ÅÍ¸¦ ¹Ù¶óº¸µµ·Ï À¯Áö
+        // UI ì¹´ë©”ë¼ê°€ ìºë¦­í„°ë¥¼ ë°”ë¼ë³´ë„ë¡ ìœ ì§€
         if (uiCamera != null && targetCharacter != null)
         {
-            Vector3 offset = targetCharacter.forward * 2.2f + Vector3.up * 1.5f;
+            // ì¢…ì¡±ë³„ ì „/í›„ ê±°ë¦¬ë§Œ ìŠ¤ìœ„ì¹˜ë¡œ ì¡°ì ˆ
+            float dist = GetRaceCameraDistance(currentRace);
+            float height = GetRaceLookAtHeight(currentRace);
+            float lookY = GetRaceCameraHeight(currentRace);
+
+            Vector3 offset = targetCharacter.forward * dist + Vector3.up * height; // ë†’ì´ëŠ” ê·¸ëŒ€ë¡œ ìœ ì§€
+            //Vector3 offset = targetCharacter.forward * 2.2f + Vector3.up * 1.5f;
             uiCamera.transform.position = targetCharacter.position + offset;
-            uiCamera.transform.LookAt(targetCharacter.position + Vector3.up * 1.0f);
+            uiCamera.transform.LookAt(targetCharacter.position + Vector3.up * lookY);
         }
     }
 
-    /// <summary>UI Ä«¸Ş¶ó ÀÚµ¿ ¼¼ÆÃ</summary>
+    /// <summary>ì¢…ì¡±ë³„ ì¹´ë©”ë¼ ì „/í›„ ê±°ë¦¬</summary>
+    private float GetRaceCameraDistance(string race)
+    {
+        // ë¹„êµ í¸ì˜ë¥¼ ìœ„í•´ ì†Œë¬¸ì í†µì¼
+        string r = string.IsNullOrEmpty(race) ? "humanmale" : race.ToLowerInvariant();
+
+        switch (r)
+        {
+            case "humanmale": return 2.2f;
+            case "dwarfmale": return 2.0f;
+            case "gnomemale": return 1.2f;
+            case "nightelfmale": return 2.7f;
+            case "orcmale": return 2.5f;
+            case "trollmale": return 2.8f;
+            case "goblinmale": return 1.7f;
+            case "scourgefemale": return 2.0f;
+            default: return 2.2f;
+        }
+    }
+
+    /// <summary>ì¢…ì¡±ë³„ ì‹œì„ (LookAt) ë†’ì´ â€” í•„ìš” ì‹œ ë¯¸ì„¸ì¡°ì •</summary>
+    private float GetRaceLookAtHeight(string race)
+    {
+        string r = string.IsNullOrEmpty(race) ? "humanmale" : race.ToLowerInvariant();
+        switch (r)
+        {
+            case "humanmale": return 1.4f;
+            case "dwarfmale": return 1.3f;
+            case "gnomemale": return 0.7f;
+            case "nightelfmale": return 1.6f;
+            case "orcmale": return 1.4f;
+            case "trollmale": return 1.5f;
+            case "goblinmale": return 1.0f;
+            case "scourgefemale": return 1.2f;
+            default: return 1.4f;
+        }
+    }
+
+    /// <summary>ì¢…ì¡±ë³„ ì¹´ë©”ë¼ ë†’ì´</summary>
+    private float GetRaceCameraHeight(string race)
+    {
+        string r = string.IsNullOrEmpty(race) ? "humanmale" : race.ToLowerInvariant();
+        switch (r)
+        {
+            case "humanmale": return 1.0f;
+            case "dwarfmale": return 0.7f;
+            case "gnomemale": return 0.5f;
+            case "nightelfmale": return 1.3f;
+            case "orcmale": return 1.1f;
+            case "trollmale": return 1.3f;
+            case "goblinmale": return 0.6f;
+            case "scourgefemale": return 0.9f;
+            default: return 1.0f;
+        }
+    }
+
+    /// <summary>UI ì¹´ë©”ë¼ ìë™ ì„¸íŒ…</summary>
     private void SetupUICamera()
     {
         if (uiCamera == null)
@@ -78,7 +149,7 @@ public class EquipmentPresenter : MonoBehaviour
         }
     }
 
-    /// <summary>ÀåºñÃ¢ ¿­±â/´İ±â</summary>
+    /// <summary>ì¥ë¹„ì°½ ì—´ê¸°/ë‹«ê¸°</summary>
     private void ToggleEquipment()
     {
         if (view == null) return;
@@ -116,35 +187,35 @@ public class EquipmentPresenter : MonoBehaviour
         return (ps != null && ps.Data != null) ? ps.Data.Level : 1;
     }
 
-    /// <summary>¾ÆÀÌÅÛ ÀåÂø (uniqueId ±â¹İ)</summary>
+    /// <summary>ì•„ì´í…œ ì¥ì°© (uniqueId ê¸°ë°˜)</summary>
     public void HandleEquipItem(InventoryItem item)
     {
-        // === ·¹º§ Á¦ÇÑ Ã¼Å© ===
+        // === ë ˆë²¨ ì œí•œ ì²´í¬ ===
         int reqLevel = Mathf.Max(1, item.data.level);
         int curLevel = GetPlayerLevel();
         if (curLevel < reqLevel)
         {
-            Debug.LogWarning($"[ÀåÂø ½ÇÆĞ] ¿ä±¸ ·¹º§ {reqLevel}, ÇöÀç ·¹º§ {curLevel} ¡æ '{item.data.name}' ÀåÂø ºÒ°¡");
-            // ÇÊ¿äÇÏ¸é ¿©±â¼­ UI Åä½ºÆ®/»ç¿îµå/¹öÆ° Èçµé±â µî ÇÇµå¹é È£Ãâ
+            Debug.LogWarning($"[ì¥ì°© ì‹¤íŒ¨] ìš”êµ¬ ë ˆë²¨ {reqLevel}, í˜„ì¬ ë ˆë²¨ {curLevel} â†’ '{item.data.name}' ì¥ì°© ë¶ˆê°€");
+            // í•„ìš”í•˜ë©´ ì—¬ê¸°ì„œ UI í† ìŠ¤íŠ¸/ì‚¬ìš´ë“œ/ë²„íŠ¼ í”ë“¤ê¸° ë“± í”¼ë“œë°± í˜¸ì¶œ
             return;
         }
 
         string slotType = item.data.type;
         var slot = model.GetSlot(slotType);
 
-        // ±âÁ¸ Àåºñ¸¦ ÀÎº¥Åä¸®¿¡ Ãß°¡
+        // ê¸°ì¡´ ì¥ë¹„ë¥¼ ì¸ë²¤í† ë¦¬ì— ì¶”ê°€
         if (slot?.equipped != null)
         {
             inventoryPresenter?.AddExistingItem(slot.equipped);
         }
 
-        // Àåºñ µ¥ÀÌÅÍ ±³Ã¼
+        // ì¥ë¹„ ë°ì´í„° êµì²´
         model.EquipItem(slotType, item);
 
-        // ÀÎº¥Åä¸®¿¡¼­ ÇØ´ç ¾ÆÀÌÅÛ Á¦°Å
+        // ì¸ë²¤í† ë¦¬ì—ì„œ í•´ë‹¹ ì•„ì´í…œ ì œê±°
         inventoryPresenter?.RemoveItemFromInventory(item.uniqueId);
 
-        // Ä³¸¯ÅÍ ¸ğµ¨ ÇÁ¸®ÆÕ ÀåÂø
+        // ìºë¦­í„° ëª¨ë¸ í”„ë¦¬íŒ¹ ì¥ì°©
         if (!string.IsNullOrEmpty(item.prefabPath) && targetCharacter != null)
         {
             var prefab = Resources.Load<GameObject>(item.prefabPath);
@@ -152,19 +223,19 @@ public class EquipmentPresenter : MonoBehaviour
                 AttachPrefabToCharacter(prefab, slotType);
         }
 
-        // UI & ½ºÅÈ °»½Å
+        // UI & ìŠ¤íƒ¯ ê°±ì‹ 
         ApplyStatsAndSave();
         inventoryPresenter?.Refresh();
         RefreshEquipmentUI();
     }
 
-    /// <summary>µå·¡±×¾Øµå·ÓÀ¸·Î Àåºñ ÀåÂø</summary>
+    /// <summary>ë“œë˜ê·¸ì•¤ë“œë¡­ìœ¼ë¡œ ì¥ë¹„ ì¥ì°©</summary>
     private void HandleEquipFromInventory(string slotType, InventoryItem item)
     {
         HandleEquipItem(item);
     }
 
-    /// <summary>¾ÆÀÌÅÛ ÇØÁ¦ (uniqueId ±â¹İ)</summary>
+    /// <summary>ì•„ì´í…œ í•´ì œ (uniqueId ê¸°ë°˜)</summary>
     public void HandleUnequipItem(string slotType)
     {
         var slot = model.GetSlot(slotType);
@@ -172,13 +243,13 @@ public class EquipmentPresenter : MonoBehaviour
 
         var item = slot.equipped;
 
-        // ÀÎº¥Åä¸®·Î ¹İÈ¯
+        // ì¸ë²¤í† ë¦¬ë¡œ ë°˜í™˜
         inventoryPresenter?.AddExistingItem(item);
 
-        // Àåºñ µ¥ÀÌÅÍ ¾÷µ¥ÀÌÆ®
+        // ì¥ë¹„ ë°ì´í„° ì—…ë°ì´íŠ¸
         model.UnequipItem(slotType);
 
-        // Ä³¸¯ÅÍ ¸ğµ¨¿¡¼­ ÇÁ¸®ÆÕ Á¦°Å
+        // ìºë¦­í„° ëª¨ë¸ì—ì„œ í”„ë¦¬íŒ¹ ì œê±°
         RemovePrefabFromCharacter(slotType);
 
         inventoryPresenter?.Refresh();
@@ -186,7 +257,7 @@ public class EquipmentPresenter : MonoBehaviour
         RefreshEquipmentUI();
     }
 
-    // Àåºñ º¯°æ ½Ã Áï½Ã ½ºÅÈ °»½Å + ÀúÀå
+    // ì¥ë¹„ ë³€ê²½ ì‹œ ì¦‰ì‹œ ìŠ¤íƒ¯ ê°±ì‹  + ì €ì¥
     private void ApplyStatsAndSave()
     {
         var ps = PlayerStatsManager.Instance;
@@ -197,7 +268,7 @@ public class EquipmentPresenter : MonoBehaviour
         }
     }
 
-    /// <summary>JSON ÀúÀåµÈ Àåºñ µ¥ÀÌÅÍ º¹¿ø</summary>
+    /// <summary>JSON ì €ì¥ëœ ì¥ë¹„ ë°ì´í„° ë³µì›</summary>
     private void InitializeEquippedItems()
     {
         foreach (var slot in model.Slots)
@@ -213,7 +284,7 @@ public class EquipmentPresenter : MonoBehaviour
         if (ps != null) ps.RecalculateStats(model.Slots);
     }
 
-    /// <summary>Àåºñ ÇÁ¸®ÆÕ Ä³¸¯ÅÍ º»¿¡ ÀåÂø</summary>
+    /// <summary>ì¥ë¹„ í”„ë¦¬íŒ¹ ìºë¦­í„° ë³¸ì— ì¥ì°©</summary>
     private void AttachPrefabToCharacter(GameObject prefab, string slotType)
     {
         Transform bone = GetSlotTransform(slotType);
@@ -225,37 +296,37 @@ public class EquipmentPresenter : MonoBehaviour
             Destroy(lastChild.gameObject);
         }
 
-        // »õ ÇÁ¸®ÆÕ ÀåÂø
+        // ìƒˆ í”„ë¦¬íŒ¹ ì¥ì°©
         GameObject instance = Instantiate(prefab, bone);
         instance.transform.SetAsLastSibling();
         instance.transform.localPosition = GetSlotOffset(slotType);
         instance.transform.localRotation = Quaternion.identity;
 
-        // ¦¡¦¡ ¿©±âºÎÅÍ Ãß°¡: Àåºñ·Î ºÙÀ» ¶© Áİ±â/ÅøÆÁ/¹°¸® ºñÈ°¼ºÈ­ ¦¡¦¡
-        // 1) ÀåÂø ¸¶Ä¿ ºÎÂø
+        // â”€â”€ ì—¬ê¸°ë¶€í„° ì¶”ê°€: ì¥ë¹„ë¡œ ë¶™ì„ ë• ì¤ê¸°/íˆ´íŒ/ë¬¼ë¦¬ ë¹„í™œì„±í™” â”€â”€
+        // 1) ì¥ì°© ë§ˆì»¤ ë¶€ì°©
         if (instance.GetComponent<EquippedMarker>() == null)
             instance.AddComponent<EquippedMarker>();
 
-        // 2) ±ÙÁ¢ Áİ±â/ÅøÆÁ ½ºÅ©¸³Æ® Á¦°Å
+        // 2) ê·¼ì ‘ ì¤ê¸°/íˆ´íŒ ìŠ¤í¬ë¦½íŠ¸ ì œê±°
         foreach (var pickup in instance.GetComponentsInChildren<ItemPickup>(true))
             Destroy(pickup);
 
-        // (È¤½Ã ºÙ¾îÀÖÀ» ¼ö ÀÖ´Â) ¿ùµå ÅøÆÁ Æ®¸®°Å·ùµµ Á¦°ÅÇÏ°í ½Í´Ù¸é:
+        // (í˜¹ì‹œ ë¶™ì–´ìˆì„ ìˆ˜ ìˆëŠ”) ì›”ë“œ íˆ´íŒ íŠ¸ë¦¬ê±°ë¥˜ë„ ì œê±°í•˜ê³  ì‹¶ë‹¤ë©´:
         foreach (var hover in instance.GetComponentsInChildren<ItemHoverTooltip>(true))
             Destroy(hover);
 
-        // 3) ¹°¸® Ãæµ¹/Áß·Â Á¦°Å (Ä³¸¯ÅÍ º»¿¡ ºÙ¾úÀ» ¶© ºÒÇÊ¿ä)
+        // 3) ë¬¼ë¦¬ ì¶©ëŒ/ì¤‘ë ¥ ì œê±° (ìºë¦­í„° ë³¸ì— ë¶™ì—ˆì„ ë• ë¶ˆí•„ìš”)
         foreach (var col in instance.GetComponentsInChildren<Collider>(true))
             col.enabled = false;
         foreach (var rb in instance.GetComponentsInChildren<Rigidbody>(true))
             Destroy(rb);
 
-        // 4) (¼±ÅÃ) ·¹ÀÌ¾î ºĞ¸®ÇØ¼­ ´Ù¸¥ ½Ã½ºÅÛ¿¡¼­ ¹«½ÃµÇ°Ô
+        // 4) (ì„ íƒ) ë ˆì´ì–´ ë¶„ë¦¬í•´ì„œ ë‹¤ë¥¸ ì‹œìŠ¤í…œì—ì„œ ë¬´ì‹œë˜ê²Œ
         // int equipLayer = LayerMask.NameToLayer("UICharacter");
         // if (equipLayer != -1) SetLayerRecursively(instance, equipLayer);
     }
 
-    /// <summary>Àåºñ ÇÁ¸®ÆÕ Ä³¸¯ÅÍ º»¿¡¼­ Á¦°Å</summary>
+    /// <summary>ì¥ë¹„ í”„ë¦¬íŒ¹ ìºë¦­í„° ë³¸ì—ì„œ ì œê±°</summary>
     private void RemovePrefabFromCharacter(string slotType)
     {
         Transform bone = GetSlotTransform(slotType);
@@ -268,7 +339,7 @@ public class EquipmentPresenter : MonoBehaviour
         }
     }
 
-    /// <summary>½½·Ô º» Ã£±â</summary>
+    /// <summary>ìŠ¬ë¡¯ ë³¸ ì°¾ê¸°</summary>
     private Transform GetSlotTransform(string slotType)
     {
         string boneName = slotType switch
@@ -287,11 +358,11 @@ public class EquipmentPresenter : MonoBehaviour
             if (t.name == boneName)
                 return t;
 
-        Debug.LogWarning($"{slotType} ½½·Ô¿¡ ÇØ´çÇÏ´Â º»({boneName})À» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+        Debug.LogWarning($"{slotType} ìŠ¬ë¡¯ì— í•´ë‹¹í•˜ëŠ” ë³¸({boneName})ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         return null;
     }
 
-    /// <summary>½½·Ôº° ¿ÀÇÁ¼Â</summary>
+    /// <summary>ìŠ¬ë¡¯ë³„ ì˜¤í”„ì…‹</summary>
     private Vector3 GetSlotOffset(string slotType)
     {
         return slotType switch
@@ -304,7 +375,7 @@ public class EquipmentPresenter : MonoBehaviour
         };
     }
 
-    /// <summary>Àåºñ UI °»½Å</summary>
+    /// <summary>ì¥ë¹„ UI ê°±ì‹ </summary>
     private void RefreshEquipmentUI()
     {
         if (view != null && model != null)
