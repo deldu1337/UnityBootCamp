@@ -262,57 +262,6 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
 
 
     /// <summary>장비 기반으로 MaxHP만 계산</summary>
-    //public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
-    //{
-    //    float prevHP = Data.CurrentHP;
-    //    float prevMP = Data.CurrentMP;
-
-    //    // 기본값(레벨업 반영된 값)으로 초기화
-    //    // 저장된 JSON에서 불러온 값이 이미 레벨업까지 반영된 값이므로,
-    //    // "기본값"은 PlayerData의 MaxHP, MaxMP, Atk, Def 등을 복사해서 사용
-    //    float baseHP = 100f + (Data.Level - 1) * 10f; // 레벨당 10씩 증가 (레벨업 로직과 맞춤)
-    //    float baseMP = 50f;                           // 레벨업으로 MP가 변하는 로직이 있으면 수정
-    //    float baseAtk = 5f + (Data.Level - 1) * 2f;   // 레벨당 2씩 증가
-    //    float baseDef = 2f + (Data.Level - 1) * 0.5f;   // 레벨당 1씩 증가
-    //    float baseDex = 10f;                          // 기본값 그대로
-    //    float baseAS = 2f;                            // 기본값 그대로
-    //    float baseCC = 0.1f;
-    //    float baseCD = 1.5f;
-
-    //    // 장비 스탯 합산
-    //    float equipHP = 0f, equipMP = 0f, equipAtk = 0f, equipDef = 0f, equipDex = 0f;
-    //    float equipAS = 0f, equipCC = 0f, equipCD = 0f;
-
-    //    if (equippedSlots != null)
-    //    {
-    //        foreach (var slot in equippedSlots)
-    //        {
-    //            if (slot.equipped == null || slot.equipped.data == null || slot.equipped.rolled == null) continue;
-    //            var eq = slot.equipped.rolled;
-    //            equipHP += eq.hp;
-    //            equipMP += eq.mp;
-    //            equipAtk += eq.atk;
-    //            equipDef += eq.def;
-    //            equipDex += eq.dex;
-    //            equipAS += eq.As;
-    //            equipCC += eq.cc;
-    //            equipCD += eq.cd;
-    //        }
-    //    }
-
-    //    // 최종 스탯 = 기본값 + 장비값
-    //    Data.MaxHP = baseHP + equipHP;
-    //    Data.MaxMP = baseMP + equipMP;
-    //    Data.Atk = baseAtk + equipAtk;
-    //    Data.Def = baseDef + equipDef;
-    //    Data.Dex = baseDex + equipDex;
-    //    Data.AttackSpeed = baseAS + equipAS;
-    //    Data.CritChance = baseCC + equipCC;
-    //    Data.CritDamage = baseCD + equipCD;
-
-    //    SaveLoadService.SavePlayerData(Data);
-    //    UpdateUI();
-    //}
     public void RecalculateStats(IReadOnlyList<EquipmentSlot> equippedSlots)
     {
         // 1) 장비 보너스 합산
@@ -329,7 +278,7 @@ public class PlayerStatsManager : MonoBehaviour, IHealth
             }
         }
 
-        // 2) ★ Final = Base + Equip
+        // 2) Final = Base + Equip
         Data.MaxHP = Data.BaseMaxHP + eqHP;
         Data.MaxMP = Data.BaseMaxMP + eqMP;
         Data.Atk = Data.BaseAtk + eqAtk;
