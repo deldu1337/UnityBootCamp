@@ -701,6 +701,9 @@ MonoBehaviour:
   hpBar: {fileID: 57407508}
   mpBar: {fileID: 1293829627}
   expBar: {fileID: 1789484378}
+  Circle: {fileID: 1144754256}
+  portraitsFolder: Portraits
+  defaultPortraitName: default
   statusUIRootName: StatusUI
   hpIndex: 3
   mpIndex: 4
