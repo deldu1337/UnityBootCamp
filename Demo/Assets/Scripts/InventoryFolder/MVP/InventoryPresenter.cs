@@ -316,12 +316,15 @@
 //}
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryPresenter : MonoBehaviour
 {
     private InventoryModel model;
     private InventoryView view;
     private bool isOpen;
+
+    private Button InvenButton;
 
     void Start()
     {
@@ -338,6 +341,9 @@ public class InventoryPresenter : MonoBehaviour
         model = new InventoryModel(race);
         view.Initialize(CloseInventory);
         isOpen = false;
+
+        InvenButton = GameObject.Find("QuickUI").transform.GetChild(2).GetComponent<Button>();
+        InvenButton.onClick.AddListener(ToggleInventory);
     }
 
     void Update()

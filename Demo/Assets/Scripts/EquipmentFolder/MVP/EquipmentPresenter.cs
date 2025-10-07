@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// 장비 UI와 캐릭터 모델을 연결하고 장착/해제 및 스탯 계산을 담당하는 Presenter
@@ -14,6 +15,8 @@ public class EquipmentPresenter : MonoBehaviour
 
     [SerializeField] private Camera uiCamera;           // 장비 UI 전용 카메라
     [SerializeField] private Transform targetCharacter; // 캐릭터 모델
+
+    private Button EquipButton;
 
     // 현재 플레이어 종족(카메라 간격 스위치에 사용)
     private string currentRace = "humanmale";
@@ -35,6 +38,9 @@ public class EquipmentPresenter : MonoBehaviour
 
         if (view != null)
             view.Initialize(CloseEquipment, HandleEquipFromInventory);
+
+        EquipButton = GameObject.Find("QuickUI").transform.GetChild(1).GetComponent<Button>();
+        EquipButton.onClick.AddListener(ToggleEquipment);
 
         SetupUICamera();
         InitializeEquippedItems();
