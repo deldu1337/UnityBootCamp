@@ -296,20 +296,27 @@ public class ItemTooltipUI : MonoBehaviour
         var d = item.data;
         var r = item.rolled;
 
-        // 라인 추가 헬퍼 (최대치면 색상 강조)
+        bool isPotion = string.Equals(d.type, "potion", System.StringComparison.OrdinalIgnoreCase);
+
+        // 라인 추가 헬퍼 (포션이면 rolled 절대 적용 X)
         void AddLine(string label, string key, float baseVal)
         {
             float v = baseVal;
-            bool hasRolled = r != null && r.TryGet(key, out v);
+
+            // ★ 포션이 아닐 때만 rolled 적용
+            bool hasRolled = !isPotion && r != null && r.TryGet(key, out v);
+
             bool isZero = Mathf.Abs(v) <= 0.0001f;
             if (isZero) return;
 
+            // 하이라이트(최대치)는 포션 제외
             bool isMax = hasRolled && ItemRoller.IsMaxRoll(item.id, key, v);
+
             string valueStr = key == "cc" ? $"+{v * 100f}%" :
                               key == "cd" ? $"x{v}" :
                               $"+{v}";
 
-            if (isMax && d.type != "potion")
+            if (!isPotion && isMax && d.type != "potion")
                 sb.AppendLine($"<color=#{ColorUtility.ToHtmlStringRGBA(MaxRollColor)}>{label}  {valueStr}</color>");
             else
                 sb.AppendLine($"{label}  {valueStr}");
