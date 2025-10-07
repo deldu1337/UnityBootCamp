@@ -111,6 +111,7 @@ public class EquipmentView : MonoBehaviour
                 var hover = btn.GetComponent<ItemHoverTooltip>();
                 if (hover == null) hover = btn.gameObject.AddComponent<ItemHoverTooltip>();
                 hover.SetItem(slot.equipped);
+                hover.SetContext(ItemOrigin.Equipment);   // ★ 추가: 장비창 컨텍스트
 
                 // PointerClick 이벤트 직접 등록 (우클릭만 처리)
                 var trigger = btn.GetComponent<UnityEngine.EventSystems.EventTrigger>();
