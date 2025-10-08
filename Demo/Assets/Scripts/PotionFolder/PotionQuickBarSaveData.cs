@@ -17,4 +17,7 @@ public class PotionSlotEntry
     public string prefabPath;   // 원래 프리팹 경로(있으면)
     public float hp;
     public float mp;
+
+    // ★ 추가: 수량
+    public int qty;
 }

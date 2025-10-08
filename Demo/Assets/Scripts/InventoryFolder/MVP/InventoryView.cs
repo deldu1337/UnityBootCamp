@@ -55,6 +55,19 @@ public class InventoryView : MonoBehaviour
                 if (icon != null) image.sprite = icon;
             }
 
+            // ★ 우하단 수량 라벨(필요 시 생성 후 갱신)
+            var qty = EnsureQtyLabel(button.transform);
+            if (item.data != null && item.data.type == "potion" && item.quantity >= 1)
+            {
+                qty.text = item.quantity.ToString();
+                qty.enabled = true;
+            }
+            else
+            {
+                qty.text = "";
+                qty.enabled = false;
+            }
+
             var draggable = button.GetComponent<DraggableItemView>();
             if (draggable == null)
                 draggable = button.gameObject.AddComponent<DraggableItemView>();
@@ -74,5 +87,52 @@ public class InventoryView : MonoBehaviour
             CanvasGroup.blocksRaycasts = true;
         }
     }
+
+    // 가장 위에 using 유지:
+    // using UnityEngine.UI;
+
+    private Text EnsureQtyLabel(Transform parent)
+    {
+        var t = parent.Find("Qty") as RectTransform;
+        if (t == null)
+        {
+            var go = new GameObject("Qty", typeof(RectTransform));
+            t = go.GetComponent<RectTransform>();
+            t.SetParent(parent, false);
+            t.anchorMin = new Vector2(1, 0);
+            t.anchorMax = new Vector2(1, 0);
+            t.pivot = new Vector2(1, 0);
+            t.anchoredPosition = new Vector2(-4, 4);
+            t.sizeDelta = new Vector2(60, 24);
+
+            var txt = go.AddComponent<Text>();
+            txt.alignment = TextAnchor.LowerRight;
+
+            // ★ 변경된 부분: 내장 폰트 이름 교체 + 폴백
+            Font f = null;
+            try
+            {
+                // 새 내장 폰트 이름
+                f = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            }
+            catch { /* 일부 버전에서 예외 가능 */ }
+
+            // 만약 위에서 못 찾으면 OS 폰트 폴백 시도
+            if (f == null)
+            {
+                try { f = Font.CreateDynamicFontFromOSFont("Arial", 18); } catch { }
+            }
+
+            txt.font = f;            // f가 null이어도 Text는 동작하지만 가능하면 세팅됨
+            txt.fontSize = 16;
+            txt.raycastTarget = false;
+
+            var outline = go.AddComponent<Outline>();
+            outline.effectDistance = new Vector2(1, -1);
+            outline.useGraphicAlpha = true;
+        }
+        return t.GetComponent<Text>();
+    }
+
 }
 

@@ -64,6 +64,9 @@ public class QuickSlotDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler
         // 부모(Potion1) 안에서 Text가 항상 맨 위로 오게 보장
         if (originalParent != null)
         {
+            var qtyTr = originalParent.Find("Qty");
+            if (qtyTr) qtyTr.SetAsLastSibling();
+
             var textTr = originalParent.Find("Text (Legacy)");
             if (textTr) textTr.SetAsLastSibling();
         }

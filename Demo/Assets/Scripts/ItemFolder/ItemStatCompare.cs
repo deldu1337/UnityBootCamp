@@ -1,32 +1,184 @@
+ï»¿//using System;
+//using System.Text;
+//using UnityEngine;
+
+//public static class ItemStatCompare
+//{
+//    // UI ìƒ‰ìƒ (Unity Text ë¦¬ì¹˜í…ìŠ¤íŠ¸)
+//    private const string POS = "#35C759"; // ì´ˆë¡
+//    private const string NEG = "#FF3B30"; // ë¹¨ê°•
+//    private const string ZERO = "#A1A1A6"; // íšŒìƒ‰
+//    private const string LABEL = "#DADADA"; // ë¼ë²¨ í…ìŠ¤íŠ¸ ê¸°ë³¸ìƒ‰
+//    private const string MAX = "#49DDDF";  // ê·¹ì˜µ í•˜ì´ë¼ì´íŠ¸(ì›íŒ¨ë„ê³¼ ë™ì¼ í†¤)
+
+//    // inv > eq ì´ë©´ ì´ˆë¡ +, inv < eq ì´ë©´ ë¹¨ê°• -, 0ì´ë©´ íšŒìƒ‰ 0
+//    private static string ColorizeDiff(float diff, bool signed = true)
+//    {
+//        string sign = diff > 0.0001f ? "+" : (diff < -0.0001f ? "" : "");
+//        string color = diff > 0.0001f ? POS : (diff < -0.0001f ? NEG : ZERO);
+//        string val = diff.ToString(diff == Mathf.RoundToInt(diff) ? "+0;-#;0" : "+0.##;-0.##;0");
+//        if (!signed) val = diff.ToString(diff == Mathf.RoundToInt(diff) ? "0;-#;0" : "0.##;-0.##;0");
+//        return $"<color={color}>{(signed ? val : sign + val)}</color>";
+//    }
+
+//    private static float Eff(float baseVal, bool hasRolled, float rolledVal)
+//        => hasRolled ? rolledVal : baseVal;
+
+//    private static void Take(InventoryItem item, out float hp, out float mp, out float atk, out float def, out float dex, out float AS, out float cc, out float cd)
+//    {
+//        // rolledê°€ ìˆìœ¼ë©´ has* í”Œë˜ê·¸ë¥¼ ë”°ë¼ ìš°ì„  ì‚¬ìš©
+//        if (item.rolled != null)
+//        {
+//            hp = Eff(item.data.hp, item.rolled.hasHp, item.rolled.hp);
+//            mp = Eff(item.data.mp, item.rolled.hasMp, item.rolled.mp);
+//            atk = Eff(item.data.atk, item.rolled.hasAtk, item.rolled.atk);
+//            def = Eff(item.data.def, item.rolled.hasDef, item.rolled.def);
+//            dex = Eff(item.data.dex, item.rolled.hasDex, item.rolled.dex);
+//            AS = Eff(item.data.As, item.rolled.hasAs, item.rolled.As);
+//            cc = Eff(item.data.cc, item.rolled.hasCc, item.rolled.cc);
+//            cd = Eff(item.data.cd, item.rolled.hasCd, item.rolled.cd);
+//        }
+//        else
+//        {
+//            hp = item.data.hp; mp = item.data.mp; atk = item.data.atk; def = item.data.def;
+//            dex = item.data.dex; AS = item.data.As; cc = item.data.cc; cd = item.data.cd;
+//        }
+//    }
+
+//    public static string BuildSingleTooltip(InventoryItem item, string tier = null)
+//    {
+//        Take(item, out var hp, out var mp, out var atk, out var def, out var dex, out var AS, out var cc, out var cd);
+
+//        string TierLine = string.IsNullOrEmpty(tier) ? "" : $"\n<color=#FFD60A>[{tier}]</color>";
+//        return
+//$@"<b>{item.data.name}</b>{TierLine}
+//<color={LABEL}>ì¢…ë¥˜</color>  {item.data.type}
+//<color={LABEL}>ë ˆë²¨</color>  {Mathf.Max(1, item.data.level)}
+
+//<color={LABEL}>HP</color>  {hp}
+//<color={LABEL}>MP</color>  {mp}
+//<color={LABEL}>ATK</color> {atk}
+//<color={LABEL}>DEF</color> {def}
+//<color={LABEL}>DEX</color> {dex}
+//<color={LABEL}>AS</color>  {AS}
+//<color={LABEL}>CC</color>  {cc}
+//<color={LABEL}>CD</color>  {cd}";
+//    }
+
+//    // inv ì•„ì´í…œì´ í•´ë‹¹ ìŠ¤íƒ¯ "ì˜µì…˜ì„ ê°–ê³  ìˆëŠ”ì§€" íŒì • (ì›ë˜ íŒ¨ë„ê³¼ ë™ì¼í•œ ì² í•™)
+//    private static bool HasOption(InventoryItem item, string key, float baseVal, out float effective)
+//    {
+//        effective = baseVal;
+//        var r = item.rolled;
+//        bool hasRolled =
+//            r != null && r.TryGet(key, out effective); // ë¡¤ë§ ê°’ ìš°ì„ 
+
+//        // ìœ íš¨ì„±: ë¡¤ë§ ê°’ì´ ìˆìœ¼ë©´ ê·¸ ê°’, ì—†ìœ¼ë©´ base ê°’ì´ 0ì´ ì•„ë‹Œì§€ë¡œ íŒë‹¨
+//        const float EPS = 0.0001f;
+//        float v = hasRolled ? effective : baseVal;
+//        return Mathf.Abs(v) > EPS;
+//    }
+
+//    private static string FormatValue(string key, float v)
+//    {
+//        if (key == "cc") return $"{v * 100f:0.##}%";
+//        if (key == "cd") return $"{v:0.##}";
+//        return $"{v:0.##}";
+//    }
+
+//    /// <summary>
+//    /// ì¸ë²¤ ì•„ì´í…œì´ ê°€ì§„ ì˜µì…˜ë§Œ ì¶œë ¥.
+//    /// showEquippedValues=true ë©´ ë¼ë²¨ ì˜† ê°’ì€ "ì¥ì°©(eq) ê°’"ì„ í‘œì‹œí•˜ê³ ,
+//    /// ê´„í˜¸ì—ëŠ” í•­ìƒ (ì¸ë²¤ - ì¥ì°©) ì¦ê°ìƒ‰ì„ í‘œì‹œ.
+//    /// </summary>
+//    public static string BuildCompareLines(InventoryItem inv, InventoryItem eq, bool showEquippedValues)
+//    {
+//        // ìµœì¢… íš¨ê³¼ê°’(rolled ë°˜ì˜) ê°€ì ¸ì˜¤ê¸°
+//        Take(inv, out var hp1, out var mp1, out var atk1, out var def1, out var dex1, out var AS1, out var cc1, out var cd1);
+//        Take(eq, out var hp0, out var mp0, out var atk0, out var def0, out var dex0, out var AS0, out var cc0, out var cd0);
+
+//        string Line(string label, string key, float invV, float eqV)
+//        {
+//            float diff = invV - eqV;                         // (ì¸ë²¤ - ì¥ì°©)
+//            float shown = showEquippedValues ? eqV : invV;   // í‘œì‹œê°’ ì„ íƒ
+
+//            // ê·¹ì˜µ íŒì •ì€ "í‘œì‹œ ì£¼ì²´" ì•„ì´í…œì—ì„œ ìˆ˜í–‰ (ì›íŒ¨ë„ê³¼ ë™ì¼í•œ ì² í•™)
+//            InventoryItem shownItem = showEquippedValues ? eq : inv;
+//            bool isMax = false;
+//            if (shownItem != null && shownItem.data != null && shownItem.data.type != "potion")
+//            {
+//                // keyì™€ shownê°’ìœ¼ë¡œ ê·¹ì˜µ íŒì •
+//                isMax = ItemRoller.IsMaxRoll(shownItem.id, key, shown);
+//            }
+
+//            string valueStr = FormatValue(key, shown);
+//            if (isMax) valueStr = $"<color={MAX}>{valueStr}</color>";
+
+//            return $"<color={LABEL}>{label}</color>  {valueStr}  ({ColorizeDiff(diff)})";
+//        }
+
+//        var sb = new StringBuilder();
+//        float _;
+//        if (HasOption(inv, "hp", inv.data.hp, out _)) sb.AppendLine(Line("HP", "hp", hp1, hp0));
+//        if (HasOption(inv, "mp", inv.data.mp, out _)) sb.AppendLine(Line("MP", "mp", mp1, mp0));
+//        if (HasOption(inv, "atk", inv.data.atk, out _)) sb.AppendLine(Line("ë°ë¯¸ì§€", "atk", atk1, atk0));
+//        if (HasOption(inv, "def", inv.data.def, out _)) sb.AppendLine(Line("ë°©ì–´ë ¥", "def", def1, def0));
+//        if (HasOption(inv, "dex", inv.data.dex, out _)) sb.AppendLine(Line("ë¯¼ì²©ì„±", "dex", dex1, dex0));
+//        if (HasOption(inv, "As", inv.data.As, out _)) sb.AppendLine(Line("ê³µê²© ì†ë„", "As", AS1, AS0));
+//        if (HasOption(inv, "cc", inv.data.cc, out _)) sb.AppendLine(Line("ì¹˜ëª…íƒ€ í™•ë¥ ", "cc", cc1, cc0));
+//        if (HasOption(inv, "cd", inv.data.cd, out _)) sb.AppendLine(Line("ì¹˜ëª…íƒ€ ë°ë¯¸ì§€", "cd", cd1, cd0));
+
+//        if (sb.Length == 0) sb.Append("í‘œì‹œí•  ì˜µì…˜ ì—†ìŒ");
+//        return sb.ToString();
+//    }
+//}
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 public static class ItemStatCompare
 {
-    // UI »ö»ó (Unity Text ¸®Ä¡ÅØ½ºÆ®)
-    private const string POS = "#35C759"; // ÃÊ·Ï
-    private const string NEG = "#FF3B30"; // »¡°­
-    private const string ZERO = "#A1A1A6"; // È¸»ö
-    private const string LABEL = "#DADADA"; // ¶óº§ ÅØ½ºÆ® ±âº»»ö
-    private const string MAX = "#49DDDF";  // ±Ø¿É ÇÏÀÌ¶óÀÌÆ®(¿øÆĞ³Î°ú µ¿ÀÏ Åæ)
+    private const string POS = "#35C759";
+    private const string NEG = "#FF3B30";
+    private const string ZERO = "#A1A1A6";
+    private const string LABEL = "#DADADA";
+    private const string MAX = "#49DDDF";
+    private const float EPS = 0.0001f;
 
-    // inv > eq ÀÌ¸é ÃÊ·Ï +, inv < eq ÀÌ¸é »¡°­ -, 0ÀÌ¸é È¸»ö 0
-    private static string ColorizeDiff(float diff, bool signed = true)
+    private static string LabelFor(string key) => key switch
     {
-        string sign = diff > 0.0001f ? "+" : (diff < -0.0001f ? "" : "");
-        string color = diff > 0.0001f ? POS : (diff < -0.0001f ? NEG : ZERO);
+        "hp" => "HP",
+        "mp" => "MP",
+        "atk" => "ë°ë¯¸ì§€",
+        "def" => "ë°©ì–´ë ¥",
+        "dex" => "ë¯¼ì²©ì„±",
+        "As" => "ê³µê²© ì†ë„",
+        "cc" => "ì¹˜ëª…íƒ€ í™•ë¥ ",
+        "cd" => "ì¹˜ëª…íƒ€ ë°ë¯¸ì§€",
+        _ => key.ToUpper()
+    };
+
+    private static string FormatValue(string key, float v)
+    {
+        if (key == "cc") return $"{v * 100f:0.##}%";
+        if (key == "cd") return $"x{v:0.##}";   // â˜… cdëŠ” x ì ‘ë‘ì‚¬
+        return $"{v:0.##}";
+    }
+
+    private static string ColorizeDiff(float diff)
+    {
+        string color = diff > EPS ? POS : (diff < -EPS ? NEG : ZERO);
         string val = diff.ToString(diff == Mathf.RoundToInt(diff) ? "+0;-#;0" : "+0.##;-0.##;0");
-        if (!signed) val = diff.ToString(diff == Mathf.RoundToInt(diff) ? "0;-#;0" : "0.##;-0.##;0");
-        return $"<color={color}>{(signed ? val : sign + val)}</color>";
+        return $"<color={color}>{val}</color>";
     }
 
     private static float Eff(float baseVal, bool hasRolled, float rolledVal)
         => hasRolled ? rolledVal : baseVal;
 
-    private static void Take(InventoryItem item, out float hp, out float mp, out float atk, out float def, out float dex, out float AS, out float cc, out float cd)
+    private static void Take(InventoryItem item,
+        out float hp, out float mp, out float atk, out float def, out float dex, out float AS, out float cc, out float cd)
     {
-        // rolled°¡ ÀÖÀ¸¸é has* ÇÃ·¡±×¸¦ µû¶ó ¿ì¼± »ç¿ë
         if (item.rolled != null)
         {
             hp = Eff(item.data.hp, item.rolled.hasHp, item.rolled.hp);
@@ -45,90 +197,124 @@ public static class ItemStatCompare
         }
     }
 
-    public static string BuildSingleTooltip(InventoryItem item, string tier = null)
+    // â˜… ì•„ì´í…œì´ ì‹¤ì œë¡œ ê°€ì§€ê³  ìˆëŠ”(0ì´ ì•„ë‹Œ) ì˜µì…˜ë§Œ ë”•ì…”ë„ˆë¦¬ë¡œ ìˆ˜ì§‘
+    private static Dictionary<string, float> GatherNonZeroStats(InventoryItem item)
     {
         Take(item, out var hp, out var mp, out var atk, out var def, out var dex, out var AS, out var cc, out var cd);
-
-        string TierLine = string.IsNullOrEmpty(tier) ? "" : $"\n<color=#FFD60A>[{tier}]</color>";
-        return
-$@"<b>{item.data.name}</b>{TierLine}
-<color={LABEL}>Á¾·ù</color>  {item.data.type}
-<color={LABEL}>·¹º§</color>  {Mathf.Max(1, item.data.level)}
-
-<color={LABEL}>HP</color>  {hp}
-<color={LABEL}>MP</color>  {mp}
-<color={LABEL}>ATK</color> {atk}
-<color={LABEL}>DEF</color> {def}
-<color={LABEL}>DEX</color> {dex}
-<color={LABEL}>AS</color>  {AS}
-<color={LABEL}>CC</color>  {cc}
-<color={LABEL}>CD</color>  {cd}";
+        var d = new Dictionary<string, float>(8);
+        if (Mathf.Abs(hp) > EPS) d["hp"] = hp;
+        if (Mathf.Abs(mp) > EPS) d["mp"] = mp;
+        if (Mathf.Abs(atk) > EPS) d["atk"] = atk;
+        if (Mathf.Abs(def) > EPS) d["def"] = def;
+        if (Mathf.Abs(dex) > EPS) d["dex"] = dex;
+        if (Mathf.Abs(AS) > EPS) d["As"] = AS;
+        if (Mathf.Abs(cc) > EPS) d["cc"] = cc;
+        if (Mathf.Abs(cd) > EPS) d["cd"] = cd;
+        return d;
     }
 
-    // inv ¾ÆÀÌÅÛÀÌ ÇØ´ç ½ºÅÈ "¿É¼ÇÀ» °®°í ÀÖ´ÂÁö" ÆÇÁ¤ (¿ø·¡ ÆĞ³Î°ú µ¿ÀÏÇÑ Ã¶ÇĞ)
-    private static bool HasOption(InventoryItem item, string key, float baseVal, out float effective)
-    {
-        effective = baseVal;
-        var r = item.rolled;
-        bool hasRolled =
-            r != null && r.TryGet(key, out effective); // ·Ñ¸µ °ª ¿ì¼±
-
-        // À¯È¿¼º: ·Ñ¸µ °ªÀÌ ÀÖÀ¸¸é ±× °ª, ¾øÀ¸¸é base °ªÀÌ 0ÀÌ ¾Æ´ÑÁö·Î ÆÇ´Ü
-        const float EPS = 0.0001f;
-        float v = hasRolled ? effective : baseVal;
-        return Mathf.Abs(v) > EPS;
-    }
-
-    private static string FormatValue(string key, float v)
-    {
-        if (key == "cc") return $"{v * 100f:0.##}%";
-        if (key == "cd") return $"{v:0.##}";
-        return $"{v:0.##}";
-    }
-
-    /// <summary>
-    /// ÀÎº¥ ¾ÆÀÌÅÛÀÌ °¡Áø ¿É¼Ç¸¸ Ãâ·Â.
-    /// showEquippedValues=true ¸é ¶óº§ ¿· °ªÀº "ÀåÂø(eq) °ª"À» Ç¥½ÃÇÏ°í,
-    /// °ıÈ£¿¡´Â Ç×»ó (ÀÎº¥ - ÀåÂø) Áõ°¨»öÀ» Ç¥½Ã.
-    /// </summary>
     public static string BuildCompareLines(InventoryItem inv, InventoryItem eq, bool showEquippedValues)
     {
-        // ÃÖÁ¾ È¿°ú°ª(rolled ¹İ¿µ) °¡Á®¿À±â
-        Take(inv, out var hp1, out var mp1, out var atk1, out var def1, out var dex1, out var AS1, out var cc1, out var cd1);
-        Take(eq, out var hp0, out var mp0, out var atk0, out var def0, out var dex0, out var AS0, out var cc0, out var cd0);
+        bool invGem = inv?.data?.type != null && inv.data.type.Equals("gem", StringComparison.OrdinalIgnoreCase);
+        bool eqGem = eq?.data?.type != null && eq.data.type.Equals("gem", StringComparison.OrdinalIgnoreCase);
+        bool isGemMode = invGem || eqGem;
 
-        string Line(string label, string key, float invV, float eqV)
+        var invStats = GatherNonZeroStats(inv);
+        var eqStats = GatherNonZeroStats(eq);
+
+        // í‚¤ ì •ë ¬(ë³´ê¸° ì¢‹ê²Œ ê³ ì • ìˆœì„œ)
+        string[] ORDER = { "hp", "mp", "atk", "def", "dex", "As", "cc", "cd" };
+        System.Func<string, int> idx = k => {
+            int i = System.Array.IndexOf(ORDER, k);
+            return i < 0 ? 999 : i;
+        };
+
+        var keySet = isGemMode
+            ? new System.Collections.Generic.HashSet<string>(invStats.Keys)
+            : new System.Collections.Generic.HashSet<string>(invStats.Keys);
+        if (isGemMode) foreach (var k in eqStats.Keys) keySet.Add(k);
+
+        var keys = new System.Collections.Generic.List<string>(keySet);
+        keys.Sort((a, b) => {
+            int ia = idx(a), ib = idx(b);
+            if (ia != ib) return ia.CompareTo(ib);
+            return string.Compare(a, b, System.StringComparison.Ordinal);
+        });
+
+        // ë¼ì¸ ë²„í‚·
+        var bothLines = new System.Collections.Generic.List<string>(); // ë‘˜ ë‹¤ ì˜µì…˜ O
+        var removedLines = new System.Collections.Generic.List<string>(); // ì¥ì°©ë§Œ O â†’ (ì‚¬ë¼ì§)
+        var newLines = new System.Collections.Generic.List<string>(); // ì¸ë²¤ë§Œ O â†’ (ìƒˆ ì˜µì…˜)
+
+        foreach (var key in keys)
         {
-            float diff = invV - eqV;                         // (ÀÎº¥ - ÀåÂø)
-            float shown = showEquippedValues ? eqV : invV;   // Ç¥½Ã°ª ¼±ÅÃ
+            invStats.TryGetValue(key, out var invV);
+            eqStats.TryGetValue(key, out var eqV);
+            bool invHas = invStats.ContainsKey(key);
+            bool eqHas = eqStats.ContainsKey(key);
 
-            // ±Ø¿É ÆÇÁ¤Àº "Ç¥½Ã ÁÖÃ¼" ¾ÆÀÌÅÛ¿¡¼­ ¼öÇà (¿øÆĞ³Î°ú µ¿ÀÏÇÑ Ã¶ÇĞ)
-            InventoryItem shownItem = showEquippedValues ? eq : inv;
+            // í‘œê¸°ê°’: í•œìª½ë§Œ ìˆì„ ë•Œë„ 0ì´ ì•„ë‹ˆë¼ ê°€ì§„ ìª½ì˜ ê°’ìœ¼ë¡œ
+            float shown = showEquippedValues
+                ? (eqHas ? eqV : invV)
+                : (invHas ? invV : eqV);
+
+            // ê·¹ì˜µ í•˜ì´ë¼ì´íŠ¸ëŠ” í‘œê¸° ì£¼ì²´ê°€ í•´ë‹¹ í‚¤ë¥¼ ì‹¤ì œë¡œ ê°€ì§ˆ ë•Œë§Œ
             bool isMax = false;
-            if (shownItem != null && shownItem.data != null && shownItem.data.type != "potion")
+            if (inv != null && eq != null)
             {
-                // key¿Í shown°ªÀ¸·Î ±Ø¿É ÆÇÁ¤
-                isMax = ItemRoller.IsMaxRoll(shownItem.id, key, shown);
+                var shownItem = (showEquippedValues ? (eqHas ? eq : inv) : (invHas ? inv : eq));
+                if (shownItem != null && shownItem.data != null &&
+                    !string.Equals(shownItem.data.type, "potion", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    isMax = ItemRoller.IsMaxRoll(shownItem.id, key, shown);
+                }
             }
 
             string valueStr = FormatValue(key, shown);
             if (isMax) valueStr = $"<color={MAX}>{valueStr}</color>";
 
-            return $"<color={LABEL}>{label}</color>  {valueStr}  ({ColorizeDiff(diff)})";
+            string line;
+            if (invHas && eqHas)
+            {
+                // ì •ìƒ Â± ë¹„êµ
+                string diffStr = ColorizeDiff(invV - eqV);
+                line = $"<color={LABEL}>{LabelFor(key)}</color>  {valueStr}  ({diffStr})";
+                bothLines.Add(line);
+            }
+            else if (!invHas && eqHas)
+            {
+                // ì‚¬ë¼ì§ (ì¥ì°©ì—ë§Œ ìˆë˜ ì˜µì…˜)
+                string baseVal = FormatValue(key, eqV);
+
+                // cdëŠ” - ë¶™ì´ì§€ ì•Šê³  xí‘œê¸° ê·¸ëŒ€ë¡œ, ê·¸ ì™¸ëŠ” - ì ‘ë‘ì‚¬
+                string shownRemoved = (key == "cd") ? baseVal : "-" + baseVal;
+
+                string diffStr = $"<color={NEG}>{shownRemoved}</color> <size=11><color={ZERO}>(ê¸°ì¡´ ì˜µì…˜)</color></size>";
+                line = $"<color={LABEL}>{LabelFor(key)}</color>  {diffStr}";
+                removedLines.Add(line);
+            }
+            else // invHas && !eqHas
+            {
+                // ìƒˆ ì˜µì…˜ (ì¸ë²¤ì—ë§Œ ìˆëŠ” ì˜µì…˜)
+                string addVal = FormatValue(key, invV);
+
+                // cdëŠ” + ë¶™ì´ì§€ ì•Šê³  xí‘œê¸° ê·¸ëŒ€ë¡œ, ê·¸ ì™¸ëŠ” + ì ‘ë‘ì‚¬
+                string shownAdded = (key == "cd") ? addVal : "+" + addVal;
+
+                string diffStr = $"<color={POS}>{shownAdded}</color> <size=11><color={ZERO}>(ìƒˆ ì˜µì…˜)</color></size>";
+                line = $"<color={LABEL}>{LabelFor(key)}</color>  {diffStr}";
+                newLines.Add(line);
+            }
+
         }
 
+        // ì¶œë ¥ ìˆœì„œ: ê¸°ì¡´ ê³µí†µ â†’ â˜…ì‚¬ë¼ì§ â†’ ìƒˆ ì˜µì…˜ (ìš”ì²­ì‚¬í•­)
         var sb = new StringBuilder();
-        float _;
-        if (HasOption(inv, "hp", inv.data.hp, out _)) sb.AppendLine(Line("HP", "hp", hp1, hp0));
-        if (HasOption(inv, "mp", inv.data.mp, out _)) sb.AppendLine(Line("MP", "mp", mp1, mp0));
-        if (HasOption(inv, "atk", inv.data.atk, out _)) sb.AppendLine(Line("µ¥¹ÌÁö", "atk", atk1, atk0));
-        if (HasOption(inv, "def", inv.data.def, out _)) sb.AppendLine(Line("¹æ¾î·Â", "def", def1, def0));
-        if (HasOption(inv, "dex", inv.data.dex, out _)) sb.AppendLine(Line("¹ÎÃ¸¼º", "dex", dex1, dex0));
-        if (HasOption(inv, "As", inv.data.As, out _)) sb.AppendLine(Line("°ø°İ ¼Óµµ", "As", AS1, AS0));
-        if (HasOption(inv, "cc", inv.data.cc, out _)) sb.AppendLine(Line("Ä¡¸íÅ¸ È®·ü", "cc", cc1, cc0));
-        if (HasOption(inv, "cd", inv.data.cd, out _)) sb.AppendLine(Line("Ä¡¸íÅ¸ µ¥¹ÌÁö", "cd", cd1, cd0));
+        foreach (var l in bothLines) sb.AppendLine(l);
+        foreach (var l in removedLines) sb.AppendLine(l);  // â† ì‚¬ë¼ì§ì„ ìƒˆ ì˜µì…˜ë³´ë‹¤ ìœ„ë¡œ
+        foreach (var l in newLines) sb.AppendLine(l);
 
-        if (sb.Length == 0) sb.Append("Ç¥½ÃÇÒ ¿É¼Ç ¾øÀ½");
+        if (sb.Length == 0) sb.Append("í‘œì‹œí•  ì˜µì…˜ ì—†ìŒ");
         return sb.ToString();
     }
 }

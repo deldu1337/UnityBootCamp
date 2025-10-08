@@ -383,6 +383,118 @@ public class InventoryPresenter : MonoBehaviour
     }
 
     /// <summary>아이템 “획득” 시점에 롤링을 확정해서 인벤토리에 저장.</summary>
+    //public void AddItem(int id, Sprite icon, string prefabPath)
+    //{
+    //    var dataManager = DataManager.Instance;
+    //    if (dataManager == null || !dataManager.dicItemDatas.ContainsKey(id))
+    //    {
+    //        Debug.LogWarning($"아이템 ID {id}가 DataManager에 없음!");
+    //        return;
+    //    }
+
+    //    var baseData = dataManager.dicItemDatas[id];
+
+    //    //var item = new InventoryItem
+    //    //{
+    //    //    uniqueId = Guid.NewGuid().ToString(),
+    //    //    id = id,
+    //    //    data = baseData,
+    //    //    iconPath = icon ? "Icons/" + icon.name : null,
+    //    //    prefabPath = prefabPath,
+    //    //    rolled = ItemRoller.CreateRolledStats(id)
+    //    //};
+
+    //    // ★ 포션이면 먼저 합치기 시도
+    //    if (baseData.type == "potion")
+    //    {
+    //        // 인벤에 같은 포션이 있으면 +1 하고 끝
+    //        if (model.TryStackPotion(id, +1))
+    //        {
+    //            Refresh();
+    //            return;
+    //        }
+    //    }
+
+    //    // 새로 추가(포션이지만 기존 스택이 없을 때)
+    //    var item = new InventoryItem
+    //    {
+    //        uniqueId = Guid.NewGuid().ToString(),
+    //        id = id,
+    //        data = baseData,
+    //        iconPath = icon ? "Icons/" + icon.name : null,
+    //        prefabPath = prefabPath,
+    //        rolled = ItemRoller.CreateRolledStats(id),
+
+    //        // ★ 스택 플래그/초기값
+    //        stackable = baseData.type == "potion",
+    //        quantity = 1,
+    //        maxStack = 99
+    //    };
+
+    //    if (InventoryGuards.IsInvalid(item))
+    //    {
+    //        Debug.LogWarning("[InventoryPresenter] 생성된 아이템이 무효 → 추가 취소");
+    //        return;
+    //    }
+
+    //    model.AddItem(item);
+    //    Refresh();
+    //}
+
+    //public void AddItem(int id, Sprite icon, string prefabPath)
+    //{
+    //    var dataManager = DataManager.Instance;
+    //    if (dataManager == null || !dataManager.dicItemDatas.ContainsKey(id))
+    //    {
+    //        Debug.LogWarning($"아이템 ID {id}가 DataManager에 없음!");
+    //        return;
+    //    }
+    //    var baseData = dataManager.dicItemDatas[id];
+
+    //    // ★ 1) 퀵슬롯에 같은 포션 있으면 거기에 +1
+    //    if (baseData.type == "potion")
+    //    {
+    //        var qb = PotionQuickBar.Instance;
+    //        if (qb != null && qb.TryAddToExistingSlot(id, +1))
+    //        {
+    //            // 퀵슬롯에 합쳐졌으니 인벤에는 추가하지 않음
+    //            return;
+    //        }
+    //    }
+
+    //    // ★ 2) 퀵슬롯에 없다면 인벤토리 스택 시도
+    //    if (baseData.type == "potion")
+    //    {
+    //        if (model.TryStackPotion(id, +1))
+    //        {
+    //            Refresh();
+    //            return;
+    //        }
+    //    }
+
+    //    // ★ 3) 새 엔트리로 추가
+    //    var item = new InventoryItem
+    //    {
+    //        uniqueId = Guid.NewGuid().ToString(),
+    //        id = id,
+    //        data = baseData,
+    //        iconPath = icon ? "Icons/" + icon.name : null,
+    //        prefabPath = prefabPath,
+    //        rolled = ItemRoller.CreateRolledStats(id),
+    //        stackable = baseData.type == "potion",
+    //        quantity = 1,
+    //        maxStack = 99
+    //    };
+
+    //    if (InventoryGuards.IsInvalid(item))
+    //    {
+    //        Debug.LogWarning("[InventoryPresenter] 생성된 아이템이 무효 → 추가 취소");
+    //        return;
+    //    }
+
+    //    model.AddItem(item);
+    //    Refresh();
+    //}
     public void AddItem(int id, Sprite icon, string prefabPath)
     {
         var dataManager = DataManager.Instance;
@@ -394,6 +506,28 @@ public class InventoryPresenter : MonoBehaviour
 
         var baseData = dataManager.dicItemDatas[id];
 
+        // ★ 1순위: 퀵슬롯 스택 증가 시도 (포션만)
+        if (baseData.type == "potion" && PotionQuickBar.Instance != null)
+        {
+            if (PotionQuickBar.Instance.TryAddToExistingSlot(id, +1))
+            {
+                // 퀵슬롯 라벨은 TryAddToExistingSlot에서 갱신됨. 인벤 토글이 열려있다면 UI만 새로고침.
+                Refresh();
+                return;
+            }
+        }
+
+        // ★ 2순위: 인벤토리 스택 증가 시도
+        if (baseData.type == "potion")
+        {
+            if (model.TryStackPotion(id, +1))
+            {
+                Refresh();
+                return;
+            }
+        }
+
+        // 3순위: 새 아이템 생성
         var item = new InventoryItem
         {
             uniqueId = Guid.NewGuid().ToString(),
@@ -401,7 +535,11 @@ public class InventoryPresenter : MonoBehaviour
             data = baseData,
             iconPath = icon ? "Icons/" + icon.name : null,
             prefabPath = prefabPath,
-            rolled = ItemRoller.CreateRolledStats(id)
+            rolled = ItemRoller.CreateRolledStats(id),
+
+            stackable = baseData.type == "potion",
+            quantity = 1,
+            maxStack = 99
         };
 
         if (InventoryGuards.IsInvalid(item))
@@ -413,6 +551,7 @@ public class InventoryPresenter : MonoBehaviour
         model.AddItem(item);
         Refresh();
     }
+
 
     // 반환값으로 '실제 제거 성공' 여부
     public bool RemoveItemFromInventory(string uniqueId)
@@ -444,7 +583,23 @@ public class InventoryPresenter : MonoBehaviour
         var item = model.GetItemById(uniqueId);
         if (item == null) return;
 
-        // 포션 즉시사용
+        //// 포션 즉시사용
+        //if (item.data != null && string.Equals(item.data.type, "potion", StringComparison.OrdinalIgnoreCase))
+        //{
+        //    var stats = PlayerStatsManager.Instance;
+        //    if (stats != null)
+        //    {
+        //        float hp = item.rolled != null && item.rolled.hasHp ? item.rolled.hp : item.data.hp;
+        //        float mp = item.rolled != null && item.rolled.hasMp ? item.rolled.mp : item.data.mp;
+        //        if (hp > 0) stats.Heal(hp);
+        //        if (mp > 0) stats.RestoreMana(mp);
+        //    }
+        //    model.RemoveById(uniqueId);
+        //    Refresh();
+        //    return;
+        //}
+
+        // ★ 포션 즉시사용(수량 1 감소)
         if (item.data != null && string.Equals(item.data.type, "potion", StringComparison.OrdinalIgnoreCase))
         {
             var stats = PlayerStatsManager.Instance;
@@ -455,7 +610,9 @@ public class InventoryPresenter : MonoBehaviour
                 if (hp > 0) stats.Heal(hp);
                 if (mp > 0) stats.RestoreMana(mp);
             }
-            model.RemoveById(uniqueId);
+
+            // 기존엔 RemoveById였는데 → ★ 수량 감소 API로 변경
+            model.ConsumePotionByUniqueId(uniqueId, 1);
             Refresh();
             return;
         }
