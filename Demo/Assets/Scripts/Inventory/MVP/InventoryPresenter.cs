@@ -342,7 +342,7 @@ public class InventoryPresenter : MonoBehaviour
         view.Initialize(CloseInventory);
         isOpen = false;
 
-        InvenButton = GameObject.Find("QuickUI").transform.GetChild(2).GetComponent<Button>();
+        InvenButton = GameObject.Find("QuickUI").transform.GetChild(3).GetComponent<Button>();
         InvenButton.onClick.AddListener(ToggleInventory);
     }
 

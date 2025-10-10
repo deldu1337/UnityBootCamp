@@ -1861,6 +1861,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -3527409783107265746, guid: 407f170e683ce1841978ec5e41e3c41f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2066227946929215859}
+    - targetCorrespondingSourceObject: {fileID: -3527409783107265746, guid: 407f170e683ce1841978ec5e41e3c41f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7676344712633812319}
   m_SourcePrefab: {fileID: -7328813083177254579, guid: 407f170e683ce1841978ec5e41e3c41f, type: 3}
 --- !u!4 &335583744933145268 stripped
 Transform:
@@ -2073,6 +2076,22 @@ MonoBehaviour:
   playerClass: warrior
   quickBar: {fileID: 0}
   skillBook: {fileID: 0}
+--- !u!114 &7676344712633812319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470347076982775785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a89c15fd84db8429a1144a04b48c74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInfoUI: {fileID: 0}
+  exitButton: {fileID: 0}
+  equipmentUI: {fileID: 0}
+  forceCloseOnStart: 1
 --- !u!4 &4557343290726616533 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5637147828190038290, guid: 407f170e683ce1841978ec5e41e3c41f, type: 3}

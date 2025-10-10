@@ -16,6 +16,15 @@ public class EquipmentView : MonoBehaviour
     [SerializeField] private Button weaponSlot;
     [SerializeField] private Button shieldSlot;
 
+    public RectTransform RootRect
+    {
+        get
+        {
+            if (!equipmentUI) equipmentUI = GameObject.Find("EquipmentUI");
+            return equipmentUI ? equipmentUI.GetComponent<RectTransform>() : null;
+        }
+    }
+
     /// <summary>초기화: 슬롯 연결, 종료 버튼 연결</summary>
     public void Initialize(Action onExit, Action<string, InventoryItem> onEquipDropped)
     {
