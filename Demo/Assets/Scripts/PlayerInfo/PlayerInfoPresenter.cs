@@ -129,6 +129,8 @@
 
 //    public void Toggle() { if (isOpen) Close(); else Open(); }
 //}
+using System.Collections;
+using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -141,6 +143,9 @@ public class PlayerInfoPresenter : MonoBehaviour
     [SerializeField] private GameObject equipmentUI;
     [SerializeField] private bool forceCloseOnStart = true;
 
+    // ★ 추가: 스탯 텍스트 레퍼런스
+    [SerializeField] private Text statsText;
+
     private Button InfoButton;
     private Image image;
     private Sprite[] sprites;
@@ -148,6 +153,9 @@ public class PlayerInfoPresenter : MonoBehaviour
     private RectTransform equipmentRect;    // ★ 실제로 움직이는 RT
     private bool isOpen = false;
     public bool IsOpen => isOpen;
+
+    private Coroutine initRoutine;                // ★ 추가: 초기화 코루틴
+    private PlayerStatsManager ps;                // ★ 추가: 캐시
 
     // 비활성 포함 탐색 (이름으로)
     private static GameObject FindIncludingInactive(string name)
@@ -208,6 +216,70 @@ public class PlayerInfoPresenter : MonoBehaviour
         return cur;
     }
 
+    void OnEnable()
+    {
+        // ★ 플레이어/매니저 준비될 때까지 대기 후 이벤트 구독
+        initRoutine = StartCoroutine(InitializeWhenReady());
+    }
+
+    void OnDisable()
+    {
+        if (initRoutine != null) { StopCoroutine(initRoutine); initRoutine = null; }
+        UnsubscribeStatEvents();
+    }
+
+    private IEnumerator InitializeWhenReady()     // ★ 추가
+    {
+        // PlayerStatsManager.Instance 대기
+        while (PlayerStatsManager.Instance == null) yield return null;
+        ps = PlayerStatsManager.Instance;
+
+        // UI 참조가 아직 null이면 한 프레임 정도 더 대기
+        if (playerInfoUI == null)
+        {
+            yield return null;
+            playerInfoUI = GameObject.Find("PlayerInfoUI") ?? playerInfoUI;
+        }
+
+        // 이벤트 구독 & 첫 갱신
+        SubscribeStatEvents();
+        RefreshStatsText();
+    }
+
+    private void SubscribeStatEvents()            // ★ 추가
+    {
+        if (ps == null) return;
+
+        ps.OnHPChanged -= OnHPChanged;
+        ps.OnMPChanged -= OnMPChanged;
+        ps.OnExpChanged -= OnExpChanged;
+        ps.OnLevelUp -= OnLevelUp;
+
+        ps.OnHPChanged += OnHPChanged;
+        ps.OnMPChanged += OnMPChanged;
+        ps.OnExpChanged += OnExpChanged;
+        ps.OnLevelUp += OnLevelUp;
+    }
+
+    private void UnsubscribeStatEvents()          // ★ 추가
+    {
+        if (ps == null) return;
+
+        ps.OnHPChanged -= OnHPChanged;
+        ps.OnMPChanged -= OnMPChanged;
+        ps.OnExpChanged -= OnExpChanged;
+        ps.OnLevelUp -= OnLevelUp;
+    }
+
+    // ===== 이벤트 핸들러: 전부 텍스트 리프레시로 연결 =====
+    private void OnHPChanged(float cur, float max) => RefreshStatsText();
+    private void OnMPChanged(float cur, float max) => RefreshStatsText();
+    private void OnExpChanged(int level, float exp) => RefreshStatsText();
+    private void OnLevelUp(int level) => RefreshStatsText();
+
+    // ===== Start/Update/Toggle/Open/Close 등 기존 로직은 그대로 두고,
+    //      Open()에서 한 번 더 RefreshStatsText() 호출하는 정도만 유지 =====
+
     void Start()
     {
         if (!playerInfoUI) playerInfoUI = GameObject.Find("PlayerInfoUI") ?? FindIncludingInactive("PlayerInfoUI");
@@ -215,7 +287,7 @@ public class PlayerInfoPresenter : MonoBehaviour
         exitButton = playerInfoUI.transform.GetChild(4).GetComponent<Button>();
         sprites = new Sprite[8];
         sprites = Resources.LoadAll<Sprite>("CharacterIcons");
-        
+        statsText = playerInfoUI.transform.GetChild(7).GetComponent<Text>();
 
         var ps = PlayerStatsManager.Instance;
         string race = (ps != null && ps.Data != null && !string.IsNullOrEmpty(ps.Data.Race))
@@ -326,6 +398,9 @@ public class PlayerInfoPresenter : MonoBehaviour
         isOpen = true;
         UIEscapeStack.Instance.Push("playerinfo", Close, () => isOpen);
 
+        // ★ 추가: 열릴 때 최신 스탯 갱신
+        RefreshStatsText();
+
         // ★ 핵심: 활성화로 인한 레이아웃 리빌드가 끝난 "다음 프레임"에 다시 복원
         if (playerInfoRect && UIPanelSwitcher.HasSnapshot)
             StartCoroutine(ReapplySnapshotNextFrame(playerInfoRect));
@@ -353,5 +428,36 @@ public class PlayerInfoPresenter : MonoBehaviour
         playerInfoUI.SetActive(false);
         isOpen = false;
         UIEscapeStack.Instance.Remove("playerinfo");
+    }
+
+    // ★ 추가: 스탯 텍스트 갱신 함수 (외부에서도 호출 가능)
+    public void RefreshStatsText()
+    {
+        if (!statsText) return;
+
+        var ps = PlayerStatsManager.Instance;
+        var d = ps != null ? ps.Data : null;
+        if (d == null)
+        {
+            statsText.text = "스탯 데이터를 불러올 수 없습니다.";
+            return;
+        }
+
+        // 보기 좋은 포맷으로 정리
+        var sb = new StringBuilder();
+        sb.AppendLine($"종족 : {d.Race}");
+        sb.AppendLine($"레벨 : {d.Level}");
+        sb.AppendLine($"경험치(EXP) : {d.Exp:#,0} / {d.ExpToNextLevel:#,0}");
+        sb.AppendLine();
+        sb.AppendLine($"HP : {d.CurrentHP:#,0.##} / {d.MaxHP:#,0.##}");
+        sb.AppendLine($"MP : {d.CurrentMP:#,0.##} / {d.MaxMP:#,0.##}");
+        sb.AppendLine($"데미지(ATK) : {d.Atk:#,0.##}");
+        sb.AppendLine($"방어력(DEF) : {d.Def:#,0.##}");
+        sb.AppendLine($"민첩성(DEX) : {d.Dex:#,0.##}");
+        sb.AppendLine($"공격 속도(AS) : {d.AttackSpeed:#,0.##}");
+        sb.AppendLine($"치명타 확률(CC) : {d.CritChance * 100f:0.##}%");
+        sb.AppendLine($"치명타 데미지(CD) : {d.CritDamage:0.##}x");
+
+        statsText.text = sb.ToString();
     }
 }

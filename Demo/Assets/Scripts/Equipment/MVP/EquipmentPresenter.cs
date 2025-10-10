@@ -823,6 +823,10 @@ public class EquipmentPresenter : MonoBehaviour
             ps.RecalculateStats(model.Slots);
             SaveLoadService.SavePlayerDataForRace(ps.Data.Race, ps.Data);
         }
+
+        // ★ 추가: 플레이어인포 텍스트 갱신
+        var pi = FindAnyObjectByType<PlayerInfoPresenter>(FindObjectsInactive.Include);
+        if (pi != null) pi.RefreshStatsText();
     }
 
     private void InitializeEquippedItems()
