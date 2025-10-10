@@ -1,4 +1,4 @@
-//using UnityEngine;
+ï»¿//using UnityEngine;
 //using UnityEngine.UI;
 
 //public class PlayerInfoPresenter : MonoBehaviour
@@ -17,7 +17,7 @@
 //    private bool isOpen = false;
 //    public bool IsOpen => isOpen;
 
-//    // ºñÈ°¼º Æ÷ÇÔ Å½»ö ÇïÆÛ
+//    // ë¹„í™œì„± í¬í•¨ íƒìƒ‰ í—¬í¼
 //    private static GameObject FindIncludingInactive(string name)
 //    {
 //        var all = Resources.FindObjectsOfTypeAll<GameObject>();
@@ -39,12 +39,12 @@
 
 //        if (!playerInfoUI)
 //        {
-//            Debug.LogError("[PlayerInfoPresenter] playerInfoUI¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+//            Debug.LogError("[PlayerInfoPresenter] playerInfoUIë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
 //            enabled = false;
 //            return;
 //        }
 
-//        // EquipmentPresenter/EquipmentView °æÀ¯·Î Rect¸¦ ¾ò´Â ·çÆ®
+//        // EquipmentPresenter/EquipmentView ê²½ìœ ë¡œ Rectë¥¼ ì–»ëŠ” ë£¨íŠ¸
 //        if (!equipmentPresenter)
 //            equipmentPresenter = FindAnyObjectByType<EquipmentPresenter>(FindObjectsInactive.Include);
 
@@ -52,7 +52,7 @@
 
 //        if (!equipmentUI && equipmentPresenter != null)
 //        {
-//            // View.RootRect °æÀ¯
+//            // View.RootRect ê²½ìœ 
 //            var view = FindAnyObjectByType<EquipmentView>(FindObjectsInactive.Include);
 //            if (view && view.RootRect)
 //                equipmentUI = view.RootRect.gameObject;
@@ -79,12 +79,12 @@
 //    {
 //        if (Input.GetKeyDown(KeyCode.R))
 //        {
-//            // ¡Ú ÀüÈ¯ Á÷Àü: ÀåºñÃ¢ÀÌ ÄÑÁ® ÀÖÀ¸¸é ÇöÀç À§Ä¡ ½º³À¼¦ ÀúÀå
+//            // â˜… ì „í™˜ ì§ì „: ì¥ë¹„ì°½ì´ ì¼œì ¸ ìˆìœ¼ë©´ í˜„ì¬ ìœ„ì¹˜ ìŠ¤ëƒ…ìƒ· ì €ì¥
 //            bool equipWasOpen = equipmentPresenter && equipmentPresenter.IsOpen;
 //            if (equipWasOpen && equipmentRect)
 //                UIPanelSwitcher.SaveSnapshot(equipmentRect);
 
-//            // ±âÁ¸ ·ÎÁ÷ À¯Áö
+//            // ê¸°ì¡´ ë¡œì§ ìœ ì§€
 //            if (equipWasOpen && equipmentRect && playerInfoRect)
 //                UIPanelSwitcher.CopyLayoutRT(equipmentRect, playerInfoRect);
 
@@ -102,7 +102,7 @@
 //    {
 //        if (isOpen || !playerInfoUI) return;
 
-//        // ¡Ú ¿­¸®±â Àü¿¡ ½º³À¼¦ ÀÖÀ¸¸é º¹¿ø
+//        // â˜… ì—´ë¦¬ê¸° ì „ì— ìŠ¤ëƒ…ìƒ· ìˆìœ¼ë©´ ë³µì›
 //        if (playerInfoRect && UIPanelSwitcher.HasSnapshot)
 //            UIPanelSwitcher.LoadSnapshot(playerInfoRect);
 
@@ -117,7 +117,7 @@
 //    {
 //        if (!isOpen || !playerInfoUI) return;
 
-//        // ¡Ú ´İÈ÷±â Á÷Àü ÇöÀç À§Ä¡ ½º³À¼¦ ÀúÀå
+//        // â˜… ë‹«íˆê¸° ì§ì „ í˜„ì¬ ìœ„ì¹˜ ìŠ¤ëƒ…ìƒ· ì €ì¥
 //        if (playerInfoRect)
 //            UIPanelSwitcher.SaveSnapshot(playerInfoRect);
 
@@ -143,21 +143,22 @@ public class PlayerInfoPresenter : MonoBehaviour
     [SerializeField] private GameObject equipmentUI;
     [SerializeField] private bool forceCloseOnStart = true;
 
-    // ¡Ú Ãß°¡: ½ºÅÈ ÅØ½ºÆ® ·¹ÆÛ·±½º
-    [SerializeField] private Text statsText;
+    // â˜… ì¶”ê°€: ìŠ¤íƒ¯ í…ìŠ¤íŠ¸ ë ˆí¼ëŸ°ìŠ¤
+    [SerializeField] private Text statsLabelText;    // â† ì¶”ê°€: ë¼ë²¨ ì—´
+    [SerializeField] private Text statsValueText;    // â† ì¶”ê°€: ê°’ ì—´(ì˜¤ë¥¸ìª½ ì •ë ¬)
 
     private Button InfoButton;
     private Image image;
     private Sprite[] sprites;
-    private RectTransform playerInfoRect;   // ¡Ú ½ÇÁ¦·Î ¿òÁ÷ÀÌ´Â RT
-    private RectTransform equipmentRect;    // ¡Ú ½ÇÁ¦·Î ¿òÁ÷ÀÌ´Â RT
+    private RectTransform playerInfoRect;   // â˜… ì‹¤ì œë¡œ ì›€ì§ì´ëŠ” RT
+    private RectTransform equipmentRect;    // â˜… ì‹¤ì œë¡œ ì›€ì§ì´ëŠ” RT
     private bool isOpen = false;
     public bool IsOpen => isOpen;
 
-    private Coroutine initRoutine;                // ¡Ú Ãß°¡: ÃÊ±âÈ­ ÄÚ·çÆ¾
-    private PlayerStatsManager ps;                // ¡Ú Ãß°¡: Ä³½Ã
+    private Coroutine initRoutine;                // â˜… ì¶”ê°€: ì´ˆê¸°í™” ì½”ë£¨í‹´
+    private PlayerStatsManager ps;                // â˜… ì¶”ê°€: ìºì‹œ
 
-    // ºñÈ°¼º Æ÷ÇÔ Å½»ö (ÀÌ¸§À¸·Î)
+    // ë¹„í™œì„± í¬í•¨ íƒìƒ‰ (ì´ë¦„ìœ¼ë¡œ)
     private static GameObject FindIncludingInactive(string name)
     {
         var all = Resources.FindObjectsOfTypeAll<GameObject>();
@@ -170,24 +171,24 @@ public class PlayerInfoPresenter : MonoBehaviour
         return null;
     }
 
-    // ·çÆ®¿¡¼­ ½ÇÁ¦ µå·¡±×·Î ÀÌµ¿ÇÏ´Â "Ã¢ ÆĞ³Î" RT Ã£±â
-    // ±ÔÄ¢: ·çÆ® ÇÏÀ§¿¡¼­ UIDragHandler¸¦ Ã£°í, ±× ÇÚµé·¯ÀÇ parent RT¸¦ ¹İÈ¯. ¾øÀ¸¸é ·çÆ®ÀÇ RT.
-    // ¡Ú °øÅë: ½ÇÁ¦·Î ¿òÁ÷ÀÏ "Ã¢ ·çÆ®" RT¸¦ ¾ò´Â´Ù.
-    // ±ÔÄ¢:
-    //  1) root ÇÏÀ§¿¡¼­ ÀÌ¸§ÀÌ "HeadPanel"ÀÎ Æ®·£½ºÆûÀ» Ã£°í -> ±× parent RT¸¦ Ã¢ ·çÆ®·Î »ç¿ë
-    //  2) ¾øÀ¸¸é rootÀÇ RectTransform »ç¿ë
-    //  3) ¸¶Áö¸·À¸·Î CanvasÀÇ 'Á÷°è ÀÚ½Ä' ·¹º§±îÁö Å¸°í ¿Ã¶ó°¡ ÅëÀÏ
+    // ë£¨íŠ¸ì—ì„œ ì‹¤ì œ ë“œë˜ê·¸ë¡œ ì´ë™í•˜ëŠ” "ì°½ íŒ¨ë„" RT ì°¾ê¸°
+    // ê·œì¹™: ë£¨íŠ¸ í•˜ìœ„ì—ì„œ UIDragHandlerë¥¼ ì°¾ê³ , ê·¸ í•¸ë“¤ëŸ¬ì˜ parent RTë¥¼ ë°˜í™˜. ì—†ìœ¼ë©´ ë£¨íŠ¸ì˜ RT.
+    // â˜… ê³µí†µ: ì‹¤ì œë¡œ ì›€ì§ì¼ "ì°½ ë£¨íŠ¸" RTë¥¼ ì–»ëŠ”ë‹¤.
+    // ê·œì¹™:
+    //  1) root í•˜ìœ„ì—ì„œ ì´ë¦„ì´ "HeadPanel"ì¸ íŠ¸ëœìŠ¤í¼ì„ ì°¾ê³  -> ê·¸ parent RTë¥¼ ì°½ ë£¨íŠ¸ë¡œ ì‚¬ìš©
+    //  2) ì—†ìœ¼ë©´ rootì˜ RectTransform ì‚¬ìš©
+    //  3) ë§ˆì§€ë§‰ìœ¼ë¡œ Canvasì˜ 'ì§ê³„ ìì‹' ë ˆë²¨ê¹Œì§€ íƒ€ê³  ì˜¬ë¼ê°€ í†µì¼
     private static RectTransform GetMovableWindowRT(GameObject root)
     {
         if (!root) return null;
 
         RectTransform cand = null;
 
-        // 1) HeadPanel ¿ì¼±
+        // 1) HeadPanel ìš°ì„ 
         var head = root.transform.Find("HeadPanel");
         if (head == null)
         {
-            // È¤½Ã ´õ ±íÀÌ ÀÖÀ» ¼ö ÀÖÀ¸´Ï ÀüÃ¼ Å½»ö
+            // í˜¹ì‹œ ë” ê¹Šì´ ìˆì„ ìˆ˜ ìˆìœ¼ë‹ˆ ì „ì²´ íƒìƒ‰
             foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
             {
                 if (t.name == "HeadPanel") { head = t; break; }
@@ -196,21 +197,21 @@ public class PlayerInfoPresenter : MonoBehaviour
 
         if (head && head.parent is RectTransform headParentRT)
         {
-            cand = headParentRT; // HeadPanelÀÇ ºÎ¸ğ°¡ 'Ã¢ ·çÆ®'
+            cand = headParentRT; // HeadPanelì˜ ë¶€ëª¨ê°€ 'ì°½ ë£¨íŠ¸'
         }
         else
         {
-            // 2) fallback: rootÀÇ RT
+            // 2) fallback: rootì˜ RT
             cand = root.GetComponent<RectTransform>();
         }
 
         if (!cand) return null;
 
-        // 3) Canvas Á÷°è ÀÚ½Ä ·¹º§±îÁö ²ø¾î¿Ã¸®±â(¾çÂÊ ÆĞ³ÎÀ» µ¿ÀÏ ·¹º§·Î ÅëÀÏ)
+        // 3) Canvas ì§ê³„ ìì‹ ë ˆë²¨ê¹Œì§€ ëŒì–´ì˜¬ë¦¬ê¸°(ì–‘ìª½ íŒ¨ë„ì„ ë™ì¼ ë ˆë²¨ë¡œ í†µì¼)
         RectTransform cur = cand;
         while (cur && cur.parent is RectTransform prt)
         {
-            if (prt.GetComponent<Canvas>() != null) break; // prt°¡ Canvas ¡æ cur´Â Canvas Á÷°è
+            if (prt.GetComponent<Canvas>() != null) break; // prtê°€ Canvas â†’ curëŠ” Canvas ì§ê³„
             cur = prt;
         }
         return cur;
@@ -218,7 +219,7 @@ public class PlayerInfoPresenter : MonoBehaviour
 
     void OnEnable()
     {
-        // ¡Ú ÇÃ·¹ÀÌ¾î/¸Å´ÏÀú ÁØºñµÉ ¶§±îÁö ´ë±â ÈÄ ÀÌº¥Æ® ±¸µ¶
+        // â˜… í”Œë ˆì´ì–´/ë§¤ë‹ˆì € ì¤€ë¹„ë  ë•Œê¹Œì§€ ëŒ€ê¸° í›„ ì´ë²¤íŠ¸ êµ¬ë…
         initRoutine = StartCoroutine(InitializeWhenReady());
     }
 
@@ -228,25 +229,25 @@ public class PlayerInfoPresenter : MonoBehaviour
         UnsubscribeStatEvents();
     }
 
-    private IEnumerator InitializeWhenReady()     // ¡Ú Ãß°¡
+    private IEnumerator InitializeWhenReady()     // â˜… ì¶”ê°€
     {
-        // PlayerStatsManager.Instance ´ë±â
+        // PlayerStatsManager.Instance ëŒ€ê¸°
         while (PlayerStatsManager.Instance == null) yield return null;
         ps = PlayerStatsManager.Instance;
 
-        // UI ÂüÁ¶°¡ ¾ÆÁ÷ nullÀÌ¸é ÇÑ ÇÁ·¹ÀÓ Á¤µµ ´õ ´ë±â
+        // UI ì°¸ì¡°ê°€ ì•„ì§ nullì´ë©´ í•œ í”„ë ˆì„ ì •ë„ ë” ëŒ€ê¸°
         if (playerInfoUI == null)
         {
             yield return null;
             playerInfoUI = GameObject.Find("PlayerInfoUI") ?? playerInfoUI;
         }
 
-        // ÀÌº¥Æ® ±¸µ¶ & Ã¹ °»½Å
+        // ì´ë²¤íŠ¸ êµ¬ë… & ì²« ê°±ì‹ 
         SubscribeStatEvents();
         RefreshStatsText();
     }
 
-    private void SubscribeStatEvents()            // ¡Ú Ãß°¡
+    private void SubscribeStatEvents()            // â˜… ì¶”ê°€
     {
         if (ps == null) return;
 
@@ -261,7 +262,7 @@ public class PlayerInfoPresenter : MonoBehaviour
         ps.OnLevelUp += OnLevelUp;
     }
 
-    private void UnsubscribeStatEvents()          // ¡Ú Ãß°¡
+    private void UnsubscribeStatEvents()          // â˜… ì¶”ê°€
     {
         if (ps == null) return;
 
@@ -271,14 +272,14 @@ public class PlayerInfoPresenter : MonoBehaviour
         ps.OnLevelUp -= OnLevelUp;
     }
 
-    // ===== ÀÌº¥Æ® ÇÚµé·¯: ÀüºÎ ÅØ½ºÆ® ¸®ÇÁ·¹½Ã·Î ¿¬°á =====
+    // ===== ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬: ì „ë¶€ í…ìŠ¤íŠ¸ ë¦¬í”„ë ˆì‹œë¡œ ì—°ê²° =====
     private void OnHPChanged(float cur, float max) => RefreshStatsText();
     private void OnMPChanged(float cur, float max) => RefreshStatsText();
     private void OnExpChanged(int level, float exp) => RefreshStatsText();
     private void OnLevelUp(int level) => RefreshStatsText();
 
-    // ===== Start/Update/Toggle/Open/Close µî ±âÁ¸ ·ÎÁ÷Àº ±×´ë·Î µÎ°í,
-    //      Open()¿¡¼­ ÇÑ ¹ø ´õ RefreshStatsText() È£ÃâÇÏ´Â Á¤µµ¸¸ À¯Áö =====
+    // ===== Start/Update/Toggle/Open/Close ë“± ê¸°ì¡´ ë¡œì§ì€ ê·¸ëŒ€ë¡œ ë‘ê³ ,
+    //      Open()ì—ì„œ í•œ ë²ˆ ë” RefreshStatsText() í˜¸ì¶œí•˜ëŠ” ì •ë„ë§Œ ìœ ì§€ =====
 
     void Start()
     {
@@ -287,7 +288,16 @@ public class PlayerInfoPresenter : MonoBehaviour
         exitButton = playerInfoUI.transform.GetChild(4).GetComponent<Button>();
         sprites = new Sprite[8];
         sprites = Resources.LoadAll<Sprite>("CharacterIcons");
-        statsText = playerInfoUI.transform.GetChild(7).GetComponent<Text>();
+        statsLabelText = playerInfoUI.transform.GetChild(7).transform.GetChild(0).GetComponent<Text>();
+        statsValueText = playerInfoUI.transform.GetChild(7).transform.GetChild(1).GetComponent<Text>();
+
+        // ğŸ”¸ ê°’ í…ìŠ¤íŠ¸ë¥¼ ìš°ì¸¡ ì •ë ¬
+        if (statsValueText)
+        {
+            statsValueText.alignment = TextAnchor.UpperRight;
+            statsValueText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            statsValueText.verticalOverflow = VerticalWrapMode.Truncate;
+        }
 
         var ps = PlayerStatsManager.Instance;
         string race = (ps != null && ps.Data != null && !string.IsNullOrEmpty(ps.Data.Race))
@@ -314,12 +324,12 @@ public class PlayerInfoPresenter : MonoBehaviour
 
         if (!playerInfoUI)
         {
-            Debug.LogError("[PlayerInfoPresenter] playerInfoUI¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+            Debug.LogError("[PlayerInfoPresenter] playerInfoUIë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
             enabled = false;
             return;
         }
 
-        // ½ÇÁ¦ ¿òÁ÷ÀÌ´Â RT·Î ¼¼ÆÃ
+        // ì‹¤ì œ ì›€ì§ì´ëŠ” RTë¡œ ì„¸íŒ…
         playerInfoRect = GetMovableWindowRT(playerInfoUI);
         equipmentRect = GetMovableWindowRT(equipmentUI);
 
@@ -342,7 +352,7 @@ public class PlayerInfoPresenter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            // ÀüÈ¯ Á÷Àü: ÀåºñÃ¢ÀÌ ÄÑÁ® ÀÖÀ¸¸é, ÀåºñÃ¢ÀÇ "¿òÁ÷ÀÌ´Â RT" ±âÁØÀ¸·Î ½º³À¼¦ ÀúÀå + ·¹ÀÌ¾Æ¿ô º¹»ç
+            // ì „í™˜ ì§ì „: ì¥ë¹„ì°½ì´ ì¼œì ¸ ìˆìœ¼ë©´, ì¥ë¹„ì°½ì˜ "ì›€ì§ì´ëŠ” RT" ê¸°ì¤€ìœ¼ë¡œ ìŠ¤ëƒ…ìƒ· ì €ì¥ + ë ˆì´ì•„ì›ƒ ë³µì‚¬
             var eqPresenter = FindAnyObjectByType<EquipmentPresenter>();
             bool equipWasOpen = eqPresenter && eqPresenter.IsOpen;
 
@@ -361,7 +371,7 @@ public class PlayerInfoPresenter : MonoBehaviour
             {
                 eqPresenter.CloseEquipmentPublic();
 
-                // (¼±ÅÃ) ÇöÀç PI À§Ä¡¸¦ ÀåºñÂÊ¿¡µµ ¹İ¿µÇØµÎ°í ´İ±â
+                // (ì„ íƒ) í˜„ì¬ PI ìœ„ì¹˜ë¥¼ ì¥ë¹„ìª½ì—ë„ ë°˜ì˜í•´ë‘ê³  ë‹«ê¸°
                 if (playerInfoRect && equipmentRect)
                     UIPanelSwitcher.CopyLayoutRT(playerInfoRect, equipmentRect);
             }
@@ -387,7 +397,7 @@ public class PlayerInfoPresenter : MonoBehaviour
     {
         if (isOpen || !playerInfoUI) return;
 
-        // 1Â÷ Àû¿ë(¸ÔÀ» ¶§µµ ÀÖÀ½)
+        // 1ì°¨ ì ìš©(ë¨¹ì„ ë•Œë„ ìˆìŒ)
         if (playerInfoRect && UIPanelSwitcher.HasSnapshot)
         {
             Debug.Log($"[SNAP] Load  to: {PathOf(playerInfoRect)}");
@@ -398,19 +408,19 @@ public class PlayerInfoPresenter : MonoBehaviour
         isOpen = true;
         UIEscapeStack.Instance.Push("playerinfo", Close, () => isOpen);
 
-        // ¡Ú Ãß°¡: ¿­¸± ¶§ ÃÖ½Å ½ºÅÈ °»½Å
+        // â˜… ì¶”ê°€: ì—´ë¦´ ë•Œ ìµœì‹  ìŠ¤íƒ¯ ê°±ì‹ 
         RefreshStatsText();
 
-        // ¡Ú ÇÙ½É: È°¼ºÈ­·Î ÀÎÇÑ ·¹ÀÌ¾Æ¿ô ¸®ºôµå°¡ ³¡³­ "´ÙÀ½ ÇÁ·¹ÀÓ"¿¡ ´Ù½Ã º¹¿ø
+        // â˜… í•µì‹¬: í™œì„±í™”ë¡œ ì¸í•œ ë ˆì´ì•„ì›ƒ ë¦¬ë¹Œë“œê°€ ëë‚œ "ë‹¤ìŒ í”„ë ˆì„"ì— ë‹¤ì‹œ ë³µì›
         if (playerInfoRect && UIPanelSwitcher.HasSnapshot)
             StartCoroutine(ReapplySnapshotNextFrame(playerInfoRect));
     }
 
     private System.Collections.IEnumerator ReapplySnapshotNextFrame(RectTransform rt)
     {
-        yield return null; // ÇÑ ÇÁ·¹ÀÓ ´ë±â (SetActive ¡æ ºÎ¸ğ ·¹ÀÌ¾Æ¿ô ¸®ºôµå ³¡³­ µÚ)
+        yield return null; // í•œ í”„ë ˆì„ ëŒ€ê¸° (SetActive â†’ ë¶€ëª¨ ë ˆì´ì•„ì›ƒ ë¦¬ë¹Œë“œ ëë‚œ ë’¤)
         Debug.Log($"[SNAP] Load  to: {PathOf(playerInfoRect)}");
-        UIPanelSwitcher.LoadSnapshot(rt);           // ½º³À¼¦ ÀçÀû¿ë
+        UIPanelSwitcher.LoadSnapshot(rt);           // ìŠ¤ëƒ…ìƒ· ì¬ì ìš©
         Canvas.ForceUpdateCanvases();
         var prt = rt.parent as RectTransform;
         if (prt) UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(prt);
@@ -421,7 +431,7 @@ public class PlayerInfoPresenter : MonoBehaviour
     {
         if (!isOpen || !playerInfoUI) return;
 
-        // ´İÈ÷±â Á÷Àü ÇöÀç À§Ä¡ ½º³À¼¦ ÀúÀå (¿òÁ÷ÀÌ´Â RT)
+        // ë‹«íˆê¸° ì§ì „ í˜„ì¬ ìœ„ì¹˜ ìŠ¤ëƒ…ìƒ· ì €ì¥ (ì›€ì§ì´ëŠ” RT)
         if (playerInfoRect)
             UIPanelSwitcher.SaveSnapshot(playerInfoRect);
 
@@ -430,34 +440,74 @@ public class PlayerInfoPresenter : MonoBehaviour
         UIEscapeStack.Instance.Remove("playerinfo");
     }
 
-    // ¡Ú Ãß°¡: ½ºÅÈ ÅØ½ºÆ® °»½Å ÇÔ¼ö (¿ÜºÎ¿¡¼­µµ È£Ãâ °¡´É)
+    private static string GetRaceDisplayName(string race)
+    {
+        if (string.IsNullOrEmpty(race)) return "ì¸ê°„";
+        switch (race.ToLowerInvariant())
+        {
+            case "humanmale": return "ì¸ê°„";
+            case "dwarfmale": return "ë“œì›Œí”„";
+            case "gnomemale": return "ë…¸ì›€";
+            case "nightelfmale": return "ì—˜í”„";
+            case "orcmale": return "ì˜¤í¬";
+            case "trollmale": return "íŠ¸ë¡¤";
+            case "goblinmale": return "ê³ ë¸”ë¦°";
+            case "scourgefemale": return "ì–¸ë°ë“œ";
+            default: return race; // ì•Œ ìˆ˜ ì—†ìœ¼ë©´ ì›ë¬¸ í‘œì‹œ
+        }
+    }
+
+    // â˜… ì¶”ê°€: ìŠ¤íƒ¯ í…ìŠ¤íŠ¸ ê°±ì‹  í•¨ìˆ˜ (ì™¸ë¶€ì—ì„œë„ í˜¸ì¶œ ê°€ëŠ¥)
     public void RefreshStatsText()
     {
-        if (!statsText) return;
-
         var ps = PlayerStatsManager.Instance;
         var d = ps != null ? ps.Data : null;
+        var displayRace = GetRaceDisplayName(d.Race);
+
+        // í´ë°±: ë°ì´í„° ì—†ìœ¼ë©´ ê¸°ì¡´ ë™ì‘
         if (d == null)
         {
-            statsText.text = "½ºÅÈ µ¥ÀÌÅÍ¸¦ ºÒ·¯¿Ã ¼ö ¾ø½À´Ï´Ù.";
+            if (statsLabelText) statsLabelText.text = "";
+            if (statsValueText) statsValueText.text = "";
             return;
         }
 
-        // º¸±â ÁÁÀº Æ÷¸ËÀ¸·Î Á¤¸®
-        var sb = new StringBuilder();
-        sb.AppendLine($"Á¾Á· : {d.Race}");
-        sb.AppendLine($"·¹º§ : {d.Level}");
-        sb.AppendLine($"°æÇèÄ¡(EXP) : {d.Exp:#,0} / {d.ExpToNextLevel:#,0}");
-        sb.AppendLine();
-        sb.AppendLine($"HP : {d.CurrentHP:#,0.##} / {d.MaxHP:#,0.##}");
-        sb.AppendLine($"MP : {d.CurrentMP:#,0.##} / {d.MaxMP:#,0.##}");
-        sb.AppendLine($"µ¥¹ÌÁö(ATK) : {d.Atk:#,0.##}");
-        sb.AppendLine($"¹æ¾î·Â(DEF) : {d.Def:#,0.##}");
-        sb.AppendLine($"¹ÎÃ¸¼º(DEX) : {d.Dex:#,0.##}");
-        sb.AppendLine($"°ø°İ ¼Óµµ(AS) : {d.AttackSpeed:#,0.##}");
-        sb.AppendLine($"Ä¡¸íÅ¸ È®·ü(CC) : {d.CritChance * 100f:0.##}%");
-        sb.AppendLine($"Ä¡¸íÅ¸ µ¥¹ÌÁö(CD) : {d.CritDamage:0.##}x");
+        // ğŸ”¸ ë‘ ì—´ì´ ì¡´ì¬í•˜ë©´ ë¼ë²¨/ê°’ì„ ë¶„ë¦¬í•´ì„œ ì¶œë ¥ (ê°’ì€ ì˜¤ë¥¸ìª½ ì •ë ¬)
+        if (statsLabelText && statsValueText)
+        {
+            // ë¼ë²¨ ë¹Œë“œ (ì™¼ìª½)
+            var labels = new System.Text.StringBuilder();
+            labels.AppendLine("ì¢…ì¡±");
+            labels.AppendLine("ë ˆë²¨");
+            labels.AppendLine("ê²½í—˜ì¹˜");
+            labels.AppendLine();
+            labels.AppendLine("HP");
+            labels.AppendLine("MP");
+            labels.AppendLine("ë°ë¯¸ì§€(ATK)");
+            labels.AppendLine("ë°©ì–´ë ¥(DEF)");
+            labels.AppendLine("ë¯¼ì²©ì„±(DEX)");
+            labels.AppendLine("ê³µê²© ì†ë„(AS)");
+            labels.AppendLine("ì¹˜ëª…íƒ€ í™•ë¥ (CC)");
+            labels.AppendLine("ì¹˜ëª…íƒ€ ë°ë¯¸ì§€(CD)");
 
-        statsText.text = sb.ToString();
+            // ê°’ ë¹Œë“œ (ì˜¤ë¥¸ìª½ ì •ë ¬ì€ Text ì„¤ì •ìœ¼ë¡œ ì²˜ë¦¬)
+            var values = new System.Text.StringBuilder();
+            values.AppendLine($"{displayRace}");
+            values.AppendLine($"{d.Level}");
+            values.AppendLine($"{d.Exp:#,0} / {d.ExpToNextLevel:#,0}");
+            values.AppendLine();
+            values.AppendLine($"{d.CurrentHP:#,0.##} / {d.MaxHP:#,0.##}");
+            values.AppendLine($"{d.CurrentMP:#,0.##} / {d.MaxMP:#,0.##}");
+            values.AppendLine($"{d.Atk:#,0.##}");
+            values.AppendLine($"{d.Def:#,0.##}");
+            values.AppendLine($"{d.Dex:#,0.##}");
+            values.AppendLine($"{d.AttackSpeed:#,0.##}");
+            values.AppendLine($"{d.CritChance * 100f:0.##}%");
+            values.AppendLine($"{d.CritDamage:0.##}x");
+
+            statsLabelText.text = labels.ToString();
+            statsValueText.text = values.ToString();
+            return;
+        }
     }
 }
