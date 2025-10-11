@@ -1,120 +1,13 @@
-//using UnityEngine;
-//using UnityEngine.UI;
-//using UnityEngine.EventSystems;
-
-//public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
-//{
-//    [Header("Refs")]
-//    public Image icon;                 // ÀÚ½Ä "Icon"
-//    public GameObject lockOverlay;     // ÀÚ½Ä "LockOverlay"
-//    [SerializeField] private Image bg; // ÀÚ½Ä "Bg" (¼±ÅÃ)
-
-//    [Header("Runtime")]
-//    public string SkillId { get; private set; }
-//    public int UnlockLevel { get; private set; }
-//    public bool Unlocked { get; private set; }
-//    public Sprite IconSprite { get; private set; }
-
-//    private Canvas rootCanvas;
-//    private Image ghost;
-
-//    void Awake()
-//    {
-//        rootCanvas = GetComponentInParent<Canvas>();
-
-//        if (bg) bg.raycastTarget = false;
-
-//        if (icon)
-//        {
-//            icon.preserveAspect = true;
-//            icon.raycastTarget = false;
-//            // ¿©±â¼­´Â ´õ ÀÌ»ó ²¨µÎÁö ¾ÊÀ½
-//            // icon.enabled = false;  ¡ç Á¦°Å
-//        }
-//    }
-
-//    void OnEnable()
-//    {
-//        EnsureIconVisibility();
-//    }
-
-//    public void Setup(string id, Sprite sp, int unlockLv, bool unlocked)
-//    {
-//        SkillId = id;
-//        UnlockLevel = unlockLv;
-//        IconSprite = sp;
-//        Unlocked = unlocked;
-
-//        if (icon) icon.sprite = sp;
-//        if (lockOverlay) lockOverlay.SetActive(!unlocked);
-
-//        EnsureIconVisibility();
-//    }
-
-//    public void SetUnlocked(bool unlocked)
-//    {
-//        Unlocked = unlocked;
-//        if (lockOverlay) lockOverlay.SetActive(!unlocked);
-//        EnsureIconVisibility();
-//    }
-
-//    private void EnsureIconVisibility()
-//    {
-//        // ¾ÆÀÌÄÜ ½ºÇÁ¶óÀÌÆ®°¡ ÀÖÀ¸¸é Ç×»ó º¸ÀÌ°Ô
-//        if (icon)
-//            icon.enabled = (IconSprite != null || icon.sprite != null);
-
-//        // ÇÊ¿äÇÏ¸é »öµµ Á¶Àı °¡´É(¿¹: Àá±İ ½Ã ¹İÅõ¸í)
-//        // if (icon) icon.color = Unlocked ? Color.white : new Color(1,1,1,0.7f);
-//    }
-
-//    // ===== Drag =====
-//    public void OnBeginDrag(PointerEventData e)
-//    {
-//        if (!Unlocked || icon == null || icon.sprite == null) return;
-
-//        ghost = new GameObject("Ghost", typeof(Image)).GetComponent<Image>();
-//        ghost.raycastTarget = false;
-//        ghost.transform.SetParent(rootCanvas.transform, false);
-//        ghost.rectTransform.sizeDelta = icon.rectTransform.rect.size;
-//        ghost.sprite = icon.sprite;
-//        ghost.color = new Color(1, 1, 1, 0.8f);
-
-//        UpdateGhost(e);
-//    }
-
-//    public void OnDrag(PointerEventData e)
-//    {
-//        if (ghost) UpdateGhost(e);
-//    }
-
-//    public void OnEndDrag(PointerEventData e)
-//    {
-//        if (ghost) Destroy(ghost.gameObject);
-//        ghost = null;
-//    }
-
-//    void UpdateGhost(PointerEventData e)
-//    {
-//        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-//            rootCanvas.transform as RectTransform,
-//            e.position,
-//            rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera,
-//            out var local
-//        );
-//        ghost.rectTransform.anchoredPosition = local;
-//    }
-//}
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Refs")]
-    public Image icon;                 // ÀÚ½Ä "Icon"
-    public GameObject lockOverlay;     // ÀÚ½Ä "LockOverlay"
-    [SerializeField] private Image bg; // ÀÚ½Ä "Bg" (¼±ÅÃ)
+    public Image icon;                 // ìì‹ "Icon"
+    public GameObject lockOverlay;     // ìì‹ "LockOverlay"
+    [SerializeField] private Image bg; // ìì‹ "Bg" (ì„ íƒ)
 
     [Header("Runtime")]
     public string SkillId { get; private set; }
@@ -134,11 +27,26 @@ public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHan
         if (icon)
         {
             icon.preserveAspect = true;
-            icon.raycastTarget = false; // µå·¡±×½Ã ¸¶¿ì½º ÇÈ Â÷´Ü
+            icon.raycastTarget = false; // ë“œë˜ê·¸ì‹œ ë§ˆìš°ìŠ¤ í”½ ì°¨ë‹¨
         }
     }
 
     void OnEnable() => EnsureIconVisibility();
+
+    // ğŸ”¹ íŒ¨ë„/ì•„ì´í…œì´ êº¼ì§ˆ ë•Œ ë–  ìˆëŠ” ê³ ìŠ¤íŠ¸ ì •ë¦¬
+    void OnDisable()
+    {
+        ForceEndDrag();
+    }
+
+    public void ForceEndDrag()
+    {
+        if (ghost)
+        {
+            Destroy(ghost.gameObject);
+            ghost = null;
+        }
+    }
 
     public void Setup(string id, Sprite sp, int unlockLv, bool unlocked)
     {
@@ -162,10 +70,10 @@ public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHan
 
     private void EnsureIconVisibility()
     {
-        // ¾ÆÀÌÄÜ ½ºÇÁ¶óÀÌÆ®°¡ ÀÖÀ¸¸é Ç×»ó º¸ÀÌ°Ô
+        // ì•„ì´ì½˜ ìŠ¤í”„ë¼ì´íŠ¸ê°€ ìˆìœ¼ë©´ í•­ìƒ ë³´ì´ê²Œ
         if (icon)
             icon.enabled = (IconSprite != null || icon.sprite != null);
-        // Àá±İ »óÅÂ¶ó¸é ¾à°£ÀÇ ¾ËÆÄ¸¦ ÁÙ ¼öµµ ÀÖÀ½ (¿øÇÏ¸é ÁÖ¼® ÇØÁ¦)
+        // ì ê¸ˆ ìƒíƒœë¼ë©´ ì•½ê°„ì˜ ì•ŒíŒŒë¥¼ ì¤„ ìˆ˜ë„ ìˆìŒ (ì›í•˜ë©´ ì£¼ì„ í•´ì œ)
         // if (icon) icon.color = Unlocked ? Color.white : new Color(1, 1, 1, 0.7f);
     }
 
@@ -182,7 +90,7 @@ public class SkillBookItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHan
         ghost.sprite = icon.sprite;
         ghost.color = new Color(1, 1, 1, 0.85f);
 
-        // ¾ÆÀÌÄÜ Å©±â¿¡ ¸ÂÃç »çÀÌÁî
+        // ì•„ì´ì½˜ í¬ê¸°ì— ë§ì¶° ì‚¬ì´ì¦ˆ
         var size = icon.rectTransform.rect.size;
         ghost.rectTransform.sizeDelta = size;
 
