@@ -94,10 +94,10 @@ public class ItemTooltipManager : MonoBehaviour
         if (string.IsNullOrEmpty(tier)) return Color.white;
         switch (tier.ToLower())
         {
-            case "common": return Color.white;
-            case "uncommon": return new Color32(50, 205, 50, 255);   // 연두
+            case "normal": return Color.white;
+            case "magic": return new Color32(50, 205, 50, 255);   // 연두
             case "rare": return new Color32(0, 128, 255, 255);   // 파랑
-            case "unique": return new Color32(170, 0, 255, 255);   // 보라
+            case "unique": return new Color32(255, 0, 144, 255);   // 보라
             case "legendary": return new Color32(255, 215, 0, 255);   // 금색
             default: return Color.white;
         }

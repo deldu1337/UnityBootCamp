@@ -149,6 +149,7 @@ public class PlayerInfoPresenter : MonoBehaviour
 
     private Button InfoButton;
     private Image image;
+    private Image playerInfoImage;
     private Sprite[] sprites;
     private RectTransform playerInfoRect;   // ★ 실제로 움직이는 RT
     private RectTransform equipmentRect;    // ★ 실제로 움직이는 RT
@@ -312,12 +313,16 @@ public class PlayerInfoPresenter : MonoBehaviour
         }
 
         image = InfoButton.GetComponent<Image>();
+        playerInfoImage = playerInfoUI.transform.GetChild(8).transform.GetChild(0).GetComponent<Image>();
 
         for (int i = 0; i < sprites.Length; i++)
         {
             Debug.Log(sprites[i].name);
-            if(sprites[i].name == race)
+            if (sprites[i].name == race)
+            {
                 image.sprite = sprites[i];
+                playerInfoImage.sprite = sprites[i];
+            }
         }
 
         UIEscapeStack.GetOrCreate();

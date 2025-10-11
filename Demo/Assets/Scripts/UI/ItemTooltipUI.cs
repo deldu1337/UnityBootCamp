@@ -38,27 +38,6 @@ public class ItemTooltipUI : MonoBehaviour
 
     private static readonly Color32 MaxRollColor = new Color32(73, 221, 223, 255); // 73,221,223,255
 
-    //void Awake()
-    //{
-    //    Instance = this;
-    //    if (canvas == null) canvas = GetComponentInParent<Canvas>();
-    //    if (root == null) root = transform as RectTransform;
-
-    //    root.anchorMin = root.anchorMax = new Vector2(0.5f, 0.5f);
-    //    root.pivot = new Vector2(0f, 0.5f);
-
-    //    if (nameText) nameText.color = Color.white;
-    //    if (levelText) levelText.color = Color.white;
-    //    if (typeText) typeText.color = Color.white;
-
-    //    if (statsText)
-    //    {
-    //        statsText.color = new Color32(100, 96, 219, 255);
-    //        statsText.supportRichText = true; // 라인별 색상 사용
-    //    }
-
-    //    gameObject.SetActive(false);
-    //}
     void Awake()
     {
         Instance = this;
@@ -431,10 +410,10 @@ public class ItemTooltipUI : MonoBehaviour
 
         switch (tier.Trim().ToLower())
         {
-            case "common": return Color.white;
-            case "uncommon": return new Color32(50, 205, 50, 255);
+            case "normal": return Color.white;
+            case "magic": return new Color32(50, 205, 50, 255);
             case "rare": return new Color32(255, 128, 0, 255);
-            case "unique": return new Color32(170, 0, 255, 255);
+            case "unique": return new Color32(255, 0, 144, 255);
             case "legendary": return new Color32(255, 215, 0, 255);
             default: return Color.white;
         }
